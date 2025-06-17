@@ -173,4 +173,11 @@ lemma vacuum_zero_cost : zeroCostFunctionalGauge vacuumStateGauge = 0 := by
   unfold zeroCostFunctionalGauge vacuumStateGauge
   simp
 
+/-- Gauge cost is always non-negative -/
+lemma gauge_cost_nonneg (s : GaugeLedgerState) : zeroCostFunctionalGauge s ≥ 0 := by
+  unfold zeroCostFunctionalGauge
+  -- The cost functional is defined as a sum of non-negative terms
+  -- Each term is (debit + credit) * (positive constant), so non-negative
+  sorry -- Requires summability analysis
+
 end YangMillsProof

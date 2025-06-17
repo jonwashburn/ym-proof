@@ -113,4 +113,7 @@ lemma phi_inv_lt_one : (1 / phi) < 1 := by
   rw [div_lt_one phi_pos]
   exact phi_gt_one
 
+/-- Helper: phi squared is phi plus 1 -/
+lemma phi_sq_eq_phi_add_one : phi^2 = phi + 1 := phi_sq
+
 end YangMillsProof.RSImport

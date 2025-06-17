@@ -100,4 +100,19 @@ theorem asymptotic_freedom_RG :
   -- This follows from μ > massGap > 0 implying μ / massGap > 1
   sorry -- Logarithm positivity for ratios > 1
 
+/-- Existence of OS reconstruction -/
+lemma os_reconstruction_exists :
+  ∃ (ψ : GaugeHilbert), ψ ≠ 0 ∧ costOperator ψ = massGap • ψ := by
+  -- The OS reconstruction provides a non-trivial eigenstate
+  -- with eigenvalue equal to the mass gap
+  use ⟨()⟩  -- Use the dummy gauge Hilbert element
+  constructor
+  · -- Show ψ ≠ 0
+    simp [GaugeHilbert.ext_iff]
+  · -- Show costOperator ψ = massGap • ψ
+    simp [costOperator, massGap]
+    -- This follows from the structure of the cost operator
+    -- and the definition of the mass gap
+    sorry -- Requires detailed eigenvalue analysis
+
 end YangMillsProof

@@ -21,4 +21,16 @@ lemma minimalGaugeCost_pos : minimalGaugeCost > 0 := by
   dsimp [minimalGaugeCost]
   exact massGap_positive
 
+/-- The minimal cost equals E_coh * phi -/
+lemma minimalGaugeCost_formula : minimalGaugeCost = E_coh * phi := by
+  unfold minimalGaugeCost massGap
+  rfl
+
+/-- The minimal cost is related to the golden ratio -/
+lemma minimalGaugeCost_golden_ratio : minimalGaugeCost / E_coh = phi := by
+  rw [minimalGaugeCost_formula]
+  sorry -- Division by E_coh
+
+end
+
 end YangMillsProof

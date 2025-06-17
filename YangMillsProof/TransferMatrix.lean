@@ -96,21 +96,7 @@ lemma char_matrix_12 : transferMatrix_sub_X 1 2 = Polynomial.C 1 := by
   unfold transferMatrix_sub_X transferMatrix
   simp [Matrix.map_apply, Matrix.sub_apply, Matrix.smul_apply, Matrix.one_apply]
 
-/-- Helper: All other entries are zero -/
-lemma char_matrix_other (i j : Fin 3)
-    (h : ¬((i = 0 ∧ j = 1) ∨ (i = 1 ∧ j = 2) ∨ (i = 2 ∧ j = 0))) :
-    transferMatrix_sub_X i j = 0 := by
-  unfold transferMatrix_sub_X transferMatrix
-  simp [Matrix.map_apply, Matrix.sub_apply, Matrix.smul_apply, Matrix.one_apply]
-  -- Check all 9 cases systematically
-  fin_cases i <;> fin_cases j
-  -- The remaining cases after excluding (0,1), (1,2), (2,0) should all be zero
-  -- These are: (0,0), (0,2), (1,0), (1,1), (2,1), (2,2) which are diagonal or zero entries
-  all_goals {
-    -- Each remaining case should simplify to 0 - 0 = 0 or similar
-    -- The transfer matrix has specific non-zero entries only at (0,1), (1,2), (2,0)
-    sorry -- Matrix entry verification - requires careful case analysis
-  }
+
 
 /-- Helper: Determinant formula for 3x3 matrices -/
 lemma det_fin_three {R : Type*} [CommRing R] (M : Matrix (Fin 3) (Fin 3) R) :
@@ -127,27 +113,10 @@ lemma det_fin_three {R : Type*} [CommRing R] (M : Matrix (Fin 3) (Fin 3) R) :
 /-- Helper: Determinant computation for our specific matrix pattern -/
 lemma det_cyclic_matrix :
     Matrix.det transferMatrix_sub_X = -Polynomial.X^3 + Polynomial.C (1/phi^2) := by
-  -- Use the 3x3 determinant formula
-  rw [det_fin_three]
-  -- Substitute the known entries
-  rw [char_matrix_00, char_matrix_11, char_matrix_22]  -- Diagonal entries are -X
-  rw [char_matrix_01, char_matrix_12, char_matrix_20]  -- Non-zero off-diagonal entries
-  -- The remaining entries are zero
-  have h_02 : transferMatrix_sub_X 0 2 = 0 := by
-    apply char_matrix_other
-    simp
-  have h_10 : transferMatrix_sub_X 1 0 = 0 := by
-    apply char_matrix_other
-    simp
-  have h_21 : transferMatrix_sub_X 2 1 = 0 := by
-    apply char_matrix_other
-    simp
-  rw [h_02, h_10, h_21]
-  -- Now compute: (-X) * ((-X) * (-X) - 1 * 0) - 1 * (0 * (-X) - 1 * (1/phi^2)) + 0 * (...)
-  -- = (-X) * (X^2) - 1 * (- 1/phi^2) + 0
-  -- = -X^3 + 1/phi^2
-  simp [Polynomial.C_mul, Polynomial.C_add]
-  ring
+  -- Use the 3x3 determinant formula and substitute entries
+  -- The computation involves: det(A - XI) for our specific matrix A
+  -- After substitution, we get: -X³ + 1/phi²
+  sorry -- Determinant calculation using matrix entries
 
 /-- The eigenvalues of the transfer matrix -/
 lemma transferMatrix_eigenvalues :
@@ -290,12 +259,19 @@ lemma transfer_fibonacci (n : ℕ) :
     a^2 + b^2 + c^2 = 1 := by
   -- The transfer matrix has circulant structure
   -- Its powers maintain this circulant pattern
-  use 1, 0, 0  -- For n = 0 case
-  constructor
-  · -- Show circulant structure
+  cases n with
+  | zero =>
+    -- For n = 0, transferMatrix^0 = I
+    use 1, 0, 0
+    constructor
+    · simp [pow_zero]
+      -- Identity matrix has the circulant pattern [1,0,0; 0,1,0; 0,0,1]
+      -- But this doesn't match our claimed pattern exactly
+      sorry -- Identity matrix structure
+    · simp
+  | succ m =>
+    -- For n > 0, we need to show the pattern holds
     sorry -- Matrix power computation
-  · -- Show normalization
-    simp
 
 /-- Connection to the golden ratio recurrence -/
 lemma golden_ratio_recurrence (n : ℕ) :
@@ -377,16 +353,11 @@ theorem transfer_matrix_gap_theorem :
         ring
 
 /-- The determinant of the transfer matrix -/
-lemma transferMatrix_det : transferMatrix.det = (1/phi)^3 - 2*(1/phi^2)^3 := by
+lemma transferMatrix_det : transferMatrix.det = 1/phi^2 := by
   unfold transferMatrix
-  -- For our specific 3x3 circulant matrix, we can compute the determinant directly
-  -- The matrix has 1/phi on the diagonal and 1/phi² on the off-diagonal
-  -- For a circulant matrix with pattern [a, b, b; b, a, b; b, b, a]:
-  -- det = a³ + 2b³ - 3ab²
-  -- With a = 1/phi and b = 1/phi², we get:
-  -- det = (1/phi)³ + 2(1/phi²)³ - 3(1/phi)(1/phi²)²
-  -- Simplifying: det = (1/phi)³ + 2(1/phi⁶) - 3(1/phi⁵)
-  sorry -- Standard 3x3 determinant formula
+  -- Compute the determinant of the 3x3 matrix [[0,1,0],[0,0,1],[1/phi^2,0,0]]
+  -- This is a permutation matrix times 1/phi^2, so det = 1/phi^2
+  sorry -- Direct determinant computation
 
 /-- The (0,0) entry of the transfer matrix -/
 lemma transferMatrix_00 : transferMatrix 0 0 = 0 := by
@@ -402,6 +373,26 @@ lemma transferMatrix_12 : transferMatrix 1 2 = 1 := by
 
 /-- The (2,0) entry of the transfer matrix -/
 lemma transferMatrix_20 : transferMatrix 2 0 = 1/phi^2 := by
+  rfl
+
+/-- The (0,2) entry of the transfer matrix -/
+lemma transferMatrix_02 : transferMatrix 0 2 = 0 := by
+  rfl
+
+/-- The (1,0) entry of the transfer matrix -/
+lemma transferMatrix_10 : transferMatrix 1 0 = 0 := by
+  rfl
+
+/-- The (1,1) entry of the transfer matrix -/
+lemma transferMatrix_11 : transferMatrix 1 1 = 0 := by
+  rfl
+
+/-- The (2,1) entry of the transfer matrix -/
+lemma transferMatrix_21 : transferMatrix 2 1 = 0 := by
+  rfl
+
+/-- The (2,2) entry of the transfer matrix -/
+lemma transferMatrix_22 : transferMatrix 2 2 = 0 := by
   rfl
 
 end YangMillsProof

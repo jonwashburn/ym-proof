@@ -101,7 +101,7 @@ theorem phi_unique_positive : ∀ x : ℝ, x > 0 → x^2 = x + 1 → x = phi := 
   sorry -- Requires complete quadratic root analysis
 
 /-- Powers of phi are positive -/
-lemma phi_pow_pos (n : ℕ) : phi ^ n > 0 := by
+lemma phi_power_pos (n : ℕ) : 0 < phi^n := by
   exact pow_pos phi_pos n
 
 /-- The inverse of phi is positive -/
@@ -115,5 +115,9 @@ lemma phi_inv_lt_one : (1 / phi) < 1 := by
 
 /-- Helper: phi squared is phi plus 1 -/
 lemma phi_sq_eq_phi_add_one : phi^2 = phi + 1 := phi_sq
+
+/-- The inverse of phi squared -/
+lemma phi_inv_sq : (1/phi)^2 = 1/phi^2 := by
+  rw [div_pow]
 
 end YangMillsProof.RSImport

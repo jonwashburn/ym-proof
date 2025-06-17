@@ -95,7 +95,7 @@ lemma cost_nonneg (S : LedgerState) : 0 ≤ zeroCostFunctional S := by
 /-- The cost is zero iff the state is vacuum -/
 lemma cost_zero_iff_vacuum (S : LedgerState) :
   zeroCostFunctional S = 0 ↔ S = vacuumState := by
-  sorry -- This requires showing each entry is zero
+  sorry -- Requires showing each entry is zero using summability arguments
 
 /-! ## Recognition Principles as Theorems -/
 
@@ -114,5 +114,10 @@ def eightBeat : ℕ := 8
 lemma eight_beat_product : 2 * 4 = eightBeat := by
   unfold eightBeat
   norm_num
+
+/-- Helper: phi squared minus phi equals 1 -/
+lemma phi_sq_sub_phi : phi^2 - phi = 1 := by
+  rw [phi_sq]
+  ring
 
 end YangMillsProof.RSImport

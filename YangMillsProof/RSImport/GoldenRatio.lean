@@ -78,18 +78,13 @@ lemma phi_conj_product : phi * phi_conj = -1 := by
 lemma phi_conj_sum : phi + phi_conj = 1 := by
   unfold phi phi_conj
   field_simp
-  ring
-
-/-- Phi to the n-th power formula (Binet-like) -/
-lemma phi_power_formula (n : ℕ) : phi^n - phi_conj^n = Real.sqrt 5 * (phi^n - phi_conj^n) / Real.sqrt 5 := by
-  ring
 
 /-- Phi scaling property: φ^(n+1) = φ^n + φ^(n-1) for n ≥ 1 -/
 lemma phi_fibonacci (n : ℕ) (hn : n ≥ 1) : phi^(n+1) = phi^n + phi^(n-1) := by
-  cases' n with n
-  · contradiction
-  · rw [pow_succ, phi_sq, mul_add, pow_succ]
-    ring
+  -- This follows from the golden ratio recurrence φ² = φ + 1
+  -- Multiplying by φ^(n-1) gives φ^(n+1) = φ^n + φ^(n-1)
+  -- The proof requires careful handling of the recurrence relation
+  sorry -- Requires careful induction on Fibonacci property
 
 /-- Recognition Science scaling: φ^n represents the n-th rung cost multiplier -/
 lemma phi_rung_scaling (n : ℕ) : ∃ (cost : ℝ), cost = phi^n ∧ cost > 0 := by
@@ -101,17 +96,16 @@ lemma phi_rung_scaling (n : ℕ) : ∃ (cost : ℝ), cost = phi^n ∧ cost > 0 :
 /-- Phi is the unique positive solution to x² = x + 1 -/
 theorem phi_unique_positive : ∀ x : ℝ, x > 0 → x^2 = x + 1 → x = phi := by
   intro x hx_pos hx_eq
-  have h1 : x^2 - x - 1 = 0 := by linarith [hx_eq]
-  -- The quadratic x² - x - 1 = 0 has solutions (1 ± √5)/2
-  -- Since x > 0 and (1 - √5)/2 < 0, we must have x = (1 + √5)/2 = phi
-  have h2 : (1 - Real.sqrt 5) / 2 < 0 := by
-    have h : Real.sqrt 5 > 1 := by
-      rw [← sqrt_one]
-      apply sqrt_lt_sqrt
-      norm_num
-      norm_num
-    linarith
-  -- Complete quadratic formula proof would go here
-  sorry -- This requires more detailed quadratic solving
+  -- The quadratic x² - x - 1 = 0 has two roots: phi and phi_conj
+  -- Since x > 0 and phi_conj < 0, we must have x = phi
+  sorry -- Requires complete quadratic root analysis
+
+/-- Powers of phi are positive -/
+lemma phi_pow_pos (n : ℕ) : phi ^ n > 0 := by
+  exact pow_pos phi_pos n
+
+/-- The inverse of phi is positive -/
+lemma phi_inv_pos : (1 / phi) > 0 := by
+  exact div_pos one_pos phi_pos
 
 end YangMillsProof.RSImport

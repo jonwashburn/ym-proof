@@ -108,4 +108,9 @@ lemma phi_pow_pos (n : ℕ) : phi ^ n > 0 := by
 lemma phi_inv_pos : (1 / phi) > 0 := by
   exact div_pos one_pos phi_pos
 
+/-- The inverse of phi is less than 1 -/
+lemma phi_inv_lt_one : (1 / phi) < 1 := by
+  rw [div_lt_one phi_pos]
+  exact phi_gt_one
+
 end YangMillsProof.RSImport

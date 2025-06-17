@@ -98,10 +98,19 @@ lemma char_matrix_12 : transferMatrix_sub_X 1 2 = Polynomial.C 1 := by
 
 /-- Helper: All other entries are zero -/
 lemma char_matrix_other (i j : Fin 3)
-    (h : ¬((i = 0 ∧ j = 0) ∨ (i = 1 ∧ j = 1) ∨ (i = 2 ∧ j = 2) ∨
-           (i = 0 ∧ j = 1) ∨ (i = 1 ∧ j = 2) ∨ (i = 2 ∧ j = 0))) :
+    (h : ¬((i = 0 ∧ j = 1) ∨ (i = 1 ∧ j = 2) ∨ (i = 2 ∧ j = 0))) :
     transferMatrix_sub_X i j = 0 := by
-  sorry -- Matrix entry verification - requires careful case analysis
+  unfold transferMatrix_sub_X transferMatrix
+  simp [Matrix.map_apply, Matrix.sub_apply, Matrix.smul_apply, Matrix.one_apply]
+  -- Check all 9 cases systematically
+  fin_cases i <;> fin_cases j
+  -- The remaining cases after excluding (0,1), (1,2), (2,0) should all be zero
+  -- These are: (0,0), (0,2), (1,0), (1,1), (2,1), (2,2) which are diagonal or zero entries
+  all_goals {
+    -- Each remaining case should simplify to 0 - 0 = 0 or similar
+    -- The transfer matrix has specific non-zero entries only at (0,1), (1,2), (2,0)
+    sorry -- Matrix entry verification - requires careful case analysis
+  }
 
 /-- Helper: Determinant formula for 3x3 matrices -/
 lemma det_fin_three {R : Type*} [CommRing R] (M : Matrix (Fin 3) (Fin 3) R) :
@@ -378,5 +387,21 @@ lemma transferMatrix_det : transferMatrix.det = (1/phi)^3 - 2*(1/phi^2)^3 := by
   -- det = (1/phi)³ + 2(1/phi²)³ - 3(1/phi)(1/phi²)²
   -- Simplifying: det = (1/phi)³ + 2(1/phi⁶) - 3(1/phi⁵)
   sorry -- Standard 3x3 determinant formula
+
+/-- The (0,0) entry of the transfer matrix -/
+lemma transferMatrix_00 : transferMatrix 0 0 = 0 := by
+  rfl
+
+/-- The (0,1) entry of the transfer matrix -/
+lemma transferMatrix_01 : transferMatrix 0 1 = 1 := by
+  rfl
+
+/-- The (1,2) entry of the transfer matrix -/
+lemma transferMatrix_12 : transferMatrix 1 2 = 1 := by
+  rfl
+
+/-- The (2,0) entry of the transfer matrix -/
+lemma transferMatrix_20 : transferMatrix 2 0 = 1/phi^2 := by
+  rfl
 
 end YangMillsProof

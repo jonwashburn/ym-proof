@@ -98,21 +98,14 @@ lemma char_matrix_12 : transferMatrix_sub_X 1 2 = Polynomial.C 1 := by
 
 /-- Helper: Compute the (2,1) entry of the characteristic matrix -/
 lemma char_matrix_21 : transferMatrix_sub_X 2 1 = 0 := by
-  unfold transferMatrix_sub_X transferMatrix
-  -- transferMatrix 2 1 = 0 and the matrix multiplication gives 0 - 0 = 0
   sorry -- Matrix entry computation
 
 /-- Helper: Compute the (0,2) entry of the characteristic matrix -/
 lemma char_matrix_02 : transferMatrix_sub_X 0 2 = 0 := by
-  unfold transferMatrix_sub_X transferMatrix
-  -- transferMatrix 0 2 = 0 and the matrix multiplication gives 0 - 0 = 0
   sorry -- Matrix entry computation
 
 /-- Helper: Compute the (1,0) entry of the characteristic matrix -/
 lemma char_matrix_10 : transferMatrix_sub_X 1 0 = 0 := by
-  unfold transferMatrix_sub_X transferMatrix
-  -- transferMatrix 1 0 = 0, and since 1 ≠ 0, the identity matrix entry is 0
-  -- So we get Polynomial.C 0 - Polynomial.X * 0 = 0 - 0 = 0
   sorry -- Matrix entry computation
 
 /-- Helper: Determinant computation for our specific matrix pattern -/
@@ -290,12 +283,12 @@ theorem spectral_gap_confinement :
           -- sin(2π/3) = sin(120°) = √3/2 ≠ 0
           apply ne_of_gt
           -- sin(2π/3) = √3/2 > 0
-          sorry -- Standard trigonometric value sin(2π/3) = √3/2 > 0
+          sorry -- Trigonometric value: sin(2π/3) = √3/2 > 0
         · -- k = 2: sin(4π/3) ≠ 0
           -- sin(4π/3) = sin(240°) = -√3/2 ≠ 0
           apply ne_of_lt
           -- sin(4π/3) = -√3/2 < 0
-          sorry -- Standard trigonometric value sin(4π/3) = -√3/2 < 0
+          sorry -- Trigonometric value: sin(4π/3) = -√3/2 < 0
       -- (1/phi) * sin(2πk/3) ≠ 0 since 1/phi > 0 and sin(2πk/3) ≠ 0
       have h_phi_inv_ne_zero : (1 / phi : ℝ) ≠ 0 := by
         apply ne_of_gt phi_inv_pos

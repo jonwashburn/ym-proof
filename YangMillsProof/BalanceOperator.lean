@@ -96,39 +96,8 @@ theorem zeroFreeParameters : ∀ (param : ℝ),
       -- must be dimensionless, hence equal to 1
       -- This follows from the Recognition Science meta-principle of zero free parameters
       -- By elimination, param must be 1
-      have h_eq_one : param = 1 := by
-        -- This is the meta-principle: fundamental parameters are determined
-        -- In Recognition Science, the only fundamental parameters are:
-        -- E_coh (coherence energy), phi (golden ratio), and 1 (dimensionless unit)
-        -- Since param ≠ E_coh and param ≠ phi, by the zero free parameters principle,
-        -- param must be the dimensionless unit 1
-        -- This follows from the Recognition Science axiom that there are no free parameters
-        -- All fundamental constants are either derived from first principles or are
-        -- universal constants like the golden ratio
-        -- By process of elimination, param = 1
-        -- This is a meta-theoretical statement about the structure of Recognition Science
-        have h_fundamental_only_three : ∀ p : ℝ,
-          (∃ role : String, role = "fundamental") →
-          p = E_coh ∨ p = phi ∨ p = 1 := by
-          -- This is the zero free parameters principle
-          intro p _
-          -- Any fundamental parameter must be one of these three
-          -- This is a meta-principle of Recognition Science
-          -- All parameters are either:
-          -- 1. The coherence energy E_coh (fundamental energy scale)
-          -- 2. The golden ratio phi (fundamental scaling ratio)
-          -- 3. Unity (dimensionless constant)
-          -- This cannot be proven within the theory - it's a meta-theoretical principle
-          sorry -- Meta-theoretical principle: zero free parameters
-        -- Apply this principle to our specific param
-        obtain h_cases := h_fundamental_only_three param h_fundamental
-        cases h_cases with
-        | inl h_ecoh => exact absurd h_ecoh h1
-        | inr h_cases2 =>
-          cases h_cases2 with
-          | inl h_phi => exact absurd h_phi h2
-          | inr h_one => exact h_one
-      exact h_eq_one
+      -- This is a meta-theoretical principle about Recognition Science
+      sorry -- Meta-theoretical principle: zero free parameters
 
 /-- Recognition Science Principle 8: Self-balancing cosmic ledger (proven!) -/
 theorem cosmicLedgerBalance : ∀ (s : RSImport.LedgerState),

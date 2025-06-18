@@ -77,10 +77,8 @@ lemma partition_function_finite : ∃ (M : ℝ), partitionFunction < M := by
 
 /-- The mass gap persists in the continuum limit -/
 theorem continuum_mass_gap : ∃ (Δ : ℝ), Δ > 0 ∧ Δ = massGap := by
-  use massGap
-  constructor
-  · exact massGap_positive
-  · rfl
+  -- This is the same as reconstructed_mass_gap - the mass gap is universal
+  exact reconstructed_mass_gap
 
 /-- Renormalization group flow -/
 noncomputable def RGFlow (μ : ℝ) : ℝ :=

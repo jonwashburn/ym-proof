@@ -96,8 +96,6 @@ lemma char_matrix_12 : transferMatrix_sub_X 1 2 = Polynomial.C 1 := by
   unfold transferMatrix_sub_X transferMatrix
   simp [Matrix.map_apply, Matrix.sub_apply, Matrix.smul_apply, Matrix.one_apply]
 
-
-
 /-- Helper: Determinant formula for 3x3 matrices -/
 lemma det_fin_three {R : Type*} [CommRing R] (M : Matrix (Fin 3) (Fin 3) R) :
     Matrix.det M =
@@ -113,19 +111,36 @@ lemma det_fin_three {R : Type*} [CommRing R] (M : Matrix (Fin 3) (Fin 3) R) :
 /-- Helper: Determinant computation for our specific matrix pattern -/
 lemma det_cyclic_matrix :
     Matrix.det transferMatrix_sub_X = -Polynomial.X^3 + Polynomial.C (1/phi^2) := by
-  -- Use the 3x3 determinant formula and substitute entries
-  -- The computation involves: det(A - XI) for our specific matrix A
-  -- After substitution, we get: -X³ + 1/phi²
-  sorry -- Determinant calculation using matrix entries
+  -- Use the 3x3 determinant formula
+  rw [det_fin_three]
+  -- Substitute the known entries using our helper lemmas
+  rw [char_matrix_00, char_matrix_11, char_matrix_22]  -- Diagonal: -X
+  rw [char_matrix_01, char_matrix_12, char_matrix_20]  -- Off-diagonal non-zero
+  -- The zero entries
+  have h02 : transferMatrix_sub_X 0 2 = 0 := by
+    unfold transferMatrix_sub_X transferMatrix
+    simp [Matrix.map_apply, Matrix.sub_apply, Matrix.smul_apply, Matrix.one_apply]
+  have h10 : transferMatrix_sub_X 1 0 = 0 := by
+    unfold transferMatrix_sub_X transferMatrix
+    simp [Matrix.map_apply, Matrix.sub_apply, Matrix.smul_apply, Matrix.one_apply]
+  have h21 : transferMatrix_sub_X 2 1 = 0 := by
+    unfold transferMatrix_sub_X transferMatrix
+    simp [Matrix.map_apply, Matrix.sub_apply, Matrix.smul_apply, Matrix.one_apply]
+  rw [h02, h10, h21]
+  -- Now compute: (-X) * ((-X) * (-X) - 1 * 0) - 1 * (0 * (-X) - 1 * C(1/phi²)) + 0 * (0 * 0 - (-X) * 0)
+  -- = (-X) * (X²) - 1 * (-C(1/phi²)) + 0
+  -- = -X³ + C(1/phi²)
+  simp only [mul_zero, zero_mul, sub_zero, zero_sub, add_zero, neg_mul, mul_neg, neg_neg]
+  ring
 
 /-- The eigenvalues of the transfer matrix -/
 lemma transferMatrix_eigenvalues :
   charPoly = Polynomial.X^3 - Polynomial.C (1/phi^2) := by
   -- The characteristic polynomial is det(X*I - transferMatrix)
-  -- We computed this in det_cyclic_matrix, but need to handle the sign carefully
+  -- We computed det(transferMatrix - X*I) = -X³ + 1/phi²
+  -- The relationship requires careful sign handling
   unfold charPoly
-  -- The relationship between our computation and the standard definition
-  -- requires careful handling of the matrix orientation
+  -- For now, we state this relationship
   sorry -- Characteristic polynomial computation using det_cyclic_matrix
 
 /-- The transfer matrix has eigenvalue 1/phi -/
@@ -265,19 +280,9 @@ lemma transfer_fibonacci (n : ℕ) :
     a^2 + b^2 + c^2 = 1 := by
   -- The transfer matrix has circulant structure
   -- Its powers maintain this circulant pattern
-  cases n with
-  | zero =>
-    -- For n = 0, transferMatrix^0 = I
-    use 1, 0, 0
-    constructor
-    · simp [pow_zero]
-      -- Identity matrix has the circulant pattern [1,0,0; 0,1,0; 0,0,1]
-      -- But this doesn't match our claimed pattern exactly
-      sorry -- Identity matrix structure
-    · simp
-  | succ m =>
-    -- For n > 0, we need to show the pattern holds
-    sorry -- Matrix power computation
+  -- Note: This claim is actually false for n=0 since I is not circulant
+  -- We would need to modify the statement or prove only for n > 0
+  sorry -- The statement needs to be corrected
 
 /-- Connection to the golden ratio recurrence -/
 lemma golden_ratio_recurrence (n : ℕ) :
@@ -362,16 +367,13 @@ theorem transfer_matrix_gap_theorem :
 /-- The determinant of the transfer matrix -/
 lemma transferMatrix_det : transferMatrix.det = 1/phi^2 := by
   unfold transferMatrix
-  -- Compute det([[0,1,0],[0,0,1],[1/phi^2,0,0]]) using cofactor expansion
-  -- det = 0*(det([[0,1],[0,0]])) - 1*(det([[0,1],[1/phi^2,0]])) + 0*(det([[0,0],[1/phi^2,0]]))
-  -- = 0 - 1*(0*0 - 1*(1/phi^2)) + 0
-  -- = -1*(-1/phi^2) = 1/phi^2
+  -- Compute det([[0,1,0],[0,0,1],[1/phi^2,0,0]])
+  -- This is a cyclic permutation matrix scaled by 1/phi²
   rw [Matrix.det_fin_three]
   simp only [Matrix.of_apply]
-  -- The matrix entries are: (0,0)=0, (0,1)=1, (0,2)=0
-  --                        (1,0)=0, (1,1)=0, (1,2)=1
-  --                        (2,0)=1/phi^2, (2,1)=0, (2,2)=0
-  -- The computation gives 1/phi^2
+  -- Expanding: 0*(0*0 - 1*0) - 1*(0*0 - 1*(1/phi²)) + 0*(0*0 - 0*(1/phi²))
+  -- = 0 - 1*(-1/phi²) + 0 = 1/phi²
+  -- The computation gives 1/phi²
   sorry -- Arithmetic simplification
 
 /-- The (0,0) entry of the transfer matrix -/

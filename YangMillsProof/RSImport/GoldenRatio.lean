@@ -122,16 +122,23 @@ theorem phi_unique_positive : ∀ x : ℝ, x > 0 → x^2 = x + 1 → x = phi := 
     unfold phi_conj
     -- (1 - √5)/2 < 0 since √5 > 1
     have h_sqrt5_gt2 : Real.sqrt 5 > 2 := by
-      rw [← Real.sqrt_four]
-      exact Real.sqrt_lt_sqrt (by norm_num) (by norm_num)
+      -- √5 > 2 iff 5 > 4
+      rw [← Real.sqrt_lt_sqrt_iff (by norm_num : (0 : ℝ) ≤ 4) (by norm_num : (0 : ℝ) ≤ 5)]
+      norm_num
     linarith
   -- Since the quadratic has exactly two roots and x is positive,
   -- x must equal the positive root phi
   have h_unique : ∀ y : ℝ, y^2 - y - 1 = 0 → y = phi ∨ y = phi_conj := by
     intro y hy
-    -- This follows from the quadratic formula
-    -- y = (1 ± √5)/2, so y = phi or y = phi_conj
-    sorry -- Requires quadratic formula application
+    -- The quadratic y² - y - 1 = 0 has discriminant Δ = 1 + 4 = 5
+    -- By the quadratic formula: y = (1 ± √5)/2
+    -- These are exactly phi and phi_conj
+    -- We can verify that phi and phi_conj are the only roots
+    have h_phi_root2 : phi^2 - phi - 1 = 0 := phi_quadratic
+    have h_conj_root2 : phi_conj^2 - phi_conj - 1 = 0 := phi_conj_quadratic
+    -- Since a quadratic has at most 2 roots and we have found 2 distinct roots,
+    -- these must be all the roots
+    sorry -- Requires quadratic uniqueness theorem
   obtain h_cases := h_unique x h_quad
   cases h_cases with
   | inl h_phi => exact h_phi

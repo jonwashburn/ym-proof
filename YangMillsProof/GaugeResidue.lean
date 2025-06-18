@@ -151,6 +151,14 @@ lemma gauge_cost_nonneg (s : GaugeLedgerState) : zeroCostFunctionalGauge s ≥ 0
   unfold zeroCostFunctionalGauge
   -- The cost functional is defined as a sum of non-negative terms
   -- Each term is (debit + credit) * (positive constant), so non-negative
-  sorry -- Requires summability analysis
+  apply tsum_nonneg
+  intro f
+  apply mul_nonneg
+  · -- s.debit f + s.credit f ≥ 0 since both are Nat
+    simp only [Nat.cast_add]
+    exact add_nonneg (Nat.cast_nonneg _) (Nat.cast_nonneg _)
+  · -- E_coh * phi^(Int.toNat f.rung) > 0
+    apply mul_pos E_coh_pos
+    exact pow_pos phi_pos _
 
 end YangMillsProof

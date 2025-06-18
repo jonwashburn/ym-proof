@@ -39,7 +39,9 @@ lemma mass_gap_fundamental : massGap = E_coh * phi := by
 lemma mass_gap_golden_ratio : massGap / E_coh = phi := by
   rw [mass_gap_fundamental]
   -- (E_coh * phi) / E_coh = phi
-  sorry -- Division cancellation
+  rw [mul_div_assoc]
+  rw [div_self (ne_of_gt E_coh_pos)]
+  rw [one_mul]
 
 /-- The Yang-Mills existence theorem -/
 theorem yang_mills_existence : ∃ (ψ : GaugeHilbert), ψ ≠ 0 := by

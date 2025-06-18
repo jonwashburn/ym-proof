@@ -119,12 +119,12 @@ lemma det_cyclic_matrix :
 
   -- Now compute: det = a₀₀(a₁₁a₂₂ - a₁₂a₂₁) - a₀₁(a₁₀a₂₂ - a₁₂a₂₀) + a₀₂(a₁₀a₂₁ - a₁₁a₂₀)
   -- With our values:
-  -- det = (-X)((-X)(-X) - 1·0) - 1·(0·(-X) - 1·C(1/phi²)) + 0·(0·0 - (-X)·C(1/phi²))
-  -- = (-X)(X²) - 1·(0 - C(1/phi²)) + 0
+  -- det = (-X)((-X)(-X) - C(1)·0) - C(1)·(0·(-X) - C(1)·C(1/phi²)) + 0·(0·0 - (-X)·C(1/phi²))
+  -- = (-X)(X²) - C(1)·(0 - C(1/phi²)) + 0
+  -- = -X³ + C(1) * C(1/phi²)
   -- = -X³ + C(1/phi²)
 
   ring_nf
-  -- We need to simplify C(1)^2 * C(phi⁻¹^2) = C(phi⁻¹^2)
   simp only [Polynomial.C_1, one_pow, one_mul]
 
 /-- The eigenvalues of the transfer matrix -/
@@ -135,58 +135,35 @@ lemma transferMatrix_eigenvalues :
   -- For odd dimension, det(X*I - A) = -det(A - X*I)
   -- So charPoly = -(-X³ + 1/phi²) = X³ - 1/phi²
   unfold charPoly
-  rw [Matrix.charpoly]
-  -- The characteristic polynomial is det(X • 1 - C(transferMatrix))
-  -- This equals det of the matrix with entries X*δᵢⱼ - transferMatrix i j
-  -- Which is exactly -transferMatrix_sub_X by our definition
-  -- Skip complex matrix determinant proof for now
-  sorry
+  -- Use the determinant relationship and our computed result
+  have h_det : Matrix.det transferMatrix_sub_X = -Polynomial.X ^ 3 + Polynomial.C (1/phi^2) := det_cyclic_matrix
+  -- The characteristic polynomial is det(X*I - A), which is -det(A - X*I) for 3×3 matrices
+  -- So charPoly = -det(transferMatrix_sub_X) = -(-X³ + C(1/phi²)) = X³ - C(1/phi²)
+  have h_charpoly_def : Matrix.charpoly transferMatrix = -Matrix.det transferMatrix_sub_X := by
+    -- This follows from the definition of characteristic polynomial and the sign for odd dimensions
+    sorry -- Technical matrix determinant sign relationship
+  rw [h_charpoly_def, h_det]
+  -- Apply the negation: -(- X³ + C(1/phi²)) = X³ - C(1/phi²)
+  ring
 
-/-- The transfer matrix has eigenvalue 1/phi -/
-lemma transferMatrix_has_eigenvalue_inv_phi :
-  (Matrix.charpoly transferMatrix).eval (1/phi) = 0 := by
+/-- The transfer matrix has eigenvalue (1/phi²)^(1/3) -/
+lemma transferMatrix_has_eigenvalue_cube_root :
+  (Matrix.charpoly transferMatrix).eval ((1/phi^2)^(1/3 : ℝ)) = 0 := by
   -- Use the characteristic polynomial from transferMatrix_eigenvalues
   rw [← charPoly, transferMatrix_eigenvalues]
-  -- Evaluate X³ - C(1/phi²) at X = 1/phi
+  -- Evaluate X³ - C(1/phi²) at X = (1/phi²)^(1/3)
   simp only [Polynomial.eval_sub, Polynomial.eval_pow, Polynomial.eval_X, Polynomial.eval_C]
-  -- We need to show: (1/phi)³ - 1/phi² = 0
-  -- This is equivalent to: 1/phi³ = 1/phi²
-  -- Which means: phi³ = phi²
-  -- Dividing by phi²: phi = 1
-  -- But that's wrong! Let's reconsider...
-  -- Actually, we need: (1/phi)³ - 1/phi² = 0
-  -- Multiply by phi³: 1 - phi = 0, so phi = 1 (wrong!)
-  -- The issue is our characteristic polynomial should be X³ - C(1/phi²) = 0
-  -- But 1/phi is not actually a root of X³ - 1/phi²
-  -- Let me check: if λ³ = 1/phi², then λ = (1/phi²)^(1/3) = 1/phi^(2/3)
-  -- Actually, the eigenvalues are the cube roots of 1/phi²
-  -- So we need to verify that (1/phi)³ = 1/phi²
-  -- From the golden ratio: phi² = phi + 1
-  -- Therefore: 1/phi² = 1/(phi + 1)
-  -- And: 1/phi³ = 1/(phi³) = 1/(phi·phi²) = 1/(phi(phi + 1))
-  -- We need to show: 1/phi³ = 1/phi²
-  -- This would mean: phi² = phi³, or 1 = phi (contradiction!)
-  --
-  -- Actually, I think the issue is that our transfer matrix should have been defined differently
-  -- to make 1/phi an eigenvalue. Let me check the actual eigenvalue equation.
-  -- For the cyclic matrix [[0,1,0],[0,0,1],[1/phi²,0,0]], the eigenvalues satisfy:
-  -- det(λI - T) = λ³ - 1/phi² = 0
-  -- So λ³ = 1/phi²
-  -- The three cube roots are: 1/phi^(2/3), ω/phi^(2/3), ω²/phi^(2/3)
-  -- where ω = exp(2πi/3)
-  -- So 1/phi is NOT an eigenvalue unless phi^(3/2) = phi, which is false.
-  --
-  -- This suggests the lemma statement is incorrect. For now, let's prove what we can:
-  -- that the characteristic polynomial evaluated at 1/phi gives a specific value.
-  have h_phi_identity : phi^2 = phi + 1 := phi_sq
-  -- Calculate (1/phi)³ - 1/phi²
-  have h_calc : (1/phi)^3 - 1/phi^2 = 1/phi^2 * (1/phi - 1) := by
-    field_simp
-    ring
-  rw [h_calc]
-  -- Now we need to show: 1/phi² * (1/phi - 1) = 0
-  -- This requires 1/phi - 1 = 0, or phi = 1, which is false
-  sorry -- The statement needs correction - 1/phi is not an eigenvalue
+  -- We need to show: ((1/phi²)^(1/3))³ - 1/phi² = 0
+  -- This simplifies to: (1/phi²) - 1/phi² = 0, which is true
+  have h_cube : ((1/phi^2)^(1/3 : ℝ))^3 = 1/phi^2 := by
+    -- For positive real numbers, (a^(1/3))^3 = a
+    have h_pos : 0 < 1/phi^2 := by
+      apply div_pos one_pos (pow_pos phi_pos 2)
+    -- Use the identity (a^(1/3))^3 = a for positive real a
+    exact Real.rpow_natCast h_pos (1/3 : ℝ) 3
+  rw [h_cube]
+  -- ((1/phi²)^(1/3))³ - 1/phi² = 1/phi² - 1/phi² = 0
+  ring
 
 /-- The spectral gap of the transfer matrix -/
 noncomputable def transferSpectralGap : ℝ := 1/phi - 1/phi^2
@@ -241,16 +218,16 @@ lemma transfer_matrix_rung_structure (n : ℕ) :
 noncomputable def spectralProjector : Matrix (Fin 3) (Fin 3) ℝ :=
   !![1, 0, 0; 0, 0, 0; 0, 0, 0]
 
-/-- The three eigenvalues of the transfer matrix (as roots of unity scaled by 1/phi) -/
+/-- The three eigenvalues of the transfer matrix (cube roots of 1/phi² with unit root multipliers) -/
 noncomputable def transferEigenvalue (k : Fin 3) : ℂ :=
-  (1 / phi : ℂ) * Complex.exp (2 * Real.pi * Complex.I * (k : ℂ) / 3)
+  ((1 / phi^2 : ℝ)^(1/3 : ℝ) : ℂ) * Complex.exp (2 * Real.pi * Complex.I * (k : ℂ) / 3)
 
-/-- The real eigenvalue is 1/phi -/
-lemma transferEigenvalue_real : transferEigenvalue 0 = 1 / phi := by
+/-- The real eigenvalue is (1/phi²)^(1/3) -/
+lemma transferEigenvalue_real : transferEigenvalue 0 = ((1 / phi^2)^(1/3 : ℝ) : ℂ) := by
   unfold transferEigenvalue
-  simp [Complex.exp_zero, Complex.ofReal_div, Complex.ofReal_mul]
+  simp [Complex.exp_zero]
   -- When k = 0, we have exp(2πi * 0 / 3) = exp(0) = 1
-  -- So transferEigenvalue 0 = (1/phi) * 1 = 1/phi
+  -- So transferEigenvalue 0 = (1/phi²)^(1/3) * 1 = (1/phi²)^(1/3)
 
 /-- The other two eigenvalues are complex conjugates -/
 lemma transferEigenvalue_conjugate :
@@ -261,14 +238,13 @@ lemma transferEigenvalue_conjugate :
   -- The detailed proof requires careful handling of complex exponentials and roots of unity
   sorry -- Complex exponential conjugation - requires periodicity lemmas
 
-/-- All eigenvalues have modulus 1/phi -/
+/-- All eigenvalues have modulus (1/phi²)^(1/3) -/
 lemma transferEigenvalue_norm (k : Fin 3) :
-    Complex.abs (transferEigenvalue k) = 1 / phi := by
+    Complex.abs (transferEigenvalue k) = (1/phi^2)^(1/3 : ℝ) := by
   unfold transferEigenvalue
-  -- abs(1/phi * exp(2πik/3)) = abs(1/phi) * abs(exp(2πik/3)) = (1/phi) * 1 = 1/phi
-  -- For any complex exponential on the unit circle, the absolute value is preserved
-  -- The key insight is that exp(2πik/3) has modulus 1, so the result is 1/phi
-  sorry
+  -- This follows from properties of complex exponentials and absolute values
+  -- The key insight is that exp(2πik/3) has modulus 1, so the result is (1/phi²)^(1/3)
+  sorry -- Complex absolute value calculation
 
 /-- The characteristic polynomial factors as product over eigenvalues -/
 lemma charPoly_factorization :
@@ -284,9 +260,12 @@ noncomputable def minEigenvalueGap : ℝ :=
 /-- The eigenvalue gap is positive -/
 lemma minEigenvalueGap_pos : minEigenvalueGap > 0 := by
   unfold minEigenvalueGap transferEigenvalue
-  -- transferEigenvalue 1 = (1/phi) * exp(2πi/3) ≠ 1/phi since exp(2πi/3) ≠ 1
-  -- transferEigenvalue 1 = (1/phi) * exp(2πi/3) ≠ 1/phi since exp(2πi/3) ≠ 1
-  sorry
+  -- We need to show: |((1/phi²)^(1/3) * exp(2πi/3) - 1/phi)| > 0
+  -- This is equivalent to: (1/phi²)^(1/3) * exp(2πi/3) ≠ 1/phi
+  -- The proof follows from the fact that exp(2πi/3) is a primitive cube root of unity
+  -- and has a non-zero imaginary part, while 1/phi is real
+  -- Therefore their difference cannot be zero
+  sorry -- Complex eigenvalue gap analysis
 
 /-- The eigenvalue gap relates to the spectral gap -/
 lemma eigenvalue_gap_bound :
@@ -390,25 +369,57 @@ noncomputable instance : NormedSpace ℝ (Matrix (Fin 3) (Fin 3) ℝ) :=
 /-- Transfer matrix powers are bounded -/
 lemma transfer_matrix_bounded (n : ℕ) :
   ‖transferMatrix ^ n‖ ≤ (3 : ℝ) := by
-  -- The transfer matrix has spectral radius 1/phi < 1
+  -- The transfer matrix has spectral radius (1/phi²)^(1/3) < 1
   -- So its powers are bounded by a constant
   -- For the Frobenius norm, we can bound directly
-  -- Each entry of transferMatrix is at most 1, so each entry of transferMatrix^n is bounded
-  -- The Frobenius norm of a 3x3 matrix with entries bounded by M is at most 3*M
-  -- Since 1/phi < 1, powers decay, so we can bound by a constant
-  have h_spectral : ∀ k : Fin 3, Complex.abs (transferEigenvalue k) ≤ 1 / phi := by
-    intro k
-    rw [transferEigenvalue_norm]
-  have h_phi_lt_one : 1 / phi < 1 := by
-    rw [div_lt_one (phi_pos)]
-    exact phi_gt_one
+  -- Each eigenvalue has modulus (1/phi²)^(1/3), so the spectral radius is (1/phi²)^(1/3)
+  -- Since (1/phi²)^(1/3) < 1, the powers decay exponentially
+  -- The Frobenius norm of a 3×3 matrix is bounded by √3 times the spectral norm
   -- For matrices with spectral radius < 1, powers are bounded
-  -- The Frobenius norm of powers grows at most like (spectral radius)^n
-  -- Since spectral radius = 1/phi < 1, the powers are bounded
-  -- For a 3x3 matrix, the Frobenius norm is bounded by 3 times the max entry
-  -- So we use 3 as a conservative bound
-  -- The bound follows from spectral radius arguments
-  sorry
+
+  have h_spectral_radius : ∀ k : Fin 3, Complex.abs (transferEigenvalue k) = (1/phi^2)^(1/3 : ℝ) := by
+    intro k
+    exact transferEigenvalue_norm k
+
+  have h_radius_lt_one : (1/phi^2)^(1/3 : ℝ) < 1 := by
+    -- We need: (1/phi²)^(1/3) < 1, equivalent to 1/phi² < 1, equivalent to 1 < phi²
+    -- This is true since phi > 1
+    have h_base_lt_one : 1/phi^2 < 1 := by
+      rw [div_lt_one (pow_pos phi_pos 2)]
+      exact one_lt_pow phi_gt_one two_ne_zero
+    have h_base_pos : 0 < 1/phi^2 := by
+      exact div_pos one_pos (pow_pos phi_pos 2)
+    exact Real.rpow_lt_one (le_of_lt h_base_pos) h_base_lt_one (by norm_num : (0 : ℝ) < 1/3)
+
+  -- Since the spectral radius is < 1, the powers are bounded
+  -- For a 3×3 matrix, the Frobenius norm is at most √3 times the spectral norm
+  -- The spectral norm is bounded by the spectral radius for diagonalizable matrices
+  -- Since our matrix has distinct eigenvalues (up to complex conjugation), it's diagonalizable
+  -- Therefore ‖transferMatrix^n‖ ≤ C * (spectral radius)^n for some constant C
+  -- Since spectral radius < 1, this is bounded
+  -- We use 3 as a conservative upper bound that works for all n
+
+  -- Base case and small n can be checked directly
+  -- For large n, the exponential decay dominates
+  have h_decay_bound : ∀ m : ℕ, ‖transferMatrix ^ m‖ ≤ 3 * ((1/phi^2)^(1/3 : ℝ))^m := by
+    intro m
+    -- This follows from spectral radius theory and diagonalizability
+    -- The constant 3 accounts for the condition number of the eigenvector matrix
+    sorry -- Detailed spectral norm bounds
+
+  -- Since (1/phi²)^(1/3) < 1, we have ((1/phi²)^(1/3))^n ≤ 1 for all n
+  -- Therefore ‖transferMatrix^n‖ ≤ 3 * 1 = 3
+  calc ‖transferMatrix ^ n‖
+    ≤ 3 * ((1/phi^2)^(1/3 : ℝ))^n := h_decay_bound n
+    _ ≤ 3 * 1 := by
+      apply mul_le_mul_of_nonneg_left
+              · have h_base_pos : 0 ≤ 1/phi^2 := le_of_lt (div_pos one_pos (pow_pos phi_pos 2))
+          have h_base_lt_one : 1/phi^2 ≤ 1 := by
+            rw [div_le_one (pow_pos phi_pos 2)]
+            exact one_le_pow_of_one_le_left (le_of_lt phi_gt_one) 2
+          exact Real.rpow_le_one h_base_pos h_base_lt_one (Nat.cast_nonneg n)
+      · norm_num
+    _ = 3 := by ring
 
 /-- Asymptotic behavior of transfer matrix -/
 lemma transfer_matrix_asymptotic (n : ℕ) (hn : n ≥ 1) :
@@ -422,7 +433,7 @@ lemma transfer_matrix_asymptotic (n : ℕ) (hn : n ≥ 1) :
   -- But the complex eigenvalues contribute differently to the norm
   -- The decay rate is determined by |transferEigenvalue 1| = 1/phi
   -- However, the interference between eigenspaces gives the 1/phi^2 rate
-  have h_spectral_radius : ∀ k : Fin 3, k ≠ 0 → Complex.abs (transferEigenvalue k) = 1/phi := by
+  have h_spectral_radius : ∀ k : Fin 3, k ≠ 0 → Complex.abs (transferEigenvalue k) = (1/phi^2)^(1/3 : ℝ) := by
     intro k hk
     exact transferEigenvalue_norm k
   -- The dominant eigenvalue contribution is captured by the projector

@@ -114,14 +114,37 @@ lemma cost_zero_iff_vacuum (S : LedgerState) :
       · -- Case: n > N, automatically zero by finite support
         exact hN n (Nat.lt_of_not_le h)
 
-    -- Use structure extensionality
-    cases S with
-    | mk entries_S support_S =>
-      cases vacuumState with
-      | mk entries_V support_V =>
-        simp [vacuumState]
-        ext n
-        exact h_each_zero n
+    -- Now construct the equality S = vacuumState
+    have h_entries_eq : S.entries = vacuumState.entries := by
+      ext n
+      -- We need to show S.entries n = vacuumState.entries n
+      -- From h_each_zero, we have (S.entries n).debit = 0 ∧ (S.entries n).credit = 0
+      -- vacuumState.entries n is defined to have debit = 0 and credit = 0
+      cases' h_each_zero n with h_debit h_credit
+      unfold vacuumState
+      simp
+      exact ⟨h_debit, h_credit⟩
+
+    -- Use extensionality to show S = vacuumState
+    have h_finite_eq : S.finite_support = vacuumState.finite_support := by
+      -- Both have finite support, and the specific finite support doesn't matter
+      -- for states where all entries are zero
+      -- Since all entries of S are zero (from h_all_zero),
+      -- S has the same finite support structure as vacuumState
+      cases' S.finite_support with N_S hN_S
+      cases' vacuumState.finite_support with N_V hN_V
+      -- Both finite supports witness that entries are zero beyond some point
+      -- For S: ∀ n > N_S, S.entries n = 0 (from hN_S and h_all_zero)
+      -- For vacuumState: ∀ n > N_V, vacuumState.entries n = 0 (from hN_V)
+      -- Since both have all entries zero, the finite supports are equivalent
+      sorry -- Finite support equivalence for zero states
+
+    -- Use structure constructor instead of ext
+    have h_S_eq_vacuum : S = ⟨S.entries, S.finite_support⟩ := by rfl
+    rw [h_S_eq_vacuum]
+    congr 1
+    · exact h_entries_eq
+    · exact h_finite_eq
 
   · -- Reverse direction: if state is vacuum, then cost is zero
     intro h_vacuum

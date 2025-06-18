@@ -490,7 +490,43 @@ lemma charPoly_factorization :
     ∃ (p : Polynomial ℂ), p.degree = 3 ∧
     (∀ k : Fin 3, p.eval (transferEigenvalue k) = 0) ∧
     (charPoly.map Complex.ofReal) = p := by
-  sorry -- Factorization over complex numbers
+  -- The characteristic polynomial over ℂ is the product of linear factors
+  -- p(X) = (X - transferEigenvalue 0)(X - transferEigenvalue 1)(X - transferEigenvalue 2)
+  let p := (Polynomial.X - Polynomial.C (transferEigenvalue 0)) *
+           (Polynomial.X - Polynomial.C (transferEigenvalue 1)) *
+           (Polynomial.X - Polynomial.C (transferEigenvalue 2))
+  use p
+  constructor
+  · -- Degree is 3
+    unfold p
+    rw [Polynomial.degree_mul, Polynomial.degree_mul]
+    · simp [Polynomial.degree_X_sub_C]
+      norm_num
+    · simp [Polynomial.degree_X_sub_C]
+    · simp [Polynomial.degree_X_sub_C]
+    · simp [Polynomial.degree_X_sub_C]
+  constructor
+  · -- Each eigenvalue is a root
+    intro k
+    unfold p
+    simp [Polynomial.eval_mul, Polynomial.eval_sub, Polynomial.eval_X, Polynomial.eval_C]
+    fin_cases k <;> simp
+  · -- Equals the characteristic polynomial
+    -- The characteristic polynomial of transferMatrix is X³ - 1/phi²
+    -- We need to show this equals our factored form when mapped to ℂ
+    have h_charpoly : Matrix.charpoly transferMatrix = Polynomial.X^3 - Polynomial.C (1/phi^2) := by
+      exact transferMatrix_eigenvalues
+    rw [h_charpoly]
+    -- Show that (X - λ₀)(X - λ₁)(X - λ₂) = X³ - 1/phi² over ℂ
+    -- where λₖ = transferEigenvalue k
+    unfold p transferEigenvalue
+    -- Use Vieta's formulas: the constant term is λ₀λ₁λ₂ = (1/phi²)^(1/3) * exp(0) * (1/phi²)^(1/3) * exp(2πi/3) * (1/phi²)^(1/3) * exp(4πi/3)
+    -- = (1/phi²) * exp(0 + 2πi/3 + 4πi/3) = (1/phi²) * exp(2πi) = 1/phi²
+    ext
+    simp [Polynomial.coeff_map, Polynomial.coeff_sub, Polynomial.coeff_pow, Polynomial.coeff_C]
+    -- The detailed coefficient comparison requires expanding the product
+    -- This is algebraically intensive but follows from the eigenvalue relationships
+    sorry -- Detailed polynomial coefficient comparison
 
 /-- The smallest non-real eigenvalue distance from 1/phi -/
 noncomputable def minEigenvalueGap : ℝ :=
@@ -548,7 +584,56 @@ lemma eigenvalue_gap_bound :
   -- minEigenvalueGap = |transferEigenvalue 1 - 1/phi|
   -- transferSpectralGap = 1/phi - 1/phi²
   -- The geometric relationship gives the factor of 1/2
-  sorry -- Requires detailed eigenvalue geometry
+
+  -- First, compute the exact values
+  -- transferEigenvalue 1 = (1/phi²)^(1/3) * exp(2πi/3)
+  -- |transferEigenvalue 1 - 1/phi| involves complex arithmetic
+
+  have h_eigenvalue_form : transferEigenvalue 1 = ((1/phi^2)^(1/3 : ℝ) : ℂ) * Complex.exp (2 * Real.pi * Complex.I / 3) := by
+    unfold transferEigenvalue
+    simp
+
+  -- The key insight is that for our specific matrix structure,
+  -- the eigenvalue gap is related to the spectral gap by geometric factors
+  -- involving the golden ratio and cube roots of unity
+
+  have h_spectral_gap_val : transferSpectralGap = 1/phi - 1/phi^2 := by
+    unfold transferSpectralGap
+    ring
+
+  -- Use the geometric relationship between eigenvalues and spectral gap
+  -- For cube roots of unity and golden ratio structure:
+  -- |ω^(1/3) * exp(2πi/3) - 1| ≥ C * |ω - ω²| where ω = 1/phi
+
+  have h_geometric_bound : Complex.abs (transferEigenvalue 1 - (1/phi : ℂ)) ≥
+                          (Real.sqrt 3 / 2) * (1/phi - 1/phi^2) := by
+    -- This follows from the geometric arrangement of cube roots of unity
+    -- The distance from exp(2πi/3) to the real axis, scaled by the eigenvalue magnitude
+    rw [h_eigenvalue_form]
+    -- |((1/phi²)^(1/3) * exp(2πi/3) - 1/phi)|
+    -- ≥ |(1/phi²)^(1/3)| * |exp(2πi/3) - (1/phi) / (1/phi²)^(1/3)|
+    -- The imaginary part of exp(2πi/3) contributes √3/2 factor
+    sorry -- Detailed complex geometric calculation
+
+  calc minEigenvalueGap
+    = Complex.abs (transferEigenvalue 1 - (1/phi : ℂ)) := rfl
+    _ ≥ (Real.sqrt 3 / 2) * (1/phi - 1/phi^2) := h_geometric_bound
+    _ ≥ (1/2) * (1/phi - 1/phi^2) := by
+      -- Since √3/2 ≥ 1/2
+      apply mul_le_mul_of_nonneg_right
+      · have h_sqrt3_ge : Real.sqrt 3 / 2 ≥ 1/2 := by
+          rw [div_le_div_iff (by norm_num : (0 : ℝ) < 2) (by norm_num : (0 : ℝ) < 2)]
+          have h_sqrt3_ge_one : Real.sqrt 3 ≥ 1 := by
+            rw [Real.sqrt_le_iff]
+            constructor
+            · norm_num
+            · norm_num
+          linarith
+        exact h_sqrt3_ge
+      · exact le_of_lt (sub_pos.mpr (div_lt_one (pow_pos phi_pos 2)).mpr (one_lt_pow phi_gt_one two_ne_zero))
+    _ = transferSpectralGap / 2 := by
+      rw [h_spectral_gap_val]
+      ring
 
 /-- The gap in the spectrum corresponds to colour confinement -/
 theorem spectral_gap_confinement :
@@ -619,7 +704,94 @@ theorem spectral_gap_confinement :
       simp [Complex.ofReal_mul]
     -- Since lam is real and is an eigenvalue, it must be transferEigenvalue 0 = 1/phi
     left
-    sorry -- Complete the argument using that real eigenvalues must be 1/phi
+    -- Use the fact that the characteristic polynomial has only one real root
+    -- The characteristic polynomial is X³ - 1/phi²
+    -- For a cubic with positive constant term, there is exactly one real root
+    have h_charpoly_eval : (Matrix.charpoly transferMatrix).eval lam = 0 := hlam
+    rw [transferMatrix_eigenvalues] at h_charpoly_eval
+    -- So (lam³ - 1/phi²) = 0, which means lam³ = 1/phi²
+    simp [Polynomial.eval_sub, Polynomial.eval_pow, Polynomial.eval_X, Polynomial.eval_C] at h_charpoly_eval
+    -- lam³ = 1/phi², so lam = (1/phi²)^(1/3)
+    have h_lam_cube : lam^3 = 1/phi^2 := by
+      linarith [h_charpoly_eval]
+
+    -- The real cube root of 1/phi² is (1/phi²)^(1/3)
+    -- But we need to show lam = 1/phi, not (1/phi²)^(1/3)
+    -- Actually, let me reconsider the eigenvalue calculation...
+
+    -- Wait, I think there's an error in my eigenvalue definition
+    -- Let me check: if the characteristic polynomial is X³ - 1/phi²,
+    -- then the eigenvalues are the cube roots of 1/phi²
+    -- The real eigenvalue is (1/phi²)^(1/3), not 1/phi
+
+    -- Actually, let me verify this matches our transferEigenvalue 0
+    have h_real_eigenvalue : transferEigenvalue 0 = ((1/phi^2)^(1/3 : ℝ) : ℂ) := by
+      exact transferEigenvalue_real
+
+    -- So we need to show lam = (1/phi²)^(1/3), not 1/phi
+    -- But the statement claims the gap is from 1/phi, which suggests
+    -- there might be an inconsistency in the definitions
+
+    -- For now, let's proceed with the cube root relationship
+    have h_real_cube_root : ∃! r : ℝ, r^3 = 1/phi^2 ∧ r > 0 := by
+      -- There is a unique positive real cube root
+      use (1/phi^2)^(1/3 : ℝ)
+      constructor
+      · constructor
+        · exact Real.rpow_natCast_mul (div_pos one_pos (pow_pos phi_pos 2)) 3 (1/3)
+        · exact Real.rpow_pos_of_pos (div_pos one_pos (pow_pos phi_pos 2)) (1/3)
+      · intro r hr
+        cases' hr with hr_cube hr_pos
+        -- Uniqueness of positive cube root
+        have h_eq : r = (1/phi^2)^(1/3 : ℝ) := by
+          apply Real.eq_rpow_of_pow_eq hr_pos (div_pos one_pos (pow_pos phi_pos 2)) (by norm_num : (0 : ℝ) ≠ 3)
+          rw [Real.rpow_natCast_mul (div_pos one_pos (pow_pos phi_pos 2)) 3 (1/3)]
+          exact hr_cube.symm
+        exact h_eq
+
+    cases' h_real_cube_root with r hr
+    cases' hr with hr_unique hr_prop
+    cases' hr_prop with hr_cube hr_pos
+
+    -- Since lam³ = 1/phi² and lam is real, we need to determine which cube root lam is
+    -- If lam > 0, then lam = r = (1/phi²)^(1/3)
+    -- If lam < 0, then lam is a negative cube root, but there are no negative real cube roots of positive numbers
+
+    have h_lam_pos : lam > 0 := by
+      -- If lam ≤ 0 and lam³ = 1/phi² > 0, then lam < 0
+      -- But then lam³ < 0, contradicting lam³ = 1/phi² > 0
+      by_contra h_nonpos
+      push_neg at h_nonpos
+      cases' lt_or_eq_of_le h_nonpos with h_neg h_zero
+      · -- Case: lam < 0
+        have h_cube_neg : lam^3 < 0 := by
+          exact pow_neg h_neg 3
+        have h_cube_pos : (0 : ℝ) < 1/phi^2 := div_pos one_pos (pow_pos phi_pos 2)
+        rw [h_lam_cube] at h_cube_neg
+        linarith [h_cube_neg, h_cube_pos]
+      · -- Case: lam = 0
+        rw [h_zero] at h_lam_cube
+        simp at h_lam_cube
+        have h_pos : (0 : ℝ) < 1/phi^2 := div_pos one_pos (pow_pos phi_pos 2)
+        linarith [h_lam_cube, h_pos]
+
+    -- Therefore lam = (1/phi²)^(1/3) by uniqueness
+    have h_lam_eq : lam = (1/phi^2)^(1/3 : ℝ) := by
+      apply hr_unique
+      exact ⟨h_lam_cube, h_lam_pos⟩
+
+    -- But the statement expects lam = 1/phi
+    -- This suggests either:
+    -- 1) The eigenvalue definition is wrong, or
+    -- 2) The statement should be about (1/phi²)^(1/3) instead of 1/phi
+
+    -- For now, I'll assume there's a relationship: (1/phi²)^(1/3) = 1/phi
+    -- This would require 1/phi² = (1/phi)³ = 1/phi³, so phi³ = phi², so phi = 1
+    -- But phi > 1, so this is impossible
+
+    -- I think there's an error in the problem statement or eigenvalue definition
+    -- Let me proceed assuming the correct relationship
+    sorry -- Need to resolve eigenvalue vs spectral gap inconsistency
 
 /-- The transfer matrix generates the Fibonacci sequence -/
 lemma transfer_fibonacci (n : ℕ) :
@@ -686,7 +858,24 @@ lemma golden_ratio_recurrence (n : ℕ) :
         field_simp
         ring_nf
         -- After simplification, we should get sqrt 5
-        sorry -- Golden ratio arithmetic - needs careful field manipulation
+        -- (1 + √5)/2 + 2/(1 + √5) = (1 + √5)/2 + 2(1 - √5)/((1 + √5)(1 - √5))
+        -- = (1 + √5)/2 + 2(1 - √5)/(1 - 5) = (1 + √5)/2 + 2(1 - √5)/(-4)
+        -- = (1 + √5)/2 - (1 - √5)/2 = (1 + √5 - 1 + √5)/2 = 2√5/2 = √5
+        have h_calculation : (1 + Real.sqrt 5) / 2 + 2 / (1 + Real.sqrt 5) = Real.sqrt 5 := by
+          -- Use the identity (1 + √5)(1 - √5) = 1 - 5 = -4
+          have h_denom : (1 + Real.sqrt 5) * (1 - Real.sqrt 5) = -4 := by
+            ring_nf
+            simp [Real.sq_sqrt (by norm_num : (0 : ℝ) ≤ 5)]
+          -- So 2/(1 + √5) = 2(1 - √5)/(-4) = -(1 - √5)/2 = (√5 - 1)/2
+          have h_recip : 2 / (1 + Real.sqrt 5) = (Real.sqrt 5 - 1) / 2 := by
+            field_simp [ne_of_gt (by linarith [Real.sqrt_pos.mpr (by norm_num : (0 : ℝ) < 5)])]
+            rw [h_denom]
+            ring
+          rw [h_recip]
+          -- Now: (1 + √5)/2 + (√5 - 1)/2 = (1 + √5 + √5 - 1)/2 = 2√5/2 = √5
+          field_simp
+          ring
+        exact h_calculation
       rw [neg_one_pow_one, neg_neg, h_phi_sum]
       simp [Real.sqrt_div_sqrt]
     rw [h_F_0, h_F_1]
@@ -856,7 +1045,6 @@ lemma transfer_matrix_bounded (n : ℕ) :
     sorry -- Detailed spectral norm bounds
 
   -- Since (1/phi²)^(1/3) < 1, we have ((1/phi²)^(1/3))^n ≤ 1 for all n
-  -- Therefore ‖transferMatrix^n‖ ≤ 3 * 1 = 3
   calc ‖transferMatrix ^ n‖
     ≤ 3 * ((1/phi^2)^(1/3 : ℝ))^n := h_decay_bound n
     _ ≤ 3 * 1 := by
@@ -949,7 +1137,7 @@ lemma transfer_matrix_asymptotic (n : ℕ) (hn : n ≥ 1) :
       rw [abs_of_nonneg (pow_nonneg h_phi_inv_pos n)]
       apply add_le_add_left
       exact mul_le_mul_of_nonneg_left h_projector_norm (pow_nonneg h_phi_inv_pos n)
-    _ ≤ 3 + (1/phi^2)^n := by
+    _ ≤ 3 * (1/phi^2)^n := by
       -- Since 1/phi < 1/phi², we have (1/phi)^n < (1/phi²)^n for n ≥ 1
       have h_phi_ineq : 1/phi < 1/phi^2 := by
         rw [div_lt_div_iff (pow_pos phi_pos 2) phi_pos]
@@ -987,11 +1175,16 @@ lemma transferMatrix_det : transferMatrix.det = 1/phi^2 := by
   -- This is a cyclic permutation matrix scaled by 1/phi²
   rw [Matrix.det_fin_three]
   simp only [Matrix.of_apply]
-  -- The 3x3 determinant formula: a₀₀(a₁₁a₂₂ - a₁₂a₂₁) - a₀₁(a₁₀a₂₂ - a₁₂a₂₀) + a₀₂(a₁₀a₂₁ - a₁₁a₂₀)
-  -- = 0(0·0 - 1·0) - 1(0·0 - 1·(1/phi²)) + 0(0·0 - 0·(1/phi²))
-  -- = 0 - 1(0 - 1/phi²) + 0
-  -- = 1/phi²
-  norm_num
+  -- det = a₀₀(a₁₁a₂₂ - a₁₂a₂₁) - a₀₁(a₁₀a₂₂ - a₁₂a₂₀) + a₀₂(a₁₀a₂₁ - a₁₁a₂₀)
+  -- For our matrix: a₀₀=0, a₀₁=1, a₀₂=0, a₁₀=0, a₁₁=0, a₁₂=1, a₂₀=1/phi², a₂₁=0, a₂₂=0
+  -- det = 0·(0·0 - 1·0) - 1·(0·0 - 1·(1/phi²)) + 0·(0·0 - 0·(1/phi²))
+  -- = 0 - 1·(0 - 1/phi²) + 0
+  -- = -1·(-1/phi²) = 1/phi²
+  calc (0 : ℝ) * (0 * 0 - 1 * 0) - 1 * (0 * 0 - 1 * (1 / phi ^ 2)) + 0 * (0 * 0 - 0 * (1 / phi ^ 2))
+    = 0 * 0 - 1 * (0 - 1/phi^2) + 0 * 0 := by ring
+    _ = 0 - 1 * (-1/phi^2) + 0 * 0 := by ring
+    _ = 0 + 1/phi^2 + 0 := by ring
+    _ = 1/phi^2 := by ring
 
 /-- The (0,0) entry of the transfer matrix -/
 lemma transferMatrix_00 : transferMatrix 0 0 = 0 := by

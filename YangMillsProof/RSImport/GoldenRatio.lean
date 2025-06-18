@@ -133,12 +133,20 @@ theorem phi_unique_positive : ∀ x : ℝ, x > 0 → x^2 = x + 1 → x = phi := 
     -- The quadratic y² - y - 1 = 0 has discriminant Δ = 1 + 4 = 5
     -- By the quadratic formula: y = (1 ± √5)/2
     -- These are exactly phi and phi_conj
-    -- We can verify that phi and phi_conj are the only roots
-    have h_phi_root2 : phi^2 - phi - 1 = 0 := phi_quadratic
-    have h_conj_root2 : phi_conj^2 - phi_conj - 1 = 0 := phi_conj_quadratic
-    -- Since a quadratic has at most 2 roots and we have found 2 distinct roots,
-    -- these must be all the roots
-    sorry -- Requires quadratic uniqueness theorem
+    -- We verify by showing (y - phi)(y - phi_conj) = y² - y - 1
+    have h_factor : y^2 - y - 1 = (y - phi) * (y - phi_conj) := by
+      unfold phi phi_conj
+      field_simp
+      ring_nf
+      rw [sq_sqrt (by norm_num : (0 : ℝ) ≤ 5)]
+      ring
+    rw [h_factor] at hy
+    -- Since (y - phi)(y - phi_conj) = 0, either y - phi = 0 or y - phi_conj = 0
+    have h_prod_zero : (y - phi) * (y - phi_conj) = 0 := hy
+    obtain h_zero := mul_eq_zero.mp h_prod_zero
+    cases h_zero with
+    | inl h => left; linarith
+    | inr h => right; linarith
   obtain h_cases := h_unique x h_quad
   cases h_cases with
   | inl h_phi => exact h_phi

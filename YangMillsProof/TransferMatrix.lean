@@ -266,12 +266,12 @@ theorem spectral_gap_confinement :
       have h_sin_ne_zero : Real.sin (2 * Real.pi * (k : ℝ) / 3) ≠ 0 := by
         fin_cases k
         · contradiction  -- k = 0 contradicts hk
-        · -- k = 1: sin(2π/3) = √3/2 ≠ 0
-          norm_num
-          sorry -- Specific sine value
-        · -- k = 2: sin(4π/3) = -√3/2 ≠ 0
-          norm_num
-          sorry -- Specific sine value
+        · -- k = 1: sin(2π/3) ≠ 0
+          -- sin(2π/3) = sin(120°) = √3/2 ≠ 0
+          sorry -- Standard trigonometric value sin(2π/3) ≠ 0
+        · -- k = 2: sin(4π/3) ≠ 0
+          -- sin(4π/3) = sin(240°) = -√3/2 ≠ 0
+          sorry -- Standard trigonometric value sin(4π/3) ≠ 0
       -- (1/phi) * sin(2πk/3) ≠ 0 since 1/phi > 0 and sin(2πk/3) ≠ 0
       have h_phi_inv_ne_zero : (1 / phi : ℝ) ≠ 0 := by
         apply ne_of_gt phi_inv_pos
@@ -381,10 +381,8 @@ lemma transferMatrix_det : transferMatrix.det = 1/phi^2 := by
   -- This is a cyclic permutation matrix scaled by 1/phi²
   rw [Matrix.det_fin_three]
   simp only [Matrix.of_apply]
-  -- Expanding: 0*(0*0 - 1*0) - 1*(0*0 - 1*(1/phi²)) + 0*(0*0 - 0*(1/phi²))
-  -- = 0 - 1*(-1/phi²) + 0 = 1/phi²
-  -- The computation gives 1/phi²
-  sorry -- Arithmetic simplification
+  -- The 3x3 determinant formula gives us 1/phi²
+  norm_num
 
 /-- The (0,0) entry of the transfer matrix -/
 lemma transferMatrix_00 : transferMatrix 0 0 = 0 := by

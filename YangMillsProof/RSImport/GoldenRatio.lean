@@ -82,9 +82,22 @@ lemma phi_conj_sum : phi + phi_conj = 1 := by
 /-- Phi scaling property: φ^(n+1) = φ^n + φ^(n-1) for n ≥ 1 -/
 lemma phi_fibonacci (n : ℕ) (hn : n ≥ 1) : phi^(n+1) = phi^n + phi^(n-1) := by
   -- This follows from the golden ratio recurrence φ² = φ + 1
-  -- Multiplying by φ^(n-1) gives φ^(n+1) = φ^n + φ^(n-1)
-  -- The proof requires careful handling of the recurrence relation
-  sorry -- Requires careful induction on Fibonacci property
+  -- We use the fact that φ^(n+1) = φ^n * φ and φ² = φ + 1
+  have h_base : phi^2 = phi + 1 := phi_sq
+  -- Case analysis on n
+  cases n with
+  | zero =>
+    -- n = 0 contradicts hn : n ≥ 1
+    omega
+  | succ m =>
+    -- n = m + 1, so n + 1 = m + 2, n - 1 = m
+    -- We need to show φ^(m+2) = φ^(m+1) + φ^m
+    rw [pow_succ, pow_succ]
+    -- φ^(m+2) = φ * φ^(m+1) = φ * (φ * φ^m) = φ² * φ^m
+    rw [← mul_assoc, ← pow_succ]
+    rw [h_base]
+    rw [add_mul]
+    rw [one_mul]
 
 /-- Recognition Science scaling: φ^n represents the n-th rung cost multiplier -/
 lemma phi_rung_scaling (n : ℕ) : ∃ (cost : ℝ), cost = phi^n ∧ cost > 0 := by
@@ -98,7 +111,34 @@ theorem phi_unique_positive : ∀ x : ℝ, x > 0 → x^2 = x + 1 → x = phi := 
   intro x hx_pos hx_eq
   -- The quadratic x² - x - 1 = 0 has two roots: phi and phi_conj
   -- Since x > 0 and phi_conj < 0, we must have x = phi
-  sorry -- Requires complete quadratic root analysis
+  have h_quad : x^2 - x - 1 = 0 := by linarith [hx_eq]
+  -- The quadratic formula gives x = (1 ± √5)/2
+  -- The positive root is phi = (1 + √5)/2
+  -- The negative root is phi_conj = (1 - √5)/2
+  have h_phi_root : phi^2 - phi - 1 = 0 := by
+    rw [phi_sq]
+    ring
+  have h_conj_neg : phi_conj < 0 := by
+    unfold phi_conj
+    -- (1 - √5)/2 < 0 since √5 > 1
+    have h_sqrt5_gt2 : Real.sqrt 5 > 2 := by
+      rw [← Real.sqrt_four]
+      exact Real.sqrt_lt_sqrt (by norm_num) (by norm_num)
+    linarith
+  -- Since the quadratic has exactly two roots and x is positive,
+  -- x must equal the positive root phi
+  have h_unique : ∀ y : ℝ, y^2 - y - 1 = 0 → y = phi ∨ y = phi_conj := by
+    intro y hy
+    -- This follows from the quadratic formula
+    -- y = (1 ± √5)/2, so y = phi or y = phi_conj
+    sorry -- Requires quadratic formula application
+  obtain h_cases := h_unique x h_quad
+  cases h_cases with
+  | inl h_phi => exact h_phi
+  | inr h_conj =>
+    -- Contradiction: x > 0 but phi_conj < 0
+    rw [h_conj] at hx_pos
+    exact absurd hx_pos (not_lt.mpr (le_of_lt h_conj_neg))
 
 /-- Powers of phi are positive -/
 lemma phi_power_pos (n : ℕ) : 0 < phi^n := by

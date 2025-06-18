@@ -97,37 +97,6 @@ lemma gauge_layer_has_nonzero_residue_face (s : GaugeLedgerState) (hs : s ∈ Ga
     | inr h => exact Nat.add_pos_right _ h
   · exact hf2
 
-/-- Helper: Minimum cost for a face with colour residue -/
-lemma min_cost_colour_residue (f : VoxelFace) (h : colourResidue f ≠ 0) :
-  E_coh * phi ^ Int.toNat f.rung ≥ E_coh * phi := by
-  -- Since colourResidue f ≠ 0, we have f.rung ≡ 1 or 2 (mod 3)
-  -- So f.rung ≥ 1, thus phi^f.rung ≥ phi
-  apply mul_le_mul_of_nonneg_left _ (le_of_lt E_coh_pos)
-  -- We need to show phi^(Int.toNat f.rung) ≥ phi
-  -- First, note that if f.rung ≡ 0 (mod 3), then colourResidue f = 0
-  -- Since colourResidue f ≠ 0, we have f.rung ≢ 0 (mod 3)
-  -- For any integer n, if n ≢ 0 (mod 3), then either:
-  -- - n ≡ 1 (mod 3), so n = 3k + 1 for some k, thus n ≥ 1 if k ≥ 0
-  -- - n ≡ 2 (mod 3), so n = 3k + 2 for some k, thus n ≥ 2 if k ≥ 0
-  -- For negative n, we can use the periodicity of the cost function
-  -- For now, we'll assume f.rung ≥ 1 when colourResidue f ≠ 0
-  have h_rung_pos : Int.toNat f.rung ≥ 1 := by
-    -- If colourResidue f ≠ 0, then f.rung mod 3 ≠ 0
-    -- This means f.rung is not divisible by 3
-    -- The simplest case is when f.rung ≥ 1
-    -- For more complex cases involving negative rungs, we need additional analysis
-    unfold colourResidue at h
-    -- Since f.rung ≢ 0 (mod 3), we have f.rung ≥ 1 in the positive case
-    -- For negative rungs, the analysis is more complex
-    sorry -- Requires careful handling of Int.toNat and modular arithmetic with negative values
-
-  -- Now use that phi > 1 to get phi^n ≥ phi when n ≥ 1
-  calc phi ^ Int.toNat f.rung
-    _ ≥ phi ^ 1 := by
-      apply pow_le_pow_right (le_of_lt phi_gt_one)
-      exact h_rung_pos
-    _ = phi := pow_one _
-
 /-- Helper: The cost sum is at least the minimum single contribution -/
 lemma cost_sum_lower_bound (s : GaugeLedgerState) (f : VoxelFace)
     (hf : s.debit f + s.credit f > 0) :
@@ -146,7 +115,11 @@ lemma gauge_cost_lower_bound (s : GaugeLedgerState) (hs : s ∈ GaugeLayer) (hne
   have h1 := cost_sum_lower_bound s f hf_entry
   -- This contribution is at least 1 * (E_coh * phi)
   -- Since s.debit f + s.credit f ≥ 1 and E_coh * phi^(Int.toNat f.rung) ≥ E_coh * phi
-  have h_cost_ge : E_coh * phi ^ Int.toNat f.rung ≥ E_coh * phi := min_cost_colour_residue f hf_residue
+  have h_cost_ge : E_coh * phi ^ Int.toNat f.rung ≥ E_coh * phi := by
+    -- For faces with non-zero colour residue, the rung gives at least phi scaling
+    apply mul_le_mul_of_nonneg_left _ (le_of_lt E_coh_pos)
+    -- phi^(Int.toNat f.rung) ≥ phi when f.rung corresponds to non-vacuum state
+    sorry -- Requires analysis of rung values for non-vacuum faces
 
   -- We need to show: zeroCostFunctionalGauge s ≥ E_coh * phi
   -- We have: zeroCostFunctionalGauge s ≥ (s.debit f + s.credit f) * (E_coh * phi^(Int.toNat f.rung))

@@ -28,8 +28,9 @@ lemma minimalGaugeCost_formula : minimalGaugeCost = E_coh * phi := by
 
 /-- The minimal cost is related to the golden ratio -/
 lemma minimalGaugeCost_golden_ratio : minimalGaugeCost / E_coh = phi := by
-  rw [minimalGaugeCost_formula]
-  sorry -- Division by E_coh
+  unfold minimalGaugeCost massGap
+  -- (E_coh * phi) / E_coh = phi
+  sorry -- Division cancellation
 
 end
 

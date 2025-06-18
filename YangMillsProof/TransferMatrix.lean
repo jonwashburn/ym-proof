@@ -172,7 +172,17 @@ theorem transfer_gap_implies_mass_gap :
 /-- The transfer matrix encodes the rung structure -/
 lemma transfer_matrix_rung_structure (n : ℕ) :
   (transferMatrix ^ n) 0 0 = if n % 3 = 0 then 1/phi^(2*(n/3)) else 0 := by
-  sorry -- Matrix power computation - requires detailed recurrence analysis
+  -- The transfer matrix has a cyclic structure with period 3
+  -- We prove this by induction on n
+  induction n with
+  | zero =>
+    -- Base case: n = 0
+    simp [pow_zero, Matrix.one_apply]
+    -- (transferMatrix^0) 0 0 = I 0 0 = 1
+    -- And 0 % 3 = 0, 0 / 3 = 0, so 1/phi^(2*0) = 1
+  | succ m ih =>
+    -- Inductive step: assume true for m, prove for m + 1
+    sorry -- Matrix power computation - requires detailed recurrence analysis
 
 /-- Spectral decomposition of transfer matrix -/
 noncomputable def spectralProjector : Matrix (Fin 3) (Fin 3) ℝ :=
@@ -193,18 +203,14 @@ lemma transferEigenvalue_real : transferEigenvalue 0 = 1 / phi := by
 lemma transferEigenvalue_conjugate :
     starRingEnd ℂ (transferEigenvalue 1) = transferEigenvalue 2 := by
   unfold transferEigenvalue
-  simp [Complex.exp_conj]
-  -- We need to show: conj((1/phi) * exp(2πi/3)) = (1/phi) * exp(4πi/3)
-  -- This follows from the periodicity of complex exponentials
-  -- and the fact that conj(exp(iθ)) = exp(-iθ)
-  sorry -- Complex arithmetic with exponential conjugation
+  -- conj((1/phi) * exp(2πi/3)) = (1/phi) * exp(4πi/3) by periodicity
+  sorry -- Complex exponential conjugation
 
 /-- All eigenvalues have modulus 1/phi -/
 lemma transferEigenvalue_norm (k : Fin 3) :
     Complex.abs (transferEigenvalue k) = 1 / phi := by
   unfold transferEigenvalue
-  -- abs of product is product of abs
-  -- abs(1/phi * exp(...)) = abs(1/phi) * abs(exp(...)) = (1/phi) * 1 = 1/phi
+  -- abs(1/phi * exp(2πik/3)) = abs(1/phi) * abs(exp(2πik/3)) = (1/phi) * 1 = 1/phi
   sorry -- Complex absolute value computation
 
 /-- The characteristic polynomial factors as product over eigenvalues -/
@@ -221,7 +227,7 @@ noncomputable def minEigenvalueGap : ℝ :=
 /-- The eigenvalue gap is positive -/
 lemma minEigenvalueGap_pos : minEigenvalueGap > 0 := by
   unfold minEigenvalueGap transferEigenvalue
-  -- transferEigenvalue 1 = (1/phi) * exp(2πi/3) ≠ 1/phi
+  -- transferEigenvalue 1 = (1/phi) * exp(2πi/3) ≠ 1/phi since exp(2πi/3) ≠ 1
   sorry -- Complex number computation
 
 /-- The eigenvalue gap relates to the spectral gap -/
@@ -287,9 +293,10 @@ lemma transfer_preserves_symplectic :
   transferMatrix.transpose * symplecticForm * transferMatrix = symplecticForm := by
   unfold transferMatrix symplecticForm
   -- Direct matrix computation
-  ext i j
-  fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Matrix.transpose_apply]
-  all_goals sorry -- Matrix multiplication computation
+  -- transferMatrix = [[0,1,0],[0,0,1],[1/phi^2,0,0]]
+  -- symplecticForm = [[0,0,1],[0,-1,0],[1,0,0]]
+  -- We need to compute M^T * S * M = S
+  sorry -- Matrix multiplication verification
 
 /-- The minimal polynomial of the transfer matrix -/
 lemma transfer_minpoly :
@@ -355,9 +362,17 @@ theorem transfer_matrix_gap_theorem :
 /-- The determinant of the transfer matrix -/
 lemma transferMatrix_det : transferMatrix.det = 1/phi^2 := by
   unfold transferMatrix
-  -- Compute the determinant of the 3x3 matrix [[0,1,0],[0,0,1],[1/phi^2,0,0]]
-  -- This is a permutation matrix times 1/phi^2, so det = 1/phi^2
-  sorry -- Direct determinant computation
+  -- Compute det([[0,1,0],[0,0,1],[1/phi^2,0,0]]) using cofactor expansion
+  -- det = 0*(det([[0,1],[0,0]])) - 1*(det([[0,1],[1/phi^2,0]])) + 0*(det([[0,0],[1/phi^2,0]]))
+  -- = 0 - 1*(0*0 - 1*(1/phi^2)) + 0
+  -- = -1*(-1/phi^2) = 1/phi^2
+  rw [Matrix.det_fin_three]
+  simp only [Matrix.of_apply]
+  -- The matrix entries are: (0,0)=0, (0,1)=1, (0,2)=0
+  --                        (1,0)=0, (1,1)=0, (1,2)=1
+  --                        (2,0)=1/phi^2, (2,1)=0, (2,2)=0
+  -- The computation gives 1/phi^2
+  sorry -- Arithmetic simplification
 
 /-- The (0,0) entry of the transfer matrix -/
 lemma transferMatrix_00 : transferMatrix 0 0 = 0 := by

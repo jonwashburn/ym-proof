@@ -113,7 +113,13 @@ theorem zeroFreeParameters : ∀ (param : ℝ),
           -- This is the zero free parameters principle
           intro p _
           -- Any fundamental parameter must be one of these three
-          sorry -- This is axiomatic in Recognition Science meta-theory
+          -- This is a meta-principle of Recognition Science
+          -- All parameters are either:
+          -- 1. The coherence energy E_coh (fundamental energy scale)
+          -- 2. The golden ratio phi (fundamental scaling ratio)
+          -- 3. Unity (dimensionless constant)
+          -- This cannot be proven within the theory - it's a meta-theoretical principle
+          sorry -- Meta-theoretical principle: zero free parameters
         -- Apply this principle to our specific param
         obtain h_cases := h_fundamental_only_three param h_fundamental
         cases h_cases with

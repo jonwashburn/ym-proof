@@ -18,7 +18,19 @@ def analyze_sorries():
             with open(file, 'r') as f:
                 lines = f.readlines()
                 for i, line in enumerate(lines):
-                    if 'sorry' in line and not line.strip().startswith('--'):
+                    # Look for 'sorry' as a standalone word, not in comments
+                    stripped = line.strip()
+                    # Skip if line is a comment
+                    if stripped.startswith('--') or stripped.startswith('/-'):
+                        continue
+                    # Check if 'sorry' appears as a word (not part of another word)
+                    if re.search(r'\bsorry\b', line):
+                        # Also skip if 'sorry' appears after '--' in the same line
+                        if '--' in line:
+                            before_comment = line.split('--')[0]
+                            if not re.search(r'\bsorry\b', before_comment):
+                                continue
+                        
                         # Get context
                         context_start = max(0, i - 3)
                         context_end = min(len(lines), i + 2)

@@ -96,6 +96,13 @@ lemma char_matrix_12 : transferMatrix_sub_X 1 2 = Polynomial.C 1 := by
   unfold transferMatrix_sub_X transferMatrix
   simp [Matrix.map_apply, Matrix.sub_apply, Matrix.smul_apply, Matrix.one_apply]
 
+/-- Helper: Compute the (2,1) entry of the characteristic matrix -/
+lemma char_matrix_21 : transferMatrix_sub_X 2 1 = 0 := by
+  unfold transferMatrix_sub_X transferMatrix
+  simp only [Matrix.map_apply, Matrix.sub_apply, Matrix.smul_apply, Matrix.one_apply]
+  -- transferMatrix 2 1 = 0 and the matrix multiplication gives 0 - 0 = 0
+  rfl
+
 /-- Helper: Determinant computation for our specific matrix pattern -/
 lemma det_cyclic_matrix :
     Matrix.det transferMatrix_sub_X = -Polynomial.X^3 + Polynomial.C (1/phi^2) := by
@@ -111,17 +118,16 @@ lemma det_cyclic_matrix :
   have h10 : transferMatrix_sub_X 1 0 = 0 := by
     unfold transferMatrix_sub_X transferMatrix
     simp [Matrix.map_apply, Matrix.sub_apply, Matrix.smul_apply, Matrix.one_apply]
-  have h21 : transferMatrix_sub_X 2 1 = 0 := by
-    unfold transferMatrix_sub_X transferMatrix
-    simp [Matrix.map_apply, Matrix.sub_apply, Matrix.smul_apply, Matrix.one_apply]
-    rfl
+  have h21 : transferMatrix_sub_X 2 1 = 0 := char_matrix_21
+
   rw [h02, h10, h21]
   -- Now compute: (-X) * ((-X) * (-X) - 1 * 0) - 1 * (0 * (-X) - 1 * C(1/phi²)) + 0 * (0 * 0 - (-X) * 0)
   -- = (-X) * (X²) - 1 * (-C(1/phi²)) + 0
   -- = -X³ + C(1/phi²)
   simp only [mul_zero, zero_mul, sub_zero, zero_sub, add_zero, neg_mul, mul_neg, neg_neg]
   -- The computation gives us -X³ + C(1/phi²)
-  sorry -- Polynomial arithmetic
+  -- After simplification: (-X) * (X²) - 1 * (-C(1/phi²)) = -X³ + C(1/phi²)
+  ring_nf
 
 /-- The eigenvalues of the transfer matrix -/
 lemma transferMatrix_eigenvalues :
@@ -209,14 +215,18 @@ lemma transferEigenvalue_conjugate :
     starRingEnd ℂ (transferEigenvalue 1) = transferEigenvalue 2 := by
   unfold transferEigenvalue
   -- conj((1/phi) * exp(2πi/3)) = (1/phi) * exp(4πi/3) by periodicity
-  sorry -- Complex exponential conjugation
+  -- This follows from complex conjugation and periodicity properties of the exponential
+  -- The detailed proof requires careful handling of complex exponentials and roots of unity
+  sorry -- Complex exponential conjugation - requires periodicity lemmas
 
 /-- All eigenvalues have modulus 1/phi -/
 lemma transferEigenvalue_norm (k : Fin 3) :
     Complex.abs (transferEigenvalue k) = 1 / phi := by
   unfold transferEigenvalue
   -- abs(1/phi * exp(2πik/3)) = abs(1/phi) * abs(exp(2πik/3)) = (1/phi) * 1 = 1/phi
-  sorry -- Complex absolute value computation
+  -- For any complex exponential on the unit circle, the absolute value is preserved
+  -- The key insight is that exp(2πik/3) has modulus 1, so the result is 1/phi
+  sorry -- Complex absolute value computation - requires unit circle properties
 
 /-- The characteristic polynomial factors as product over eigenvalues -/
 lemma charPoly_factorization :
@@ -311,7 +321,8 @@ lemma transfer_preserves_symplectic :
   -- transferMatrix = [[0,1,0],[0,0,1],[1/phi^2,0,0]]
   -- symplecticForm = [[0,0,1],[0,-1,0],[1,0,0]]
   -- We need to compute M^T * S * M = S
-  sorry -- Matrix multiplication verification
+  -- This is a lengthy computation that we defer
+  sorry -- Matrix multiplication verification - requires detailed computation
 
 /-- The minimal polynomial of the transfer matrix -/
 lemma transfer_minpoly :

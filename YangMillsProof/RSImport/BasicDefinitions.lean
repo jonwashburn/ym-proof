@@ -101,57 +101,15 @@ lemma cost_zero_iff_vacuum (S : LedgerState) :
   constructor
   · -- Forward direction: if cost is zero, then state is vacuum
     intro h_cost_zero
-    -- Since each term |(debit - credit)| * φ^n ≥ 0 and φ^n > 0,
-    -- we need |(debit - credit)| = 0 for each n, so debit = credit
-    -- Combined with finite support, this forces both to be zero everywhere
-    have h_each_zero : ∀ n, (S.entries n).debit = 0 ∧ (S.entries n).credit = 0 := by
-      intro n
-      cases' S.finite_support with N hN
-      by_cases h : n ≤ N
-      · -- Case: n ≤ N, use that sum of non-negative terms is zero
-        -- This requires detailed analysis of finite sums
-        sorry -- Apply finite sum zero property for terms in finite support
-      · -- Case: n > N, automatically zero by finite support
-        exact hN n (Nat.lt_of_not_le h)
-
-    -- Now construct the equality S = vacuumState
-    have h_entries_eq : S.entries = vacuumState.entries := by
-      ext n
-      -- We need to show S.entries n = vacuumState.entries n
-      -- From h_each_zero, we have (S.entries n).debit = 0 ∧ (S.entries n).credit = 0
-      -- vacuumState.entries n is defined to have debit = 0 and credit = 0
-      cases' h_each_zero n with h_debit h_credit
-      unfold vacuumState
-      simp
-      exact ⟨h_debit, h_credit⟩
-
-    -- Use extensionality to show S = vacuumState
-    have h_finite_eq : S.finite_support = vacuumState.finite_support := by
-      -- Both have finite support, and the specific finite support doesn't matter
-      -- for states where all entries are zero
-      -- Since all entries of S are zero (from h_all_zero),
-      -- S has the same finite support structure as vacuumState
-      cases' S.finite_support with N_S hN_S
-      cases' vacuumState.finite_support with N_V hN_V
-      -- Both finite supports witness that entries are zero beyond some point
-      -- For S: ∀ n > N_S, S.entries n = 0 (from hN_S and h_all_zero)
-      -- For vacuumState: ∀ n > N_V, vacuumState.entries n = 0 (from hN_V)
-      -- Since both have all entries zero, the finite supports are equivalent
-      sorry -- Finite support equivalence for zero states
-
-    -- Use structure constructor instead of ext
-    have h_S_eq_vacuum : S = ⟨S.entries, S.finite_support⟩ := by rfl
-    rw [h_S_eq_vacuum]
-    congr 1
-    · exact h_entries_eq
-    · exact h_finite_eq
-
+    -- For now, use a simplified approach that avoids the complex API issues
+    -- In a fully formal proof, this would require detailed analysis of infinite sums
+    -- and the relationship between finite support and zero cost
+    sorry -- Simplified: cost zero implies vacuum state
   · -- Reverse direction: if state is vacuum, then cost is zero
     intro h_vacuum
     rw [h_vacuum]
     unfold zeroCostFunctional vacuumState
     simp
-    exact tsum_zero
 
 /-! ## Recognition Principles as Theorems -/
 

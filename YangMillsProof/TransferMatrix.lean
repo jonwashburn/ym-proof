@@ -110,27 +110,83 @@ lemma char_matrix_10 : transferMatrix_sub_X 1 0 = 0 := by
 /-- Helper: Determinant computation for our specific matrix pattern -/
 lemma det_cyclic_matrix :
     Matrix.det transferMatrix_sub_X = -Polynomial.X ^ 3 + Polynomial.C (1/phi^2) := by
-  sorry
+  -- Use the 3x3 determinant formula
+  rw [Matrix.det_fin_three]
+  -- Substitute the known entries using our helper lemmas
+  rw [char_matrix_00, char_matrix_11, char_matrix_22]  -- Diagonal: -X
+  rw [char_matrix_01, char_matrix_12, char_matrix_20]  -- Off-diagonal non-zero
+  rw [char_matrix_02, char_matrix_10, char_matrix_21]  -- Zero entries
+
+  -- Now compute: det = a₀₀(a₁₁a₂₂ - a₁₂a₂₁) - a₀₁(a₁₀a₂₂ - a₁₂a₂₀) + a₀₂(a₁₀a₂₁ - a₁₁a₂₀)
+  -- With our values:
+  -- det = (-X)((-X)(-X) - 1·0) - 1·(0·(-X) - 1·C(1/phi²)) + 0·(0·0 - (-X)·C(1/phi²))
+  -- = (-X)(X²) - 1·(0 - C(1/phi²)) + 0
+  -- = -X³ + C(1/phi²)
+
+  ring_nf
+  -- We need to simplify C(1)^2 * C(phi⁻¹^2) = C(phi⁻¹^2)
+  simp only [Polynomial.C_1, one_pow, one_mul]
 
 /-- The eigenvalues of the transfer matrix -/
 lemma transferMatrix_eigenvalues :
   charPoly = Polynomial.X^3 - Polynomial.C (1/phi^2) := by
   -- The characteristic polynomial is det(X*I - transferMatrix)
   -- We computed det(transferMatrix - X*I) = -X³ + 1/phi²
-  -- The characteristic polynomial is -det(transferMatrix - X*I) = X³ - 1/phi²
-  sorry -- Matrix charpoly relationship with determinant
+  -- For odd dimension, det(X*I - A) = -det(A - X*I)
+  -- So charPoly = -(-X³ + 1/phi²) = X³ - 1/phi²
+  unfold charPoly
+  rw [Matrix.charpoly]
+  -- The characteristic polynomial is det(X • 1 - C(transferMatrix))
+  -- This equals det of the matrix with entries X*δᵢⱼ - transferMatrix i j
+  -- Which is exactly -transferMatrix_sub_X by our definition
+  -- Skip complex matrix determinant proof for now
+  sorry
 
 /-- The transfer matrix has eigenvalue 1/phi -/
 lemma transferMatrix_has_eigenvalue_inv_phi :
   (Matrix.charpoly transferMatrix).eval (1/phi) = 0 := by
-  -- We'll use a direct calculation approach
-  -- The eigenvalue equation is det(transferMatrix - (1/phi)*I) = 0
-  -- This is equivalent to evaluating the charpoly at 1/phi
-  -- We can compute this directly from the matrix entries
-  -- For the transfer matrix [[0,1,0],[0,0,1],[1/phi²,0,0]],
-  -- the characteristic polynomial should have 1/phi as a root
-  -- This follows from the golden ratio properties of the transfer matrix
-  sorry -- Direct eigenvalue computation using golden ratio identities
+  -- Use the characteristic polynomial from transferMatrix_eigenvalues
+  rw [← charPoly, transferMatrix_eigenvalues]
+  -- Evaluate X³ - C(1/phi²) at X = 1/phi
+  simp only [Polynomial.eval_sub, Polynomial.eval_pow, Polynomial.eval_X, Polynomial.eval_C]
+  -- We need to show: (1/phi)³ - 1/phi² = 0
+  -- This is equivalent to: 1/phi³ = 1/phi²
+  -- Which means: phi³ = phi²
+  -- Dividing by phi²: phi = 1
+  -- But that's wrong! Let's reconsider...
+  -- Actually, we need: (1/phi)³ - 1/phi² = 0
+  -- Multiply by phi³: 1 - phi = 0, so phi = 1 (wrong!)
+  -- The issue is our characteristic polynomial should be X³ - C(1/phi²) = 0
+  -- But 1/phi is not actually a root of X³ - 1/phi²
+  -- Let me check: if λ³ = 1/phi², then λ = (1/phi²)^(1/3) = 1/phi^(2/3)
+  -- Actually, the eigenvalues are the cube roots of 1/phi²
+  -- So we need to verify that (1/phi)³ = 1/phi²
+  -- From the golden ratio: phi² = phi + 1
+  -- Therefore: 1/phi² = 1/(phi + 1)
+  -- And: 1/phi³ = 1/(phi³) = 1/(phi·phi²) = 1/(phi(phi + 1))
+  -- We need to show: 1/phi³ = 1/phi²
+  -- This would mean: phi² = phi³, or 1 = phi (contradiction!)
+  --
+  -- Actually, I think the issue is that our transfer matrix should have been defined differently
+  -- to make 1/phi an eigenvalue. Let me check the actual eigenvalue equation.
+  -- For the cyclic matrix [[0,1,0],[0,0,1],[1/phi²,0,0]], the eigenvalues satisfy:
+  -- det(λI - T) = λ³ - 1/phi² = 0
+  -- So λ³ = 1/phi²
+  -- The three cube roots are: 1/phi^(2/3), ω/phi^(2/3), ω²/phi^(2/3)
+  -- where ω = exp(2πi/3)
+  -- So 1/phi is NOT an eigenvalue unless phi^(3/2) = phi, which is false.
+  --
+  -- This suggests the lemma statement is incorrect. For now, let's prove what we can:
+  -- that the characteristic polynomial evaluated at 1/phi gives a specific value.
+  have h_phi_identity : phi^2 = phi + 1 := phi_sq
+  -- Calculate (1/phi)³ - 1/phi²
+  have h_calc : (1/phi)^3 - 1/phi^2 = 1/phi^2 * (1/phi - 1) := by
+    field_simp
+    ring
+  rw [h_calc]
+  -- Now we need to show: 1/phi² * (1/phi - 1) = 0
+  -- This requires 1/phi - 1 = 0, or phi = 1, which is false
+  sorry -- The statement needs correction - 1/phi is not an eigenvalue
 
 /-- The spectral gap of the transfer matrix -/
 noncomputable def transferSpectralGap : ℝ := 1/phi - 1/phi^2
@@ -209,9 +265,6 @@ lemma transferEigenvalue_conjugate :
 lemma transferEigenvalue_norm (k : Fin 3) :
     Complex.abs (transferEigenvalue k) = 1 / phi := by
   unfold transferEigenvalue
-  -- abs(1/phi * exp(2πik/3)) = abs(1/phi) * abs(exp(2πik/3)) = (1/phi) * 1 = 1/phi
-  -- For any complex exponential on the unit circle, the absolute value is preserved
-  -- The key insight is that exp(2πik/3) has modulus 1, so the result is 1/phi
   -- abs(1/phi * exp(2πik/3)) = abs(1/phi) * abs(exp(2πik/3)) = (1/phi) * 1 = 1/phi
   -- For any complex exponential on the unit circle, the absolute value is preserved
   -- The key insight is that exp(2πik/3) has modulus 1, so the result is 1/phi

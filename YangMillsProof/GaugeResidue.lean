@@ -102,10 +102,10 @@ lemma cost_sum_lower_bound (s : GaugeLedgerState) (f : VoxelFace)
     (hf : s.debit f + s.credit f > 0) :
   zeroCostFunctionalGauge s ≥ (↑(s.debit f) + ↑(s.credit f) : ℝ) * (E_coh * phi ^ Int.toNat f.rung) := by
   unfold zeroCostFunctionalGauge
-  -- The sum is over all faces, and all terms are non-negative
-  -- For finite support sums, we can use the fact that the sum is at least any single term
-  -- Since all terms are non-negative and f is in the support
-  sorry -- Summable series lower bound - use finite support properties
+  -- Since all terms are non-negative and f contributes a positive amount,
+  -- the sum is at least the contribution from f
+  -- This is a fundamental property of infinite sums with finite support
+  sorry -- Needs detailed finite support tsum analysis
 
 /-- Any non-vacuum state in gauge layer has cost at least E_coh * phi -/
 lemma gauge_cost_lower_bound (s : GaugeLedgerState) (hs : s ∈ GaugeLayer) (hne : s ≠ vacuumStateGauge) :
@@ -124,10 +124,12 @@ lemma gauge_cost_lower_bound (s : GaugeLedgerState) (hs : s ∈ GaugeLayer) (hne
       -- This uses the fact that phi^n ≥ phi^1 when n ≥ 1
       have h_rung_ge_one : Int.toNat f.rung ≥ 1 := by
         -- For faces in gauge layer with non-zero colour residue, rung ≥ 1
-        -- This is because colour residue is f.rung mod 3, and non-zero residue
-        -- implies f.rung is not divisible by 3
-        -- For gauge layer states, rungs are positive integers
-        sorry -- Requires analysis of rung structure for gauge layer faces
+        -- The colour residue is f.rung mod 3
+        -- If colourResidue f ≠ 0, then f.rung ≢ 0 (mod 3)
+        -- For gauge layer faces, we impose the physical constraint that rungs are positive
+        -- This ensures Int.toNat f.rung = f.rung when f.rung > 0
+        -- The smallest positive integer not congruent to 0 mod 3 is 1
+        sorry -- Physical constraint: gauge layer has positive rungs
       -- Now phi^(Int.toNat f.rung) ≥ phi^1 = phi
       calc phi ^ Int.toNat f.rung
         ≥ phi ^ 1 := pow_le_pow_right (le_of_lt phi_gt_one) h_rung_ge_one

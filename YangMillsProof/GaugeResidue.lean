@@ -103,8 +103,9 @@ lemma cost_sum_lower_bound (s : GaugeLedgerState) (f : VoxelFace)
   zeroCostFunctionalGauge s ≥ (↑(s.debit f) + ↑(s.credit f) : ℝ) * (E_coh * phi ^ Int.toNat f.rung) := by
   unfold zeroCostFunctionalGauge
   -- The sum is over all faces, and all terms are non-negative
-  -- So the sum is at least any single term
-  sorry -- Summable series lower bound - requires tsum properties
+  -- For finite support sums, we can use the fact that the sum is at least any single term
+  -- Since all terms are non-negative and f is in the support
+  sorry -- Summable series lower bound - use finite support properties
 
 /-- Any non-vacuum state in gauge layer has cost at least E_coh * phi -/
 lemma gauge_cost_lower_bound (s : GaugeLedgerState) (hs : s ∈ GaugeLayer) (hne : s ≠ vacuumStateGauge) :
@@ -118,8 +119,20 @@ lemma gauge_cost_lower_bound (s : GaugeLedgerState) (hs : s ∈ GaugeLayer) (hne
   have h_cost_ge : E_coh * phi ^ Int.toNat f.rung ≥ E_coh * phi := by
     -- For faces with non-zero colour residue, the rung gives at least phi scaling
     apply mul_le_mul_of_nonneg_left _ (le_of_lt E_coh_pos)
-    -- phi^(Int.toNat f.rung) ≥ phi when f.rung corresponds to non-vacuum state
-    sorry -- Requires analysis of rung values for non-vacuum faces
+    -- For gauge layer faces with non-zero colour residue, the power is at least 1
+    have h_pow_ge : phi ^ Int.toNat f.rung ≥ phi := by
+      -- This uses the fact that phi^n ≥ phi^1 when n ≥ 1
+      have h_rung_ge_one : Int.toNat f.rung ≥ 1 := by
+        -- For faces in gauge layer with non-zero colour residue, rung ≥ 1
+        -- This is because colour residue is f.rung mod 3, and non-zero residue
+        -- implies f.rung is not divisible by 3
+        -- For gauge layer states, rungs are positive integers
+        sorry -- Requires analysis of rung structure for gauge layer faces
+      -- Now phi^(Int.toNat f.rung) ≥ phi^1 = phi
+      calc phi ^ Int.toNat f.rung
+        ≥ phi ^ 1 := pow_le_pow_right (le_of_lt phi_gt_one) h_rung_ge_one
+        _ = phi := pow_one phi
+    exact h_pow_ge
 
   -- We need to show: zeroCostFunctionalGauge s ≥ E_coh * phi
   -- We have: zeroCostFunctionalGauge s ≥ (s.debit f + s.credit f) * (E_coh * phi^(Int.toNat f.rung))
@@ -127,19 +140,25 @@ lemma gauge_cost_lower_bound (s : GaugeLedgerState) (hs : s ∈ GaugeLayer) (hne
   -- And: E_coh * phi^(Int.toNat f.rung) ≥ E_coh * phi
   -- Therefore: (s.debit f + s.credit f) * (E_coh * phi^(Int.toNat f.rung)) ≥ 1 * (E_coh * phi) = E_coh * phi
 
-  calc zeroCostFunctionalGauge s
-    ≥ (↑(s.debit f) + ↑(s.credit f)) * (E_coh * phi ^ Int.toNat f.rung) := h1
-    _ ≥ 1 * (E_coh * phi ^ Int.toNat f.rung) := by
-      apply mul_le_mul_of_nonneg_right
-      · have : 1 ≤ s.debit f + s.credit f := hf_entry
-        calc (↑(s.debit f) + ↑(s.credit f) : ℝ)
-          = ↑(s.debit f + s.credit f) := (Nat.cast_add _ _).symm
-          _ ≥ (1 : ℝ) := Nat.one_le_cast.mpr this
-      · exact mul_nonneg (le_of_lt E_coh_pos) (le_of_lt (pow_pos phi_pos _))
-    _ ≥ 1 * (E_coh * phi) := by
-      rw [one_mul, one_mul]
-      exact h_cost_ge
-    _ = E_coh * phi := one_mul _
+  have h_entry_ge_one : (1 : ℝ) ≤ ↑(s.debit f + s.credit f) := by
+    -- s.debit f + s.credit f > 0 and they are naturals, so ≥ 1
+    have : 1 ≤ s.debit f + s.credit f := hf_entry
+    exact Nat.one_le_cast.mpr this
+
+  -- Complete the final calculation
+  have h_final : zeroCostFunctionalGauge s ≥ E_coh * phi := by
+    calc zeroCostFunctionalGauge s
+      ≥ (↑(s.debit f) + ↑(s.credit f)) * (E_coh * phi ^ Int.toNat f.rung) := h1
+      _ = ↑(s.debit f + s.credit f) * (E_coh * phi ^ Int.toNat f.rung) := by
+        rw [Nat.cast_add]
+      _ ≥ 1 * (E_coh * phi ^ Int.toNat f.rung) := by
+        apply mul_le_mul_of_nonneg_right h_entry_ge_one
+        exact mul_nonneg (le_of_lt E_coh_pos) (le_of_lt (pow_pos phi_pos _))
+      _ ≥ 1 * (E_coh * phi) := by
+        rw [one_mul, one_mul]
+        exact h_cost_ge
+      _ = E_coh * phi := one_mul _
+  exact h_final
 
 /-- Helper: vacuum state has zero cost -/
 lemma vacuum_zero_cost : zeroCostFunctionalGauge vacuumStateGauge = 0 := by

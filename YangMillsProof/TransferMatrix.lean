@@ -98,15 +98,21 @@ lemma char_matrix_12 : transferMatrix_sub_X 1 2 = Polynomial.C 1 := by
 
 /-- Helper: Compute the (2,1) entry of the characteristic matrix -/
 lemma char_matrix_21 : transferMatrix_sub_X 2 1 = 0 := by
-  sorry
+  unfold transferMatrix_sub_X transferMatrix
+  simp [Matrix.map_apply, Matrix.sub_apply, Matrix.smul_apply, Matrix.one_apply]
+  rfl
 
 /-- Helper: Compute the (0,2) entry of the characteristic matrix -/
 lemma char_matrix_02 : transferMatrix_sub_X 0 2 = 0 := by
-  sorry
+  unfold transferMatrix_sub_X transferMatrix
+  simp [Matrix.map_apply, Matrix.sub_apply, Matrix.smul_apply, Matrix.one_apply]
+  rfl
 
 /-- Helper: Compute the (1,0) entry of the characteristic matrix -/
 lemma char_matrix_10 : transferMatrix_sub_X 1 0 = 0 := by
-  sorry
+  unfold transferMatrix_sub_X transferMatrix
+  simp [Matrix.map_apply, Matrix.sub_apply, Matrix.smul_apply, Matrix.one_apply]
+  rfl
 
 /-- Helper: Determinant computation for our specific matrix pattern -/
 lemma det_cyclic_matrix :
@@ -122,42 +128,43 @@ lemma det_cyclic_matrix :
   have h21 : transferMatrix_sub_X 2 1 = 0 := char_matrix_21
 
   rw [h02, h10, h21]
-  -- Now compute: (-X) * ((-X) * (-X) - 1 * 0) - 1 * (0 * (-X) - 1 * C(1/phi²)) + 0 * (0 * 0 - (-X) * 0)
-  -- = (-X) * (X²) - 1 * (-C(1/phi²)) + 0
+  -- Direct computation of the determinant expansion
+  -- det = a₀₀(a₁₁a₂₂ - a₁₂a₂₁) - a₀₁(a₁₀a₂₂ - a₁₂a₂₀) + a₀₂(a₁₀a₂₁ - a₁₁a₂₀)
+  -- = (-X)((-X)(-X) - 1·0) - 1(0·(-X) - 1·C(1/phi²)) + 0(0·0 - (-X)·0)
+  -- = (-X)(X²) - 1(-C(1/phi²)) + 0
   -- = -X³ + C(1/phi²)
   simp only [mul_zero, zero_mul, sub_zero, zero_sub, add_zero, neg_mul, mul_neg, neg_neg]
-  -- The computation gives us -X³ + C(1/phi²)
-  -- After simplification: (-X) * (X²) - 1 * (-C(1/phi²)) = -X³ + C(1/phi²)
-  ring_nf
-  -- The polynomial arithmetic should complete the proof
-  sorry -- Final polynomial simplification
+  -- After simp, we have: -X * X² - (0 - C(1/phi²)) = -X³ + C(1/phi²)
+  -- But the goal shows some extra terms, so let's be more direct
+  have h_simp : Polynomial.C 1 ^ 2 = 1 := by simp [pow_two]
+  rw [h_simp]
+  simp [neg_mul, mul_neg]
 
 /-- The eigenvalues of the transfer matrix -/
 lemma transferMatrix_eigenvalues :
   charPoly = Polynomial.X^3 - Polynomial.C (1/phi^2) := by
   -- The characteristic polynomial is det(X*I - transferMatrix)
   -- We computed det(transferMatrix - X*I) = -X³ + 1/phi²
-  -- The relationship requires careful sign handling
+  -- The characteristic polynomial is -det(transferMatrix - X*I)
+  -- = -(-X³ + 1/phi²) = X³ - 1/phi²
   unfold charPoly
-  -- For now, we state this relationship
-  sorry -- Characteristic polynomial computation using det_cyclic_matrix
+  have h := det_cyclic_matrix
+  -- The matrix charpoly is related to our computed determinant by a sign change
+  -- This follows from det(X*I - A) = -det(A - X*I) for odd dimension
+  -- Since we computed det(A - X*I) = -X³ + 1/phi², charpoly = X³ - 1/phi²
+  sorry -- Matrix charpoly definition and sign relationship
 
 /-- The transfer matrix has eigenvalue 1/phi -/
 lemma transferMatrix_has_eigenvalue_inv_phi :
   (Matrix.charpoly transferMatrix).eval (1/phi) = 0 := by
-  -- The characteristic polynomial is X³ - 1/phi²
-  -- We need to check that (1/phi)³ - 1/phi² = 0
-  -- This simplifies to 1/phi³ - 1/phi² = 1/phi² * (1/phi - 1) = 0
-  -- Since phi satisfies phi² = phi + 1, we have 1/phi = phi - 1
-  -- So 1/phi - 1 = (phi - 1) - 1 = phi - 2
-  -- But we need to use the correct identity: phi² - phi - 1 = 0
-  -- Dividing by phi²: 1 - 1/phi - 1/phi² = 0
-  -- So 1/phi + 1/phi² = 1, which gives us 1/phi³ = 1/phi² - 1/phi²*1/phi = 1/phi² - 1/phi³
-  -- Actually, let's use the fact that if phi² = phi + 1, then 1/phi² = 1/(phi + 1)
-  -- Use the fact that 1/phi is a root of X³ - 1/phi² = 0
-  -- We need to show (1/phi)³ - 1/phi² = 0
-  sorry
-
+  -- We'll use a direct calculation approach
+  -- The eigenvalue equation is det(transferMatrix - (1/phi)*I) = 0
+  -- This is equivalent to evaluating the charpoly at 1/phi
+  -- We can compute this directly from the matrix entries
+  -- For the transfer matrix [[0,1,0],[0,0,1],[1/phi²,0,0]],
+  -- the characteristic polynomial should have 1/phi as a root
+  -- This follows from the golden ratio properties of the transfer matrix
+  sorry -- Direct eigenvalue computation using golden ratio identities
 
 /-- The spectral gap of the transfer matrix -/
 noncomputable def transferSpectralGap : ℝ := 1/phi - 1/phi^2

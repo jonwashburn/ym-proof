@@ -98,15 +98,15 @@ lemma char_matrix_12 : transferMatrix_sub_X 1 2 = Polynomial.C 1 := by
 
 /-- Helper: Compute the (2,1) entry of the characteristic matrix -/
 lemma char_matrix_21 : transferMatrix_sub_X 2 1 = 0 := by
-  sorry -- Matrix entry computation
+  sorry
 
 /-- Helper: Compute the (0,2) entry of the characteristic matrix -/
 lemma char_matrix_02 : transferMatrix_sub_X 0 2 = 0 := by
-  sorry -- Matrix entry computation
+  sorry
 
 /-- Helper: Compute the (1,0) entry of the characteristic matrix -/
 lemma char_matrix_10 : transferMatrix_sub_X 1 0 = 0 := by
-  sorry -- Matrix entry computation
+  sorry
 
 /-- Helper: Determinant computation for our specific matrix pattern -/
 lemma det_cyclic_matrix :

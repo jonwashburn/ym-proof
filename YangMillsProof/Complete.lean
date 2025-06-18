@@ -31,14 +31,17 @@ lemma mass_gap_from_transfer_gap : transferSpectralGap > 0 → massGap > 0 := by
   exact massGap_positive
 
 /-- The mass gap is a fundamental constant -/
-lemma mass_gap_fundamental : massGap = E_coh * phi := by
+lemma mass_gap_fundamental : massGap = RSImport.E_coh * RSImport.phi := by
   -- Direct from definition in GaugeResidue
-  sorry -- Definition equality (noncomputable)
+  unfold massGap
+  rfl
 
 /-- The mass gap satisfies the golden ratio scaling -/
-lemma mass_gap_golden_ratio : massGap / E_coh = phi := by
+lemma mass_gap_golden_ratio : massGap / RSImport.E_coh = RSImport.phi := by
   -- (E_coh * phi) / E_coh = phi
-  sorry -- Division cancellation (noncomputable)
+  rw [mass_gap_fundamental]
+  have h : RSImport.E_coh ≠ 0 := ne_of_gt E_coh_pos
+  field_simp [h]
 
 /-- The Yang-Mills existence theorem -/
 theorem yang_mills_existence : ∃ (ψ : GaugeHilbert), ψ ≠ 0 := by

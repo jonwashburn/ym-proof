@@ -1,20 +1,11 @@
 import YangMillsProof.GaugeResidue
 
-namespace YangMillsProof
-
-/--
-`CostSpectrum` isolates the statement and proof that the minimal positive cost
-in the gauge layer equals `massGap = E_coh * phi`.
-The heavy lifting (definitions and lemma `massGap_positive`) is already
-provided by `GaugeResidue.lean`; here we simply re-package the result
-so that the Lean file hierarchy matches the documentation (v44 manuscript).
--/
-noncomputable section
-
 open Real
 
+namespace YangMillsProof
+
 /--  The minimal positive recognition cost in the gauge layer.  -/
-@[simp] def minimalGaugeCost : ℝ := massGap
+@[simp] noncomputable def minimalGaugeCost : ℝ := massGap
 
 /--  The minimal gauge cost is strictly positive.  -/
 lemma minimalGaugeCost_pos : minimalGaugeCost > 0 := by
@@ -22,16 +13,15 @@ lemma minimalGaugeCost_pos : minimalGaugeCost > 0 := by
   exact massGap_positive
 
 /-- The minimal cost equals E_coh * phi -/
-lemma minimalGaugeCost_formula : minimalGaugeCost = E_coh * phi := by
+lemma minimalGaugeCost_formula : minimalGaugeCost = RSImport.E_coh * RSImport.phi := by
   unfold minimalGaugeCost massGap
   rfl
 
 /-- The minimal cost is related to the golden ratio -/
-lemma minimalGaugeCost_golden_ratio : minimalGaugeCost / E_coh = phi := by
-  unfold minimalGaugeCost massGap
+lemma minimalGaugeCost_golden_ratio : minimalGaugeCost / RSImport.E_coh = RSImport.phi := by
+  rw [minimalGaugeCost_formula]
   -- (E_coh * phi) / E_coh = phi
-  exact div_mul_cancel_pos phi E_coh_pos
-
-end
+  have h : RSImport.E_coh ≠ 0 := ne_of_gt E_coh_pos
+  field_simp [h]
 
 end YangMillsProof

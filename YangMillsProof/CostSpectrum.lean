@@ -30,7 +30,7 @@ lemma minimalGaugeCost_formula : minimalGaugeCost = E_coh * phi := by
 lemma minimalGaugeCost_golden_ratio : minimalGaugeCost / E_coh = phi := by
   unfold minimalGaugeCost massGap
   -- (E_coh * phi) / E_coh = phi
-  sorry -- Division cancellation
+  sorry -- Division cancellation - requires careful handling of associativity
 
 end
 

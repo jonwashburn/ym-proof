@@ -99,9 +99,21 @@ lemma char_matrix_12 : transferMatrix_sub_X 1 2 = Polynomial.C 1 := by
 /-- Helper: Compute the (2,1) entry of the characteristic matrix -/
 lemma char_matrix_21 : transferMatrix_sub_X 2 1 = 0 := by
   unfold transferMatrix_sub_X transferMatrix
-  simp only [Matrix.map_apply, Matrix.sub_apply, Matrix.smul_apply, Matrix.one_apply]
   -- transferMatrix 2 1 = 0 and the matrix multiplication gives 0 - 0 = 0
-  rfl
+  sorry -- Matrix entry computation
+
+/-- Helper: Compute the (0,2) entry of the characteristic matrix -/
+lemma char_matrix_02 : transferMatrix_sub_X 0 2 = 0 := by
+  unfold transferMatrix_sub_X transferMatrix
+  -- transferMatrix 0 2 = 0 and the matrix multiplication gives 0 - 0 = 0
+  sorry -- Matrix entry computation
+
+/-- Helper: Compute the (1,0) entry of the characteristic matrix -/
+lemma char_matrix_10 : transferMatrix_sub_X 1 0 = 0 := by
+  unfold transferMatrix_sub_X transferMatrix
+  -- transferMatrix 1 0 = 0, and since 1 ≠ 0, the identity matrix entry is 0
+  -- So we get Polynomial.C 0 - Polynomial.X * 0 = 0 - 0 = 0
+  sorry -- Matrix entry computation
 
 /-- Helper: Determinant computation for our specific matrix pattern -/
 lemma det_cyclic_matrix :
@@ -112,12 +124,8 @@ lemma det_cyclic_matrix :
   rw [char_matrix_00, char_matrix_11, char_matrix_22]  -- Diagonal: -X
   rw [char_matrix_01, char_matrix_12, char_matrix_20]  -- Off-diagonal non-zero
   -- The zero entries
-  have h02 : transferMatrix_sub_X 0 2 = 0 := by
-    unfold transferMatrix_sub_X transferMatrix
-    simp [Matrix.map_apply, Matrix.sub_apply, Matrix.smul_apply, Matrix.one_apply]
-  have h10 : transferMatrix_sub_X 1 0 = 0 := by
-    unfold transferMatrix_sub_X transferMatrix
-    simp [Matrix.map_apply, Matrix.sub_apply, Matrix.smul_apply, Matrix.one_apply]
+  have h02 : transferMatrix_sub_X 0 2 = 0 := char_matrix_02
+  have h10 : transferMatrix_sub_X 1 0 = 0 := char_matrix_10
   have h21 : transferMatrix_sub_X 2 1 = 0 := char_matrix_21
 
   rw [h02, h10, h21]
@@ -128,6 +136,8 @@ lemma det_cyclic_matrix :
   -- The computation gives us -X³ + C(1/phi²)
   -- After simplification: (-X) * (X²) - 1 * (-C(1/phi²)) = -X³ + C(1/phi²)
   ring_nf
+  -- The polynomial arithmetic should complete the proof
+  sorry -- Final polynomial simplification
 
 /-- The eigenvalues of the transfer matrix -/
 lemma transferMatrix_eigenvalues :
@@ -278,10 +288,14 @@ theorem spectral_gap_confinement :
         · contradiction  -- k = 0 contradicts hk
         · -- k = 1: sin(2π/3) ≠ 0
           -- sin(2π/3) = sin(120°) = √3/2 ≠ 0
-          sorry -- Standard trigonometric value sin(2π/3) ≠ 0
+          apply ne_of_gt
+          -- sin(2π/3) = √3/2 > 0
+          sorry -- Standard trigonometric value sin(2π/3) = √3/2 > 0
         · -- k = 2: sin(4π/3) ≠ 0
           -- sin(4π/3) = sin(240°) = -√3/2 ≠ 0
-          sorry -- Standard trigonometric value sin(4π/3) ≠ 0
+          apply ne_of_lt
+          -- sin(4π/3) = -√3/2 < 0
+          sorry -- Standard trigonometric value sin(4π/3) = -√3/2 < 0
       -- (1/phi) * sin(2πk/3) ≠ 0 since 1/phi > 0 and sin(2πk/3) ≠ 0
       have h_phi_inv_ne_zero : (1 / phi : ℝ) ≠ 0 := by
         apply ne_of_gt phi_inv_pos

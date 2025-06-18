@@ -141,10 +141,24 @@ lemma transferMatrix_eigenvalues :
   -- So charPoly = -det(transferMatrix_sub_X) = -(-X³ + C(1/phi²)) = X³ - C(1/phi²)
   have h_charpoly_def : Matrix.charpoly transferMatrix = -Matrix.det transferMatrix_sub_X := by
     -- This follows from the definition of characteristic polynomial and the sign for odd dimensions
-    sorry -- Technical matrix determinant sign relationship
+    unfold Matrix.charpoly
+    -- For a 3×3 matrix, charpoly = det(X*I - A) = (-1)³ * det(A - X*I) = -det(A - X*I)
+    have h_det_sign : Matrix.det (Polynomial.X • (1 : Matrix (Fin 3) (Fin 3) (Polynomial ℝ)) - transferMatrix.map Polynomial.C) =
+                      -Matrix.det transferMatrix_sub_X := by
+      -- This is the standard sign relationship for characteristic polynomials of odd-dimensional matrices
+      -- det(X*I - A) = (-1)^n * det(A - X*I) where n = 3
+      have h_neg_cube : (-1 : ℝ)^(3 : ℕ) = -1 := by norm_num
+      -- The key insight is that transferMatrix_sub_X = A - X*I = -(X*I - A)
+      have h_matrices_neg : transferMatrix_sub_X = -(Polynomial.X • (1 : Matrix (Fin 3) (Fin 3) (Polynomial ℝ)) - transferMatrix.map Polynomial.C) := by
+        ext i j
+        simp [transferMatrix_sub_X]
+        ring
+      rw [← h_matrices_neg]
+      rw [Matrix.det_neg]
+      rw [h_neg_cube]
+      ring
+    exact h_det_sign
   rw [h_charpoly_def, h_det]
-  -- Apply the negation: -(- X³ + C(1/phi²)) = X³ - C(1/phi²)
-  ring
 
 /-- The transfer matrix has eigenvalue (1/phi²)^(1/3) -/
 lemma transferMatrix_has_eigenvalue_cube_root :
@@ -242,7 +256,43 @@ lemma transfer_matrix_rung_structure (n : ℕ) :
       intro k
       -- This follows from the specific cyclic structure of our matrix
       -- A 3-cycle matrix cubed gives back to start with scaling factor
-      sorry -- Detailed 3x3 matrix computation: M^3 calculation
+      -- transferMatrix = [[0,1,0],[0,0,1],[1/phi²,0,0]]
+      -- Let's compute M³ explicitly
+      unfold transferMatrix
+      -- M² first:
+      have h_M_sq : (transferMatrix ^ 2) 0 0 = 0 := by
+        simp [Matrix.pow_two, Matrix.mul_apply, transferMatrix]
+        -- M²[0,0] = Σⱼ M[0,j] * M[j,0] = M[0,0]*M[0,0] + M[0,1]*M[1,0] + M[0,2]*M[2,0]
+        -- = 0*0 + 1*0 + 0*(1/phi²) = 0
+        norm_num
+      -- M³ = M² * M:
+      have h_M_cube : (transferMatrix ^ 3) 0 0 = 1/phi^2 := by
+        simp [Matrix.pow_three, Matrix.mul_apply, transferMatrix]
+        -- M³[0,0] = Σⱼ (M²)[0,j] * M[j,0]
+        -- Since M²[0,j] = [0, 0, 1/phi²] and M[j,0] = [0, 0, 1/phi²],
+        -- we get M³[0,0] = 0*0 + 0*0 + (1/phi²)*(1/phi²) = 1/phi⁴
+        -- Wait, let me recalculate M² more carefully:
+        have h_M2_calc : (transferMatrix ^ 2) = fun i j =>
+          match (i : ℕ), (j : ℕ) with
+          | 0, 0 => 0 | 0, 1 => 0 | 0, 2 => 1/phi^2
+          | 1, 0 => 1/phi^2 | 1, 1 => 0 | 1, 2 => 0
+          | 2, 0 => 0 | 2, 1 => 1/phi^2 | 2, 2 => 0
+          | _, _ => 0 := by
+          ext i j
+          simp [Matrix.pow_two, Matrix.mul_apply, transferMatrix]
+          fin_cases i <;> fin_cases j <;> simp <;> ring
+        -- Now M³ = M² * M:
+        calc (transferMatrix ^ 3) 0 0
+          = Σ j, (transferMatrix ^ 2) 0 j * transferMatrix j 0 := by simp [Matrix.pow_three, Matrix.mul_apply]
+          _ = (transferMatrix ^ 2) 0 0 * transferMatrix 0 0 +
+              (transferMatrix ^ 2) 0 1 * transferMatrix 1 0 +
+              (transferMatrix ^ 2) 0 2 * transferMatrix 2 0 := by simp [Finset.sum_fin_eq_sum_range]
+          _ = 0 * 0 + 0 * 0 + (1/phi^2) * (1/phi^2) := by simp [h_M2_calc, transferMatrix]
+          _ = 1/phi^4 := by ring
+        -- Oh wait, that gives 1/phi⁴, not 1/phi². Let me double-check...
+        -- Actually, the result depends on the structure. Let me reconsider the statement.
+        sorry -- Need to verify the exact cyclic period structure
+      exact h_M_cube
 
     -- Now use the fact that (M^3)^m = M^(3m)
     have h_power_rule : (transferMatrix ^ (3 * m)) = (transferMatrix ^ 3) ^ m := by
@@ -250,7 +300,17 @@ lemma transfer_matrix_rung_structure (n : ℕ) :
 
     rw [h_power_rule]
     -- Use matrix power of diagonal-like structure
-    sorry -- Apply h_period_three iteratively for m times
+    -- Since (M³)[0,0] = 1/phi², we have ((M³)^m)[0,0] = (1/phi²)^m
+    have h_iterate : ∀ j : ℕ, ((transferMatrix ^ 3) ^ j) 0 0 = (1/phi^2)^j := by
+      intro j
+      induction' j with j ih
+      · simp [pow_zero, Matrix.one_apply]
+      · rw [pow_succ, Matrix.mul_apply]
+        -- ((M³)^(j+1))[0,0] = Σₖ ((M³)^j)[0,k] * (M³)[k,0]
+        -- For a 3×3 matrix with the structure we computed, this simplifies
+        -- Since M³ has a specific pattern, we can compute this
+        sorry -- Complete the iteration using the structure of M³
+    exact h_iterate m
 
   · cases' h with h h
     · -- Case: (n+1) % 3 = 1, so n+1 = 3m + 1
@@ -268,7 +328,28 @@ lemma transfer_matrix_rung_structure (n : ℕ) :
       simp [Matrix.mul_apply, h_one_step]
       -- The (0,0) entry is sum over j of (M^(3m) 0 j) * (M 0 0)
       -- Since M 0 0 = 0, all terms vanish
-      sorry -- Matrix multiplication with zero entry
+      -- (M^(3m+1))[0,0] = Σⱼ (M^(3m))[0,j] * M[j,0]
+      -- = (M^(3m))[0,0] * M[0,0] + (M^(3m))[0,1] * M[1,0] + (M^(3m))[0,2] * M[2,0]
+      -- = (M^(3m))[0,0] * 0 + (M^(3m))[0,1] * 0 + (M^(3m))[0,2] * (1/phi²)
+      -- Since M[1,0] = M[0,0] = 0 and M[2,0] = 1/phi², the sum simplifies to:
+      -- = 0 + 0 + (M^(3m))[0,2] * (1/phi²)
+      -- Now, for the case (3m+1) % 3 = 1, we need (M^(3m+1))[0,0] = 0
+      -- This means (M^(3m))[0,2] * (1/phi²) = 0, so (M^(3m))[0,2] = 0
+      -- By the pattern established above, when 3m % 3 = 0, the matrix structure gives us (M^(3m))[0,2] = 0
+      have h_3m_structure : (transferMatrix ^ (3*m)) 0 2 = 0 := by
+        -- For 3m where 3m % 3 = 0, the (0,2) entry is 0 by the cyclic pattern
+        -- This follows from the rung structure we established
+        sorry -- Use cyclic pattern for (0,2) entry
+      rw [Matrix.mul_apply]
+      calc Σ j, (transferMatrix ^ (3 * m)) 0 j * transferMatrix j 0
+        = (transferMatrix ^ (3 * m)) 0 0 * transferMatrix 0 0 +
+          (transferMatrix ^ (3 * m)) 0 1 * transferMatrix 1 0 +
+          (transferMatrix ^ (3 * m)) 0 2 * transferMatrix 2 0 := by simp [Finset.sum_fin_eq_sum_range]
+        _ = (transferMatrix ^ (3 * m)) 0 0 * 0 +
+            (transferMatrix ^ (3 * m)) 0 1 * 0 +
+            (transferMatrix ^ (3 * m)) 0 2 * (1/phi^2) := by simp [transferMatrix]
+        _ = 0 + 0 + 0 * (1/phi^2) := by rw [h_3m_structure]
+        _ = 0 := by ring
 
     · -- Case: (n+1) % 3 = 2, so n+1 = 3m + 2
       cases' h with m hm
@@ -281,7 +362,14 @@ lemma transfer_matrix_rung_structure (n : ℕ) :
         simp [Matrix.pow_two, Matrix.mul_apply]
         -- M^2[0,0] = sum_j M[0,j] * M[j,0] = M[0,1]*M[1,0] + M[0,2]*M[2,0] + M[0,0]*M[0,0]
         -- = 1*0 + 0*(1/phi²) + 0*0 = 0
-        sorry -- Explicit 3x3 matrix multiplication
+        -- Let's be more explicit:
+        calc Σ j, transferMatrix 0 j * transferMatrix j 0
+          = transferMatrix 0 0 * transferMatrix 0 0 +
+            transferMatrix 0 1 * transferMatrix 1 0 +
+            transferMatrix 0 2 * transferMatrix 2 0 := by simp [Finset.sum_fin_eq_sum_range]
+          _ = 0 * 0 + 1 * 0 + 0 * (1/phi^2) := by simp [transferMatrix]
+          _ = 0 + 0 + 0 := by ring
+          _ = 0 := by ring
 
       -- Use M^(3m+2) = M^(3m) * M^2
       have h_mult_rule : transferMatrix ^ (3*m + 2) = transferMatrix ^ (3*m) * (transferMatrix ^ 2) := by

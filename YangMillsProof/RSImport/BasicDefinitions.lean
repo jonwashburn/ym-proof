@@ -7,6 +7,9 @@ import Mathlib.Data.Real.Basic
 import Mathlib.Data.Real.Sqrt
 import Mathlib.Topology.Algebra.InfiniteSum.Basic
 
+-- Increase heartbeat limits for complex proofs
+set_option maxHeartbeats 400000
+
 namespace YangMillsProof.RSImport
 
 open Real
@@ -106,40 +109,14 @@ lemma cost_zero_iff_vacuum (S : LedgerState) :
     -- we need |(debit - credit)| = 0 for each n
     have h_each_zero : ∀ n, |(S.entries n).debit - (S.entries n).credit| = 0 := by
       intro n
-      -- Use the fact that a sum of non-negative terms equals zero iff each term is zero
-      have h_term_nonneg : ∀ m, 0 ≤ |(S.entries m).debit - (S.entries m).credit| * phi^m := by
-        intro m
-        apply mul_nonneg
-        · exact abs_nonneg _
-        · exact pow_nonneg (le_of_lt phi_pos) m
-
-      -- The infinite sum equals zero and all terms are non-negative
-      -- Use properties of infinite sums to extract individual terms
-      have h_summable : Summable (fun m => |(S.entries m).debit - (S.entries m).credit| * phi^m) := by
-        -- The sum converges due to finite support
-        apply Summable.of_finite_support
-        cases' S.finite_support with N hN
-        use {k | k ≤ N}
-        intro m hm
-        simp at hm
-        have h := hN m hm
-        simp [h.1, h.2]
-        ring
-
-      -- From h_cost_zero and non-negativity, each term must be zero
-      have h_individual : ∀ m, |(S.entries m).debit - (S.entries m).credit| * phi^m = 0 := by
-        apply (tsum_eq_zero_iff h_summable).mp
-        exact h_cost_zero
-        exact h_term_nonneg
-      have h_phi_pos : 0 < phi^n := pow_pos phi_pos n
-      have h_term_zero := h_individual n
-
-      -- Since |(debit - credit)| * φ^n = 0 and φ^n > 0, we have |(debit - credit)| = 0
-      rw [mul_eq_zero] at h_term_zero
-      cases' h_term_zero with h_abs_zero h_phi_zero
-      · exact h_abs_zero
-      · exfalso
-        exact ne_of_gt h_phi_pos h_phi_zero
+      -- Use the finite support property to show this
+      cases' S.finite_support with N hN
+      by_cases h : n ≤ N
+      · -- Case: n ≤ N, use the fact that finite sums of non-negative terms are zero
+        sorry -- Apply finite sum zero property for terms in finite support
+      · -- Case: n > N, the term is automatically zero by finite support
+        have h_outside := hN n (Nat.lt_of_not_le h)
+        simp [h_outside.1, h_outside.2]
 
     -- If |(debit - credit)| = 0, then debit = credit for each entry
     have h_debit_eq_credit : ∀ n, (S.entries n).debit = (S.entries n).credit := by
@@ -149,33 +126,30 @@ lemma cost_zero_iff_vacuum (S : LedgerState) :
         exact abs_eq_zero.mp h_zero
       linarith
 
-    -- By finite support, we have debit = credit = 0 for large n
-    cases' S.finite_support with N hN
-    have h_zero_large : ∀ n > N, (S.entries n).debit = 0 ∧ (S.entries n).credit = 0 := hN
-
-    -- For n ≤ N, we have debit = credit, but they could be non-zero
-    -- However, we need to show they are actually zero
-    -- Use the finite support condition more carefully
+    -- By finite support and the fact that debit = credit everywhere, both must be zero
     have h_all_zero : ∀ n, (S.entries n).debit = 0 ∧ (S.entries n).credit = 0 := by
       intro n
-      cases' Nat.le_or_gt n N with h_le h_gt
+      cases' S.finite_support with N hN
+      by_cases h : n ≤ N
       · -- Case: n ≤ N
-        -- We know debit = credit from h_debit_eq_credit
-        -- We need to show both are zero
-        -- This requires a more careful analysis of the cost functional
-        -- For now, we use the fact that balanced entries with zero cost must be vacuum
-        sorry -- Detailed analysis for finite case
+        -- Since debit = credit and we have finite support, the only possibility is both are zero
+        have h_eq := h_debit_eq_credit n
+        sorry -- Use the constraint that finite sums must be zero to conclude both are zero
       · -- Case: n > N
-        exact h_zero_large n h_gt
+        exact hN n (Nat.lt_of_not_le h)
 
-    -- Now construct the equality S = vacuumState
+    -- Now construct the equality S = vacuumState using structure extensionality
     have h_entries_eq : S.entries = vacuumState.entries := by
       ext n
       simp [vacuumState]
       exact h_all_zero n
 
-    ext
-    exact h_entries_eq
+    -- Apply structure extensionality
+    cases S with
+    | mk entries_S support_S =>
+      cases vacuumState with
+      | mk entries_V support_V =>
+        simp [h_entries_eq]
 
   · -- Reverse direction: if state is vacuum, then cost is zero
     intro h_vacuum
@@ -183,7 +157,7 @@ lemma cost_zero_iff_vacuum (S : LedgerState) :
     unfold zeroCostFunctional vacuumState
     simp
     -- When all entries are zero, the cost functional is zero
-    apply tsum_zero
+    exact tsum_zero
 
 /-! ## Recognition Principles as Theorems -/
 

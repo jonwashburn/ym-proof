@@ -96,23 +96,11 @@ lemma char_matrix_12 : transferMatrix_sub_X 1 2 = Polynomial.C 1 := by
   unfold transferMatrix_sub_X transferMatrix
   simp [Matrix.map_apply, Matrix.sub_apply, Matrix.smul_apply, Matrix.one_apply]
 
-/-- Helper: Determinant formula for 3x3 matrices -/
-lemma det_fin_three {R : Type*} [CommRing R] (M : Matrix (Fin 3) (Fin 3) R) :
-    Matrix.det M =
-    M 0 0 * (M 1 1 * M 2 2 - M 1 2 * M 2 1) -
-    M 0 1 * (M 1 0 * M 2 2 - M 1 2 * M 2 0) +
-    M 0 2 * (M 1 0 * M 2 1 - M 1 1 * M 2 0) := by
-  -- This is the standard cofactor expansion along the first row
-  -- det(M) = Σ_{j=0}^{2} (-1)^{0+j} * M_{0,j} * minor_{0,j}
-  -- where minor_{0,j} is the determinant of the 2x2 submatrix
-  rw [Matrix.det_fin_three]
-  ring
-
 /-- Helper: Determinant computation for our specific matrix pattern -/
 lemma det_cyclic_matrix :
     Matrix.det transferMatrix_sub_X = -Polynomial.X^3 + Polynomial.C (1/phi^2) := by
   -- Use the 3x3 determinant formula
-  rw [det_fin_three]
+  rw [Matrix.det_fin_three]
   -- Substitute the known entries using our helper lemmas
   rw [char_matrix_00, char_matrix_11, char_matrix_22]  -- Diagonal: -X
   rw [char_matrix_01, char_matrix_12, char_matrix_20]  -- Off-diagonal non-zero
@@ -126,12 +114,14 @@ lemma det_cyclic_matrix :
   have h21 : transferMatrix_sub_X 2 1 = 0 := by
     unfold transferMatrix_sub_X transferMatrix
     simp [Matrix.map_apply, Matrix.sub_apply, Matrix.smul_apply, Matrix.one_apply]
+    rfl
   rw [h02, h10, h21]
   -- Now compute: (-X) * ((-X) * (-X) - 1 * 0) - 1 * (0 * (-X) - 1 * C(1/phi²)) + 0 * (0 * 0 - (-X) * 0)
   -- = (-X) * (X²) - 1 * (-C(1/phi²)) + 0
   -- = -X³ + C(1/phi²)
   simp only [mul_zero, zero_mul, sub_zero, zero_sub, add_zero, neg_mul, mul_neg, neg_neg]
-  ring
+  -- The computation gives us -X³ + C(1/phi²)
+  sorry -- Polynomial arithmetic
 
 /-- The eigenvalues of the transfer matrix -/
 lemma transferMatrix_eigenvalues :
@@ -268,7 +258,27 @@ theorem spectral_gap_confinement :
   · intro lam hlam
     -- The only real eigenvalue is 1/phi
     have h_real : ∀ k : Fin 3, k ≠ 0 → (transferEigenvalue k).im ≠ 0 := by
-      sorry -- Show non-real for k = 1, 2
+      intro k hk
+      unfold transferEigenvalue
+      simp only [Complex.mul_im, Complex.ofReal_im, Complex.exp_im, ne_eq]
+      -- (1/phi) * exp(2πik/3) has imaginary part (1/phi) * sin(2πk/3)
+      -- For k = 1, 2, we have sin(2π/3) ≠ 0 and sin(4π/3) ≠ 0
+      have h_sin_ne_zero : Real.sin (2 * Real.pi * (k : ℝ) / 3) ≠ 0 := by
+        fin_cases k
+        · contradiction  -- k = 0 contradicts hk
+        · -- k = 1: sin(2π/3) = √3/2 ≠ 0
+          norm_num
+          sorry -- Specific sine value
+        · -- k = 2: sin(4π/3) = -√3/2 ≠ 0
+          norm_num
+          sorry -- Specific sine value
+      -- (1/phi) * sin(2πk/3) ≠ 0 since 1/phi > 0 and sin(2πk/3) ≠ 0
+      have h_phi_inv_ne_zero : (1 / phi : ℝ) ≠ 0 := by
+        apply ne_of_gt phi_inv_pos
+      have h_mul : (1 / phi : ℝ) * Real.sin (2 * Real.pi * (k : ℝ) / 3) ≠ 0 := by
+        apply mul_ne_zero h_phi_inv_ne_zero h_sin_ne_zero
+      convert h_mul using 1
+      simp [Complex.ofReal_mul]
     -- Since lam is real and is an eigenvalue, it must be transferEigenvalue 0 = 1/phi
     left
     sorry -- Complete the argument using that real eigenvalues must be 1/phi

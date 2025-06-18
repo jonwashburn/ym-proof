@@ -104,7 +104,7 @@ lemma cost_sum_lower_bound (s : GaugeLedgerState) (f : VoxelFace)
   unfold zeroCostFunctionalGauge
   -- The sum is over all faces, and all terms are non-negative
   -- So the sum is at least any single term
-  sorry -- Summable series lower bound - requires careful handling of infinite sum
+  sorry -- Summable series lower bound - requires tsum properties
 
 /-- Any non-vacuum state in gauge layer has cost at least E_coh * phi -/
 lemma gauge_cost_lower_bound (s : GaugeLedgerState) (hs : s ∈ GaugeLayer) (hne : s ≠ vacuumStateGauge) :
@@ -155,10 +155,8 @@ lemma gauge_cost_nonneg (s : GaugeLedgerState) : zeroCostFunctionalGauge s ≥ 0
   intro f
   apply mul_nonneg
   · -- s.debit f + s.credit f ≥ 0 since both are Nat
-    simp only [Nat.cast_add]
     exact add_nonneg (Nat.cast_nonneg _) (Nat.cast_nonneg _)
-  · -- E_coh * phi^(Int.toNat f.rung) > 0
-    apply mul_pos E_coh_pos
-    exact pow_pos phi_pos _
+  · -- E_coh * phi^(Int.toNat f.rung) ≥ 0
+    exact mul_nonneg (le_of_lt E_coh_pos) (le_of_lt (pow_pos phi_pos _))
 
 end YangMillsProof

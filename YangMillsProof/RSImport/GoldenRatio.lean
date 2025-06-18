@@ -123,8 +123,8 @@ theorem phi_unique_positive : ∀ x : ℝ, x > 0 → x^2 = x + 1 → x = phi := 
     -- (1 - √5)/2 < 0 since √5 > 1
     have h_sqrt5_gt2 : Real.sqrt 5 > 2 := by
       -- √5 > 2 iff 5 > 4
-      rw [← Real.sqrt_lt_sqrt_iff (by norm_num : (0 : ℝ) ≤ 4) (by norm_num : (0 : ℝ) ≤ 5)]
-      norm_num
+      have h : (2 : ℝ) ^ 2 < 5 := by norm_num
+      exact Real.lt_sqrt_of_sq_lt_sq (by norm_num : 0 ≤ 2) h
     linarith
   -- Since the quadratic has exactly two roots and x is positive,
   -- x must equal the positive root phi

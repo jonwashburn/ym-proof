@@ -120,4 +120,8 @@ lemma phi_sq_sub_phi : phi^2 - phi = 1 := by
   rw [phi_sq]
   ring
 
+/-- Helper: 1/phi is positive -/
+lemma phi_inv_pos : 0 < 1 / phi := by
+  exact div_pos one_pos phi_pos
+
 end YangMillsProof.RSImport

@@ -145,9 +145,19 @@ lemma transferMatrix_eigenvalues :
 /-- The transfer matrix has eigenvalue 1/phi -/
 lemma transferMatrix_has_eigenvalue_inv_phi :
   (Matrix.charpoly transferMatrix).eval (1/phi) = 0 := by
-  -- We would need to compute the characteristic polynomial explicitly
-  -- For now, we just state this as a fact
+  -- The characteristic polynomial is X³ - 1/phi²
+  -- We need to check that (1/phi)³ - 1/phi² = 0
+  -- This simplifies to 1/phi³ - 1/phi² = 1/phi² * (1/phi - 1) = 0
+  -- Since phi satisfies phi² = phi + 1, we have 1/phi = phi - 1
+  -- So 1/phi - 1 = (phi - 1) - 1 = phi - 2
+  -- But we need to use the correct identity: phi² - phi - 1 = 0
+  -- Dividing by phi²: 1 - 1/phi - 1/phi² = 0
+  -- So 1/phi + 1/phi² = 1, which gives us 1/phi³ = 1/phi² - 1/phi²*1/phi = 1/phi² - 1/phi³
+  -- Actually, let's use the fact that if phi² = phi + 1, then 1/phi² = 1/(phi + 1)
+  -- Use the fact that 1/phi is a root of X³ - 1/phi² = 0
+  -- We need to show (1/phi)³ - 1/phi² = 0
   sorry
+
 
 /-- The spectral gap of the transfer matrix -/
 noncomputable def transferSpectralGap : ℝ := 1/phi - 1/phi^2
@@ -229,7 +239,10 @@ lemma transferEigenvalue_norm (k : Fin 3) :
   -- abs(1/phi * exp(2πik/3)) = abs(1/phi) * abs(exp(2πik/3)) = (1/phi) * 1 = 1/phi
   -- For any complex exponential on the unit circle, the absolute value is preserved
   -- The key insight is that exp(2πik/3) has modulus 1, so the result is 1/phi
-  sorry -- Complex absolute value computation - requires unit circle properties
+  -- abs(1/phi * exp(2πik/3)) = abs(1/phi) * abs(exp(2πik/3)) = (1/phi) * 1 = 1/phi
+  -- For any complex exponential on the unit circle, the absolute value is preserved
+  -- The key insight is that exp(2πik/3) has modulus 1, so the result is 1/phi
+  sorry
 
 /-- The characteristic polynomial factors as product over eigenvalues -/
 lemma charPoly_factorization :
@@ -246,7 +259,8 @@ noncomputable def minEigenvalueGap : ℝ :=
 lemma minEigenvalueGap_pos : minEigenvalueGap > 0 := by
   unfold minEigenvalueGap transferEigenvalue
   -- transferEigenvalue 1 = (1/phi) * exp(2πi/3) ≠ 1/phi since exp(2πi/3) ≠ 1
-  sorry -- Complex number computation
+  -- transferEigenvalue 1 = (1/phi) * exp(2πi/3) ≠ 1/phi since exp(2πi/3) ≠ 1
+  sorry
 
 /-- The eigenvalue gap relates to the spectral gap -/
 lemma eigenvalue_gap_bound :
@@ -283,12 +297,12 @@ theorem spectral_gap_confinement :
           -- sin(2π/3) = sin(120°) = √3/2 ≠ 0
           apply ne_of_gt
           -- sin(2π/3) = √3/2 > 0
-          sorry -- Trigonometric value: sin(2π/3) = √3/2 > 0
+          sorry
         · -- k = 2: sin(4π/3) ≠ 0
           -- sin(4π/3) = sin(240°) = -√3/2 ≠ 0
           apply ne_of_lt
           -- sin(4π/3) = -√3/2 < 0
-          sorry -- Trigonometric value: sin(4π/3) = -√3/2 < 0
+          sorry
       -- (1/phi) * sin(2πk/3) ≠ 0 since 1/phi > 0 and sin(2πk/3) ≠ 0
       have h_phi_inv_ne_zero : (1 / phi : ℝ) ≠ 0 := by
         apply ne_of_gt phi_inv_pos
@@ -353,7 +367,22 @@ lemma transfer_matrix_bounded (n : ℕ) :
   -- The transfer matrix has spectral radius 1/phi < 1
   -- So its powers are bounded by a constant
   -- For the Frobenius norm, we can bound directly
-  sorry -- Matrix norm computation
+  -- Each entry of transferMatrix is at most 1, so each entry of transferMatrix^n is bounded
+  -- The Frobenius norm of a 3x3 matrix with entries bounded by M is at most 3*M
+  -- Since 1/phi < 1, powers decay, so we can bound by a constant
+  have h_spectral : ∀ k : Fin 3, Complex.abs (transferEigenvalue k) ≤ 1 / phi := by
+    intro k
+    rw [transferEigenvalue_norm]
+  have h_phi_lt_one : 1 / phi < 1 := by
+    rw [div_lt_one (phi_pos)]
+    exact phi_gt_one
+  -- For matrices with spectral radius < 1, powers are bounded
+  -- The Frobenius norm of powers grows at most like (spectral radius)^n
+  -- Since spectral radius = 1/phi < 1, the powers are bounded
+  -- For a 3x3 matrix, the Frobenius norm is bounded by 3 times the max entry
+  -- So we use 3 as a conservative bound
+  -- The bound follows from spectral radius arguments
+  sorry
 
 /-- Asymptotic behavior of transfer matrix -/
 lemma transfer_matrix_asymptotic (n : ℕ) (hn : n ≥ 1) :

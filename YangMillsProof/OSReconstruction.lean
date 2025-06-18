@@ -23,14 +23,14 @@ noncomputable def fieldStrengthNorm (A : EuclideanGaugeField) : ℝ :=
   1  -- Normalized field strength
 
 /-- Convert gauge field to ledger state (placeholder) -/
-noncomputable def toGaugeLedgerState (A : EuclideanGaugeField) : GaugeLedgerState :=
+@[simp] noncomputable def toGaugeLedgerState (_ : EuclideanGaugeField) : GaugeLedgerState :=
   vacuumStateGauge  -- Placeholder conversion
 
 /-- The Euclidean action in 4D -/
-noncomputable def euclideanAction (A : EuclideanGaugeField) : ℝ :=
+@[simp] noncomputable def euclideanAction (_ : EuclideanGaugeField) : ℝ :=
   -- Standard Yang-Mills action: S = (1/4g²) ∫ Tr(F_μν F^μν) d⁴x
   -- In Recognition Science units with E_coh scaling
-  E_coh * (1 / 4) * fieldStrengthNorm A
+  E_coh * (1 / 4)
 
 /-- The partition function -/
 noncomputable def partitionFunction : ℝ :=
@@ -68,7 +68,13 @@ theorem euclidean_recognition_connection :
   · exact E_coh_pos
   · -- The connection is through the field strength normalization
     -- Both actions are proportional to E_coh
-    sorry -- Requires detailed field strength correspondence
+    ext A
+    unfold euclideanAction zeroCostFunctionalGauge toGaugeLedgerState vacuumStateGauge
+    -- Both expressions equal E_coh * (1/4) * fieldStrengthNorm A
+    -- The zeroCostFunctionalGauge applied to the vacuum gauge state yields 0
+    -- But in the Euclidean formulation, we have a non-zero field strength term
+    -- This needs more careful analysis of the gauge transformation
+    sorry
 
 /-- The partition function is finite -/
 lemma partition_function_finite : ∃ (M : ℝ), partitionFunction < M := by

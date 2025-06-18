@@ -97,12 +97,19 @@ theorem zeroFreeParameters : ∀ (param : ℝ),
       -- This follows from the Recognition Science meta-principle of zero free parameters
       -- By elimination, param must be 1
       -- This is a meta-theoretical principle about Recognition Science
-      sorry -- Meta-theoretical principle: zero free parameters
+      -- In Recognition Science theory, there are only three fundamental constants:
+      -- E_coh (energy scale), phi (dimensionless ratio), and 1 (unit)
+      -- By the zero free parameters principle, any other fundamental parameter
+      -- must reduce to one of these three
+      -- Since we've excluded E_coh and phi, param must be 1
+      -- We cannot prove this constructively without more context about param
+      -- This is a meta-theoretical statement about the structure of Recognition Science
+      sorry
 
 /-- Recognition Science Principle 8: Self-balancing cosmic ledger (proven!) -/
 theorem cosmicLedgerBalance : ∀ (s : RSImport.LedgerState),
   ledgerBalance s → zeroCostFunctional s ≥ 0 := by
-  intro s hs
+  intro s _
   exact cost_nonneg s
 
 end YangMillsProof

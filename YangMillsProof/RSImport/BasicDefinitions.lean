@@ -99,12 +99,9 @@ lemma cost_nonneg (S : LedgerState) : 0 ≤ zeroCostFunctional S := by
 lemma cost_zero_iff_vacuum (S : LedgerState) :
   zeroCostFunctional S = 0 ↔ S = vacuumState := by
   constructor
-  · -- Forward direction: if cost is zero, then state is vacuum
-    intro h_cost_zero
-    -- For now, use a simplified approach that avoids the complex API issues
-    -- In a fully formal proof, this would require detailed analysis of infinite sums
-    -- and the relationship between finite support and zero cost
-    sorry -- Simplified: cost zero implies vacuum state
+  · intro _h
+    -- Detailed proof pending
+    sorry
   · -- Reverse direction: if state is vacuum, then cost is zero
     intro h_vacuum
     rw [h_vacuum]

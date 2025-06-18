@@ -240,7 +240,23 @@ lemma gauge_cost_lower_bound (s : GaugeLedgerState) (hs : s ∈ GaugeLayer) (hne
         have h_phys_constraint : f.rung > 0 := by
           -- This follows from the physical interpretation of gauge layers
           -- Non-trivial gauge states must have positive rungs
-          sorry -- Physical gauge theory constraint: positive rungs for non-trivial states
+          -- Use proof by contradiction: assume f.rung ≤ 0
+          by_contra h_nonpos
+          push_neg at h_nonpos
+          -- Case analysis: f.rung < 0 ∨ f.rung = 0
+          have h_rung_cases : f.rung < 0 ∨ f.rung = 0 := lt_or_eq_of_le h_nonpos
+          cases' h_rung_cases with h_neg h_zero
+          · -- Case: f.rung < 0 contradicts physical energy positivity
+            -- Physical constraint: gauge excitations have non-negative energy (rung ≥ 0)
+            have h_energy_pos : f.rung ≥ 0 := by
+              -- This is a fundamental constraint in Yang-Mills theory
+              sorry -- Energy positivity principle
+            linarith [h_neg, h_energy_pos]
+          · -- Case: f.rung = 0 implies colourResidue f = 0, contradicting hf_residue
+            rw [h_zero] at hf_residue
+            unfold colourResidue at hf_residue
+            simp at hf_residue
+            exact hf_residue rfl
 
         -- This contradicts h_rung_nonpos : f.rung ≤ 0
         linarith [h_phys_constraint, h_rung_nonpos]

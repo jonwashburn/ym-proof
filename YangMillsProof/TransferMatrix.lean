@@ -56,103 +56,69 @@ noncomputable def costOperator : GaugeHilbert →ₗ[ℝ] GaugeHilbert := {
 
 /-- The transfer matrix T encodes transitions between rungs -/
 noncomputable def transferMatrix : Matrix (Fin 3) (Fin 3) ℝ :=
-  !![0, 1, 0; 0, 0, 1; 1/phi^2, 0, 0]
+  fun i j =>
+    match (i : ℕ), (j : ℕ) with
+    | 0, 1 => 1
+    | 1, 2 => 1
+    | 2, 0 => 1 / phi ^ 2
+    | _, _ => 0
 
 /-- The characteristic polynomial of the transfer matrix -/
 noncomputable def charPoly : Polynomial ℝ :=
   Matrix.charpoly transferMatrix
 
-/-- Helper: The transfer matrix minus X*I -/
+/-- Helper: The transfer matrix minus X·I (with polynomial entries) -/
 noncomputable def transferMatrix_sub_X : Matrix (Fin 3) (Fin 3) (Polynomial ℝ) :=
-  (transferMatrix.map (Polynomial.C : ℝ → Polynomial ℝ)) - (Polynomial.X : Polynomial ℝ) • (1 : Matrix (Fin 3) (Fin 3) (Polynomial ℝ))
+  fun i j => Polynomial.C (transferMatrix i j) - if i = j then Polynomial.X else 0
 
 /-- Helper: Compute the (0,0) entry of the characteristic matrix -/
 lemma char_matrix_00 : transferMatrix_sub_X 0 0 = -Polynomial.X := by
-  unfold transferMatrix_sub_X transferMatrix
-  simp [Matrix.map_apply, Matrix.sub_apply, Matrix.smul_apply, Matrix.one_apply]
+  simp [transferMatrix_sub_X, transferMatrix]
 
 /-- Helper: Compute the (1,1) entry of the characteristic matrix -/
 lemma char_matrix_11 : transferMatrix_sub_X 1 1 = -Polynomial.X := by
-  unfold transferMatrix_sub_X transferMatrix
-  simp [Matrix.map_apply, Matrix.sub_apply, Matrix.smul_apply, Matrix.one_apply]
+  simp [transferMatrix_sub_X, transferMatrix]
 
 /-- Helper: Compute the (2,2) entry of the characteristic matrix -/
 lemma char_matrix_22 : transferMatrix_sub_X 2 2 = -Polynomial.X := by
-  unfold transferMatrix_sub_X transferMatrix
-  simp [Matrix.map_apply, Matrix.sub_apply, Matrix.smul_apply, Matrix.one_apply]
+  simp [transferMatrix_sub_X, transferMatrix]
 
 /-- Helper: Compute the (0,1) entry of the characteristic matrix -/
 lemma char_matrix_01 : transferMatrix_sub_X 0 1 = Polynomial.C 1 := by
-  unfold transferMatrix_sub_X transferMatrix
-  simp [Matrix.map_apply, Matrix.sub_apply, Matrix.smul_apply, Matrix.one_apply]
+  simp [transferMatrix_sub_X, transferMatrix]
 
 /-- Helper: Compute the (2,0) entry of the characteristic matrix -/
-lemma char_matrix_20 : transferMatrix_sub_X 2 0 = Polynomial.C (1/phi^2) := by
-  unfold transferMatrix_sub_X transferMatrix
-  simp [Matrix.map_apply, Matrix.sub_apply, Matrix.smul_apply, Matrix.one_apply]
+lemma char_matrix_20 : transferMatrix_sub_X 2 0 = Polynomial.C (1 / phi ^ 2) := by
+  simp [transferMatrix_sub_X, transferMatrix]
 
 /-- Helper: Compute the (1,2) entry of the characteristic matrix -/
 lemma char_matrix_12 : transferMatrix_sub_X 1 2 = Polynomial.C 1 := by
-  unfold transferMatrix_sub_X transferMatrix
-  simp [Matrix.map_apply, Matrix.sub_apply, Matrix.smul_apply, Matrix.one_apply]
+  simp [transferMatrix_sub_X, transferMatrix]
 
 /-- Helper: Compute the (2,1) entry of the characteristic matrix -/
 lemma char_matrix_21 : transferMatrix_sub_X 2 1 = 0 := by
-  unfold transferMatrix_sub_X transferMatrix
-  simp [Matrix.map_apply, Matrix.sub_apply, Matrix.smul_apply, Matrix.one_apply]
-  rfl
+  simp [transferMatrix_sub_X, transferMatrix]
 
 /-- Helper: Compute the (0,2) entry of the characteristic matrix -/
 lemma char_matrix_02 : transferMatrix_sub_X 0 2 = 0 := by
-  unfold transferMatrix_sub_X transferMatrix
-  simp [Matrix.map_apply, Matrix.sub_apply, Matrix.smul_apply, Matrix.one_apply]
-  rfl
+  simp [transferMatrix_sub_X, transferMatrix]
 
 /-- Helper: Compute the (1,0) entry of the characteristic matrix -/
 lemma char_matrix_10 : transferMatrix_sub_X 1 0 = 0 := by
-  unfold transferMatrix_sub_X transferMatrix
-  simp [Matrix.map_apply, Matrix.sub_apply, Matrix.smul_apply, Matrix.one_apply]
-  rfl
+  simp [transferMatrix_sub_X, transferMatrix]
 
 /-- Helper: Determinant computation for our specific matrix pattern -/
 lemma det_cyclic_matrix :
-    Matrix.det transferMatrix_sub_X = -Polynomial.X^3 + Polynomial.C (1/phi^2) := by
-  -- Use the 3x3 determinant formula
-  rw [Matrix.det_fin_three]
-  -- Substitute the known entries using our helper lemmas
-  rw [char_matrix_00, char_matrix_11, char_matrix_22]  -- Diagonal: -X
-  rw [char_matrix_01, char_matrix_12, char_matrix_20]  -- Off-diagonal non-zero
-  -- The zero entries
-  have h02 : transferMatrix_sub_X 0 2 = 0 := char_matrix_02
-  have h10 : transferMatrix_sub_X 1 0 = 0 := char_matrix_10
-  have h21 : transferMatrix_sub_X 2 1 = 0 := char_matrix_21
-
-  rw [h02, h10, h21]
-  -- Direct computation of the determinant expansion
-  -- det = a₀₀(a₁₁a₂₂ - a₁₂a₂₁) - a₀₁(a₁₀a₂₂ - a₁₂a₂₀) + a₀₂(a₁₀a₂₁ - a₁₁a₂₀)
-  -- = (-X)((-X)(-X) - 1·0) - 1(0·(-X) - 1·C(1/phi²)) + 0(0·0 - (-X)·0)
-  -- = (-X)(X²) - 1(-C(1/phi²)) + 0
-  -- = -X³ + C(1/phi²)
-  simp only [mul_zero, zero_mul, sub_zero, zero_sub, add_zero, neg_mul, mul_neg, neg_neg]
-  -- After simp, we have: -X * X² - (0 - C(1/phi²)) = -X³ + C(1/phi²)
-  -- But the goal shows some extra terms, so let's be more direct
-  have h_simp : Polynomial.C 1 ^ 2 = 1 := by simp [pow_two]
-  rw [h_simp]
-  simp [neg_mul, mul_neg]
+    Matrix.det transferMatrix_sub_X = -Polynomial.X ^ 3 + Polynomial.C (1/phi^2) := by
+  sorry
 
 /-- The eigenvalues of the transfer matrix -/
 lemma transferMatrix_eigenvalues :
   charPoly = Polynomial.X^3 - Polynomial.C (1/phi^2) := by
   -- The characteristic polynomial is det(X*I - transferMatrix)
   -- We computed det(transferMatrix - X*I) = -X³ + 1/phi²
-  -- The characteristic polynomial is -det(transferMatrix - X*I)
-  -- = -(-X³ + 1/phi²) = X³ - 1/phi²
-  unfold charPoly
-  have h := det_cyclic_matrix
-  -- The matrix charpoly is related to our computed determinant by a sign change
-  -- This follows from det(X*I - A) = -det(A - X*I) for odd dimension
-  -- Since we computed det(A - X*I) = -X³ + 1/phi², charpoly = X³ - 1/phi²
-  sorry -- Matrix charpoly definition and sign relationship
+  -- The characteristic polynomial is -det(transferMatrix - X*I) = X³ - 1/phi²
+  sorry -- Matrix charpoly relationship with determinant
 
 /-- The transfer matrix has eigenvalue 1/phi -/
 lemma transferMatrix_has_eigenvalue_inv_phi :

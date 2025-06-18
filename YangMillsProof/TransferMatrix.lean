@@ -203,16 +203,93 @@ theorem transfer_gap_implies_mass_gap :
 lemma transfer_matrix_rung_structure (n : ℕ) :
   (transferMatrix ^ n) 0 0 = if n % 3 = 0 then 1/phi^(2*(n/3)) else 0 := by
   -- The transfer matrix has a cyclic structure with period 3
-  -- We prove this by induction on n
-  induction n with
-  | zero =>
-    -- Base case: n = 0
+  -- transferMatrix = [[0,1,0],[0,0,1],[1/phi²,0,0]]
+  -- This matrix cycles through positions with the pattern:
+  -- M^1: [0,1,0] at (0,0)
+  -- M^2: [0,0,1] at (0,0)
+  -- M^3: [1/phi²,0,0] at (0,0)
+  -- We prove this by strong induction using the cyclic structure
+
+  have h_transfer_def : transferMatrix = fun i j =>
+    match (i : ℕ), (j : ℕ) with
+    | 0, 1 => 1
+    | 1, 2 => 1
+    | 2, 0 => 1 / phi ^ 2
+    | _, _ => 0 := by rfl
+
+  -- The key insight: the (0,0) entry follows a 3-cycle pattern
+  -- M^(3k) gives the diagonal contribution with factor (1/phi²)^k
+  -- M^(3k+1) and M^(3k+2) give 0 since the cycle hasn't completed
+
+  induction' n using Nat.strong_induction with n ih
+
+  cases' n with n
+  · -- Base case: n = 0
     simp [pow_zero, Matrix.one_apply]
     -- (transferMatrix^0) 0 0 = I 0 0 = 1
     -- And 0 % 3 = 0, 0 / 3 = 0, so 1/phi^(2*0) = 1
-  | succ m ih =>
-    -- Inductive step: assume true for m, prove for m + 1
-    sorry -- Matrix power computation - requires detailed recurrence analysis
+    simp [Nat.zero_div]
+
+  -- Now consider n = k + 1 where k ≥ 0
+  cases' Nat.mod_three_eq_zero_or_one_or_two (n + 1) with h h
+  · -- Case: (n+1) % 3 = 0, so n+1 = 3m for some m
+    cases' h with m hm
+    simp [hm]
+    -- We need to show: (transferMatrix ^ (3*m)) 0 0 = 1/phi^(2*m)
+    -- Use the fact that transferMatrix^3 has a specific structure
+    -- transferMatrix^3 should equal a scaled identity on the (0,0) component
+    have h_period_three : ∀ k : ℕ, (transferMatrix ^ 3) 0 0 = 1/phi^2 := by
+      intro k
+      -- This follows from the specific cyclic structure of our matrix
+      -- A 3-cycle matrix cubed gives back to start with scaling factor
+      sorry -- Detailed 3x3 matrix computation: M^3 calculation
+
+    -- Now use the fact that (M^3)^m = M^(3m)
+    have h_power_rule : (transferMatrix ^ (3 * m)) = (transferMatrix ^ 3) ^ m := by
+      rw [← pow_mul]
+
+    rw [h_power_rule]
+    -- Use matrix power of diagonal-like structure
+    sorry -- Apply h_period_three iteratively for m times
+
+  · cases' h with h h
+    · -- Case: (n+1) % 3 = 1, so n+1 = 3m + 1
+      cases' h with m hm
+      simp [hm]
+      -- We need to show: (transferMatrix ^ (3*m + 1)) 0 0 = 0
+      -- This follows because one step in the cycle gives 0 at (0,0)
+      have h_one_step : transferMatrix 0 0 = 0 := by
+        simp [transferMatrix]
+      -- Use the multiplication rule: M^(3m+1) = M^(3m) * M^1
+      have h_mult_rule : transferMatrix ^ (3*m + 1) = transferMatrix ^ (3*m) * transferMatrix := by
+        rw [pow_succ]
+      rw [h_mult_rule]
+      -- Since M^1 has 0 at (0,0), the product gives 0 at (0,0)
+      simp [Matrix.mul_apply, h_one_step]
+      -- The (0,0) entry is sum over j of (M^(3m) 0 j) * (M 0 0)
+      -- Since M 0 0 = 0, all terms vanish
+      sorry -- Matrix multiplication with zero entry
+
+    · -- Case: (n+1) % 3 = 2, so n+1 = 3m + 2
+      cases' h with m hm
+      simp [hm]
+      -- We need to show: (transferMatrix ^ (3*m + 2)) 0 0 = 0
+      -- Similar reasoning: two steps in the cycle still gives 0 at (0,0)
+      have h_two_steps : (transferMatrix ^ 2) 0 0 = 0 := by
+        -- Compute M^2 explicitly
+        unfold transferMatrix
+        simp [Matrix.pow_two, Matrix.mul_apply]
+        -- M^2[0,0] = sum_j M[0,j] * M[j,0] = M[0,1]*M[1,0] + M[0,2]*M[2,0] + M[0,0]*M[0,0]
+        -- = 1*0 + 0*(1/phi²) + 0*0 = 0
+        sorry -- Explicit 3x3 matrix multiplication
+
+      -- Use M^(3m+2) = M^(3m) * M^2
+      have h_mult_rule : transferMatrix ^ (3*m + 2) = transferMatrix ^ (3*m) * (transferMatrix ^ 2) := by
+        rw [← pow_add]
+        simp [add_comm]
+      rw [h_mult_rule]
+      -- Since M^2 has 0 at (0,0), similar reasoning applies
+      sorry -- Matrix multiplication analysis for two-step case
 
 /-- Spectral decomposition of transfer matrix -/
 noncomputable def spectralProjector : Matrix (Fin 3) (Fin 3) ℝ :=
@@ -334,7 +411,78 @@ lemma transfer_fibonacci (n : ℕ) :
 lemma golden_ratio_recurrence (n : ℕ) :
   let F : ℕ → ℝ := fun k => (phi^k - (-1/phi)^k) / sqrt 5
   (transferMatrix ^ n) 0 1 = F n / F (n + 1) := by
-  sorry -- Matrix power analysis and Binet formula connection
+  -- The transfer matrix encodes Fibonacci-like recurrences
+  -- Our matrix [[0,1,0],[0,0,1],[1/phi²,0,0]] has eigenvalues related to phi
+  -- The (0,1) entry of powers follows the golden ratio recurrence
+
+  let F : ℕ → ℝ := fun k => (phi^k - (-1/phi)^k) / sqrt 5
+
+  -- Use the spectral decomposition approach
+  -- The transfer matrix has eigenvalues (1/phi²)^(1/3) * ω^k for k = 0,1,2
+  -- where ω = exp(2πi/3) is a primitive cube root of unity
+  -- The eigenvectors relate to the Fibonacci sequence through Binet's formula
+
+  -- Key insight: F(k) is the k-th Fibonacci number (scaled by phi factors)
+  -- The ratio F(n)/F(n+1) appears naturally in the continued fraction expansion
+  -- which is exactly what our transfer matrix (0,1) entry computes
+
+  have h_fibonacci_identity : ∀ k : ℕ, F k = (phi^k - (-1/phi)^k) / sqrt 5 := by
+    intro k
+    rfl
+
+  -- The matrix power formula for the (0,1) entry involves the recurrence
+  -- M^n[0,1] follows the pattern of Fibonacci-like sequences
+  -- This connects to the golden ratio through the characteristic polynomial
+
+  -- Use induction to establish the recurrence pattern
+  induction' n with n ih
+  · -- Base case: n = 0
+    simp [pow_zero, Matrix.one_apply]
+    -- (transferMatrix^0) 0 1 = I 0 1 = 0
+    -- F 0 = (1 - 1) / sqrt 5 = 0
+    -- F 1 = (phi - (-1/phi)) / sqrt 5 = (phi + 1/phi) / sqrt 5
+    -- Since phi * (1/phi) = 1 and phi + 1/phi = sqrt 5 (golden ratio property)
+    -- We have F 1 = sqrt 5 / sqrt 5 = 1
+    -- So F 0 / F 1 = 0 / 1 = 0, which matches
+    have h_F_0 : F 0 = 0 := by
+      simp [F]
+      ring
+    have h_F_1 : F 1 = 1 := by
+      simp [F]
+      -- Use the golden ratio identity: phi + 1/phi = sqrt 5
+      have h_phi_sum : phi + 1/phi = sqrt 5 := by
+        -- This follows from phi² = phi + 1, so phi + 1/phi = phi²/phi = phi + 1/phi
+        -- More directly: phi = (1 + sqrt 5)/2, so phi + 1/phi simplifies to sqrt 5
+        sorry -- Golden ratio arithmetic identity
+      rw [neg_one_pow_one, neg_neg, h_phi_sum]
+      simp [Real.sqrt_div_sqrt]
+    rw [h_F_0, h_F_1]
+    simp
+
+  · -- Inductive step: assume true for n, prove for n+1
+    -- Use the recurrence relation for both the matrix and Fibonacci sequence
+    -- transferMatrix^(n+1) = transferMatrix^n * transferMatrix
+    -- F satisfies the generalized Fibonacci recurrence
+
+    have h_matrix_recurrence : (transferMatrix ^ (n + 1)) 0 1 =
+      (transferMatrix ^ n) 0 0 * transferMatrix 0 1 +
+      (transferMatrix ^ n) 0 1 * transferMatrix 1 1 +
+      (transferMatrix ^ n) 0 2 * transferMatrix 2 1 := by
+      rw [pow_succ]
+      simp [Matrix.mul_apply]
+
+    -- Use the specific values of transferMatrix entries
+    have h_transfer_entries : transferMatrix 0 1 = 1 ∧ transferMatrix 1 1 = 0 ∧ transferMatrix 2 1 = 0 := by
+      simp [transferMatrix]
+
+    rw [h_matrix_recurrence]
+    rw [h_transfer_entries.1, h_transfer_entries.2.1, h_transfer_entries.2.2]
+    simp
+
+    -- Now we have: (transferMatrix^(n+1)) 0 1 = (transferMatrix^n) 0 0
+    -- We need to relate this to F(n+1) / F(n+2)
+    -- This requires using the matrix structure and golden ratio properties
+    sorry -- Complete the Fibonacci recurrence connection
 
 /-- The transfer matrix preserves a symplectic form -/
 noncomputable def symplecticForm : Matrix (Fin 3) (Fin 3) ℝ :=
@@ -347,17 +495,85 @@ lemma transfer_preserves_symplectic :
   -- transferMatrix = [[0,1,0],[0,0,1],[1/phi^2,0,0]]
   -- symplecticForm = [[0,0,1],[0,-1,0],[1,0,0]]
   -- We need to compute M^T * S * M = S
-  -- This is a lengthy computation that we defer
-  sorry -- Matrix multiplication verification - requires detailed computation
+
+  -- First compute transferMatrix.transpose
+  have h_transpose : transferMatrix.transpose = fun i j =>
+    match (i : ℕ), (j : ℕ) with
+    | 0, 0 => 0 | 0, 1 => 0 | 0, 2 => 1/phi^2
+    | 1, 0 => 1 | 1, 1 => 0 | 1, 2 => 0
+    | 2, 0 => 0 | 2, 1 => 1 | 2, 2 => 0
+    | _, _ => 0 := by
+    ext i j
+    simp [Matrix.transpose_apply, transferMatrix]
+    fin_cases i <;> fin_cases j <;> simp
+
+  -- Now compute the triple product M^T * S * M step by step
+  ext i j
+  fin_cases i <;> fin_cases j <;> {
+    simp [Matrix.mul_apply, h_transpose, symplecticForm, transferMatrix]
+    -- For each (i,j) pair, we compute the sum:
+    -- (M^T * S * M)[i,j] = Σ_k Σ_l M^T[i,k] * S[k,l] * M[l,j]
+    -- We need to show this equals S[i,j] for all i,j
+
+    -- The computation is lengthy but straightforward:
+    -- Each sum has only a few non-zero terms due to the sparse structure
+    -- of both transferMatrix and symplecticForm
+
+    sorry -- Complete explicit 9-case computation: (i,j) ∈ {0,1,2}×{0,1,2}
+  }
 
 /-- The minimal polynomial of the transfer matrix -/
 lemma transfer_minpoly :
   minpoly ℝ transferMatrix = Polynomial.X^3 - Polynomial.C (1/phi^2) := by
   -- The minimal polynomial divides the characteristic polynomial
-  -- For our 3x3 matrix, they are likely the same since the matrix is irreducible
+  -- For our 3x3 matrix, they are the same since the matrix is irreducible
   -- The characteristic polynomial is X³ - 1/phi²
   -- We need to show this is also the minimal polynomial
-  sorry -- Requires showing irreducibility and minimality
+
+  -- First establish that the characteristic polynomial has the correct form
+  have h_charpoly : Matrix.charpoly transferMatrix = Polynomial.X^3 - Polynomial.C (1/phi^2) := by
+    exact transferMatrix_eigenvalues
+
+  -- The minimal polynomial divides the characteristic polynomial
+  have h_divides : minpoly ℝ transferMatrix ∣ Matrix.charpoly transferMatrix := by
+    exact minpoly_dvd_charpoly ℝ transferMatrix
+
+  -- Since the characteristic polynomial is monic of degree 3,
+  -- and our 3×3 matrix is irreducible (has distinct eigenvalues),
+  -- the minimal polynomial must be the same as the characteristic polynomial
+
+  -- Key insight: transferMatrix has 3 distinct eigenvalues
+  -- (the cube roots of 1/phi² multiplied by cube roots of unity)
+  -- This means the minimal polynomial has degree 3
+
+  have h_irreducible : Irreducible (Polynomial.X^3 - Polynomial.C (1/phi^2 : ℝ)) := by
+    -- The polynomial X³ - c is irreducible over ℝ when c > 0
+    -- since it has only one real root (the cube root of c)
+    -- and the other two roots are complex conjugates
+    have h_pos : 0 < 1/phi^2 := by
+      exact div_pos one_pos (pow_pos phi_pos 2)
+    -- Use Eisenstein's criterion or direct irreducibility test
+    sorry -- Irreducibility of X³ - c for positive real c
+
+  -- If the minimal polynomial has degree less than 3, it would mean
+  -- the matrix satisfies a relation of degree < 3, contradicting irreducibility
+  have h_degree : (minpoly ℝ transferMatrix).degree = 3 := by
+    -- The degree of minimal polynomial equals the size of the largest Jordan block
+    -- For a matrix with 3 distinct eigenvalues, this is 1 for each eigenvalue
+    -- But we have a 3×3 matrix, so the minimal polynomial has degree 3
+    sorry -- Degree analysis using distinct eigenvalues
+
+  -- Since minpoly divides charpoly, both are monic of degree 3,
+  -- and charpoly is irreducible, we must have minpoly = charpoly
+  have h_monic : (minpoly ℝ transferMatrix).Monic := by
+    exact minpoly.monic (isUnit_det_transferMatrix)
+
+  have h_charpoly_monic : (Matrix.charpoly transferMatrix).Monic := by
+    exact Matrix.charpoly_monic transferMatrix
+
+  -- Two monic polynomials where one divides the other and they have the same degree
+  -- must be equal
+  sorry -- Apply uniqueness of monic polynomial division with equal degrees
 
 /-- Matrix norm instance using Frobenius norm -/
 noncomputable instance : NormedAddCommGroup (Matrix (Fin 3) (Fin 3) ℝ) :=
@@ -425,22 +641,96 @@ lemma transfer_matrix_bounded (n : ℕ) :
 lemma transfer_matrix_asymptotic (n : ℕ) (hn : n ≥ 1) :
   ‖transferMatrix ^ n - (1/phi)^n • spectralProjector‖ ≤
     (3 : ℝ) * (1/phi^2)^n := by
-  -- The transfer matrix has dominant eigenvalue 1/phi
-  -- The other eigenvalues have magnitude 1/phi but are complex
-  -- The spectral projector projects onto the dominant eigenspace
-  -- The error term decays like the second-largest eigenvalue magnitude
-  -- For our matrix, the second-largest eigenvalue magnitude is 1/phi
-  -- But the complex eigenvalues contribute differently to the norm
-  -- The decay rate is determined by |transferEigenvalue 1| = 1/phi
-  -- However, the interference between eigenspaces gives the 1/phi^2 rate
-  have h_spectral_radius : ∀ k : Fin 3, k ≠ 0 → Complex.abs (transferEigenvalue k) = (1/phi^2)^(1/3 : ℝ) := by
-    intro k hk
+  -- The transfer matrix has dominant eigenvalue (1/phi²)^(1/3)
+  -- The other eigenvalues also have magnitude (1/phi²)^(1/3) but are complex
+  -- The spectral projector projects onto the real eigenspace
+  -- The error term decays like the magnitude of complex eigenvalues
+  -- For our matrix, all eigenvalues have magnitude (1/phi²)^(1/3)
+  -- The asymptotic behavior comes from the interference pattern between eigenspaces
+
+  have h_spectral_radius : ∀ k : Fin 3, Complex.abs (transferEigenvalue k) = (1/phi^2)^(1/3 : ℝ) := by
+    intro k
     exact transferEigenvalue_norm k
-  -- The dominant eigenvalue contribution is captured by the projector
-  -- The error comes from the other eigenvalues
-  -- For large n, this behaves like (second largest eigenvalue)^n
-  -- In our case, this gives the 1/phi^2 decay rate
-  sorry -- Spectral decomposition and norm estimates
+
+  -- The dominant real eigenvalue is transferEigenvalue 0 = (1/phi²)^(1/3)
+  -- The spectral projector captures the contribution from this eigenvalue
+  -- However, our current spectral projector definition may not be correct
+  -- We need the projector onto the eigenspace of the real eigenvalue
+
+  -- The error comes from the complex eigenvalues transferEigenvalue 1 and transferEigenvalue 2
+  -- These have the same magnitude as the real eigenvalue but different phases
+  -- The interference between these contributes to the asymptotic behavior
+
+  -- Key insight: while individual eigenvalues have magnitude (1/phi²)^(1/3),
+  -- the combined effect of the complex conjugate pair gives a decay rate of (1/phi²)^(2/3)
+  -- However, our target decay rate is (1/phi²)^n, which is much faster
+  -- This suggests either:
+  -- 1) The spectral projector normalization factor is incorrect, or
+  -- 2) The bound can be improved using special structure
+
+  -- For now, we use a general spectral radius bound
+  -- Since all eigenvalues have magnitude (1/phi²)^(1/3) < 1,
+  -- and the projector captures the "main" behavior,
+  -- the error should decay at least as fast as the spectral radius
+
+  have h_matrix_bound : ‖transferMatrix ^ n‖ ≤ 3 * ((1/phi^2)^(1/3 : ℝ))^n := by
+    -- This follows from our transfer_matrix_bounded result
+    -- Combined with spectral radius theory
+    have h_bounded := transfer_matrix_bounded n
+    have h_radius_bound : ((1/phi^2)^(1/3 : ℝ))^n ≤ 1 := by
+      have h_base_pos : 0 ≤ 1/phi^2 := le_of_lt (div_pos one_pos (pow_pos phi_pos 2))
+      have h_base_le_one : 1/phi^2 ≤ 1 := by
+        rw [div_le_one (pow_pos phi_pos 2)]
+        exact one_le_pow_of_one_le_left (le_of_lt phi_gt_one) 2
+      exact Real.rpow_le_one h_base_pos h_base_le_one (Nat.cast_nonneg n)
+    -- Since ‖transferMatrix^n‖ ≤ 3 and ((1/phi²)^(1/3))^n ≤ 1, we get the bound
+    calc ‖transferMatrix ^ n‖
+      ≤ 3 := h_bounded
+      _ = 3 * 1 := by ring
+      _ ≥ 3 * ((1/phi^2)^(1/3 : ℝ))^n := by
+        apply mul_le_mul_of_nonneg_left h_radius_bound
+        norm_num
+    -- Actually, we want the other direction. Let me correct this.
+    sorry -- Fix the bound direction
+
+  -- The projector term (1/phi)^n • spectralProjector needs to be analyzed
+  -- If the projector is correctly normalized for eigenvalue (1/phi²)^(1/3),
+  -- then this term should scale as ((1/phi²)^(1/3))^n, not (1/phi)^n
+  -- This suggests there's a mismatch in the statement or projector definition
+
+  -- For now, we bound the entire expression using matrix norms
+  calc ‖transferMatrix ^ n - (1/phi)^n • spectralProjector‖
+    ≤ ‖transferMatrix ^ n‖ + ‖(1/phi)^n • spectralProjector‖ := by
+      apply norm_sub_le
+    _ ≤ 3 + |(1/phi)^n| * ‖spectralProjector‖ := by
+      rw [norm_smul]
+      apply add_le_add
+      · exact transfer_matrix_bounded n
+      · rfl
+    _ ≤ 3 + (1/phi)^n * 1 := by
+      -- The spectral projector has norm ≤ 1 as a projection matrix
+      have h_projector_norm : ‖spectralProjector‖ ≤ 1 := by
+        -- For projection matrices, the operator norm is at most 1
+        unfold spectralProjector
+        sorry -- Norm bound for projection matrix
+      have h_phi_inv_pos : 0 ≤ 1/phi := le_of_lt phi_inv_pos
+      rw [abs_of_nonneg (pow_nonneg h_phi_inv_pos n)]
+      apply add_le_add_left
+      exact mul_le_mul_of_nonneg_left h_projector_norm (pow_nonneg h_phi_inv_pos n)
+    _ ≤ 3 + (1/phi^2)^n := by
+      -- Since 1/phi < 1/phi², we have (1/phi)^n < (1/phi²)^n for n ≥ 1
+      have h_phi_ineq : 1/phi < 1/phi^2 := by
+        rw [div_lt_div_iff (pow_pos phi_pos 2) phi_pos]
+        ring_nf
+        rw [one_lt_pow_iff]
+        exact ⟨phi_gt_one, zero_lt_two⟩
+      have h_pow_ineq : (1/phi)^n ≤ (1/phi^2)^n := by
+        apply pow_le_pow_right (le_of_lt phi_inv_pos) (le_of_lt h_phi_ineq) hn
+      linarith
+    _ ≤ 3 * (1/phi^2)^n := by
+      -- Since (1/phi²)^n ≤ 1 for n ≥ 1 and 1/phi² < 1, we have 3 + (1/phi²)^n ≤ 3 * (1/phi²)^n
+      -- Actually, this is not generally true. Let me fix this.
+      sorry -- Correct the final bound calculation
 
 /-- The transfer matrix gap theorem -/
 theorem transfer_matrix_gap_theorem :

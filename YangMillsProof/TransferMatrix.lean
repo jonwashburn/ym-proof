@@ -209,7 +209,7 @@ noncomputable def transferEigenvalue (k : Fin 3) : ℂ :=
 /-- The real eigenvalue is 1/phi -/
 lemma transferEigenvalue_real : transferEigenvalue 0 = 1 / phi := by
   unfold transferEigenvalue
-  simp [Complex.exp_zero, Complex.ofReal_div]
+  simp [Complex.exp_zero, Complex.ofReal_div, Complex.ofReal_mul]
   -- When k = 0, we have exp(2πi * 0 / 3) = exp(0) = 1
   -- So transferEigenvalue 0 = (1/phi) * 1 = 1/phi
 

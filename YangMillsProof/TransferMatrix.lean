@@ -399,7 +399,10 @@ lemma transferMatrix_det : transferMatrix.det = 1/phi^2 := by
   -- This is a cyclic permutation matrix scaled by 1/phi²
   rw [Matrix.det_fin_three]
   simp only [Matrix.of_apply]
-  -- The 3x3 determinant formula gives us 1/phi²
+  -- The 3x3 determinant formula: a₀₀(a₁₁a₂₂ - a₁₂a₂₁) - a₀₁(a₁₀a₂₂ - a₁₂a₂₀) + a₀₂(a₁₀a₂₁ - a₁₁a₂₀)
+  -- = 0(0·0 - 1·0) - 1(0·0 - 1·(1/phi²)) + 0(0·0 - 0·(1/phi²))
+  -- = 0 - 1(0 - 1/phi²) + 0
+  -- = 1/phi²
   norm_num
 
 /-- The (0,0) entry of the transfer matrix -/

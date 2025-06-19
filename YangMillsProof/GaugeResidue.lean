@@ -183,8 +183,13 @@ lemma gauge_cost_lower_bound (s : GaugeLedgerState) (hs : s ∈ GaugeLayer)
     have h_rung_mod : f.rung % 3 ≠ 0 := by
       unfold colourResidue at hf_residue
       -- Convert between ZMod 3 and mod arithmetic
-      -- The exact conversion depends on Lean's version
-      sorry -- This requires the correct ZMod conversion lemma
+      -- colourResidue f = f.rung means f.rung as an element of ZMod 3
+      -- If colourResidue f ≠ 0 in ZMod 3, then f.rung % 3 ≠ 0
+      simp only [ne_eq] at hf_residue
+      -- The cast from Int to ZMod 3 is zero iff the integer is divisible by 3
+      rw [ZMod.int_cast_eq_zero_iff_of_prime] at hf_residue
+      · exact hf_residue
+      · norm_num : 3.Prime
 
     -- For non-zero mod 3, we have f.rung ≥ 1 or f.rung ≤ -1
     -- Since phi > 1, we get phi^|rung| ≥ phi
@@ -213,7 +218,33 @@ lemma gauge_cost_lower_bound (s : GaugeLedgerState) (hs : s ∈ GaugeLayer)
     · -- Case: f.rung < 1, but since rung % 3 ≠ 0, we have rung ≤ -1
       -- For negative rung, Int.toNat gives 0, but phi^0 = 1
       -- We need a different argument here
-      sorry -- This case requires handling negative rungs properly
+      -- Since f.rung < 1 and f.rung % 3 ≠ 0, we must have f.rung ≤ -1
+      have h_neg : f.rung ≤ -1 := by
+        -- f.rung is an integer < 1 with f.rung % 3 ≠ 0
+        -- The integers < 1 are {..., -2, -1, 0}
+        -- Since f.rung % 3 ≠ 0, f.rung ≠ 0, so f.rung ≤ -1
+        by_contra h_not_neg
+        push_neg at h_not_neg
+        -- So -1 < f.rung < 1, which means f.rung = 0
+        have h_zero : f.rung = 0 := by
+          have h_le : f.rung ≤ 0 := by linarith
+          have h_ge : f.rung ≥ 0 := by linarith
+          linarith
+        -- But then f.rung % 3 = 0 % 3 = 0, contradiction
+        rw [h_zero] at h_rung_mod
+        simp at h_rung_mod
+      -- For negative rungs, Int.toNat gives 0
+      have h_toNat_zero : Int.toNat f.rung = 0 := by
+        exact Int.toNat_eq_zero.mpr (le_of_lt (by linarith : f.rung < 0))
+      -- So the contribution is debit + credit ≥ 1 times E_coh * phi^0 = E_coh * 1 = E_coh
+      calc
+        (↑(s.debit f) + ↑(s.credit f) : ℝ) * (E_coh * phi ^ Int.toNat f.rung)
+        = (↑(s.debit f) + ↑(s.credit f) : ℝ) * (E_coh * phi ^ 0) := by rw [h_toNat_zero]
+        _ = (↑(s.debit f) + ↑(s.credit f) : ℝ) * (E_coh * 1) := by rw [pow_zero]
+        _ = (↑(s.debit f) + ↑(s.credit f) : ℝ) * E_coh := by rw [mul_one]
+        _ ≥ 1 * E_coh := by exact mul_le_mul_of_nonneg_right h_real (le_of_lt E_coh_pos)
+        _ = E_coh := by rw [one_mul]
+        _ < E_coh * phi := by exact mul_lt_mul_of_pos_left phi_gt_one E_coh_pos
 
   -- Combine the lower bounds: h_bound gives us s ≥ contribution, h_contribution gives us contribution ≥ target
   exact le_trans h_contribution h_bound

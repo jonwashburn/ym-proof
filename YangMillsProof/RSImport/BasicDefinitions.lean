@@ -199,11 +199,31 @@ lemma finite_support_zero_cost_implies_zero_entries (S : LedgerState)
           have h_sum_pos : 0 < ∑' j, (if j ≤ N then
               (|(S.entries j).debit - (S.entries j).credit| + (S.entries j).debit + (S.entries j).credit) * phi^j
             else 0) := by
-                                    -- The infinite sum contains the k-th term which is positive
-            -- Since all terms are non-negative and at least one is positive,
-            -- the sum must be positive
-            -- This requires showing that ∑' with a positive term is positive
-            sorry
+                        -- Since the function has finite support, we can use a simpler argument
+            -- The function is zero outside {0, ..., N}, so it's summable
+            have h_summable : Summable (fun j => if j ≤ N then
+                (|(S.entries j).debit - (S.entries j).credit| + (S.entries j).debit + (S.entries j).credit) * phi^j
+              else 0) := by
+              -- Apply summability for functions with finite support
+              apply @summable_of_ne_finset_zero _ _ _ _ _ (Finset.range (N + 1))
+              intro j hj
+              simp only [Finset.mem_range, not_lt] at hj
+              have : j > N := Nat.lt_of_succ_le hj
+              simp [if_neg (not_le_of_gt this)]
+
+            -- Now use that the k-th term is positive and ≤ the sum
+            have h_le : (if k ≤ N then
+                (|(S.entries k).debit - (S.entries k).credit| + (S.entries k).debit + (S.entries k).credit) * phi^k
+              else 0) ≤ ∑' j, (if j ≤ N then
+                (|(S.entries j).debit - (S.entries j).credit| + (S.entries j).debit + (S.entries j).credit) * phi^j
+              else 0) := by
+              apply le_tsum h_summable
+              -- Need to show all other terms are non-negative
+              intro j hj
+              exact h_term_nonneg j
+
+            -- Since 0 < k-th term ≤ sum, we have 0 < sum
+            linarith
           -- But we know the sum equals zero
           linarith
 

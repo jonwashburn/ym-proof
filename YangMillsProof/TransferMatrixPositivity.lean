@@ -19,15 +19,16 @@ structure MatrixConfigState where
   finiteSupport : ∃ N, ∀ n > N, entries n = 0
   hermitian : ∀ n, (entries n).IsHermitian
   traceless : ∀ n, (entries n).trace = 0
-  nonneg : ∀ n, (entries n).PosSemidef
 
 /-- The cone of positive configurations -/
 def PositiveCone : Set MatrixConfigState :=
   {S | ∀ n, S.entries n ≠ 0 → matrixAbs (S.entries n) > 0}
 
-/-- Heat kernel for transfer matrix -/
-noncomputable def heatKernel (t : ℝ) (n m : ℕ) : ℝ :=
-  exp (-t * |↑n - ↑m|)
+/-- Heat kernel for transfer matrix
+This is the heat kernel on su(3) with the Frobenius metric.
+It is manifestly positive for t > 0. -/
+noncomputable def heatKernel (t : ℝ) (S_n S_m : Matrix (Fin 3) (Fin 3) ℂ) : ℝ :=
+  (1 / (4 * π * t)^(3/2)) * exp (-frobeniusNormSq (S_n - S_m) / (4 * t))
 
 /-- Transfer matrix action -/
 noncomputable def transferMatrix (t : ℝ) (S : MatrixConfigState) : MatrixConfigState :=

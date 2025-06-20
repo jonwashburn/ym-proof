@@ -114,11 +114,36 @@ theorem golden_ratio_unique : ∀ x : ℝ, x > 0 → x^2 = x + 1 → x = phi := 
   have h1 : x = (1 + Real.sqrt 5)/2 ∨ x = (1 - Real.sqrt 5)/2 := by
     -- From quadratic formula for x² - x - 1 = 0
     have h_quad : x^2 - x - 1 = 0 := by linarith [h_eq]
-    -- The discriminant is 1 + 4 = 5
-    -- By quadratic formula: x = (1 ± √5)/2
-    have h_discrim : (1 : ℝ)^2 - 4*1*(-1) = 5 := by norm_num
-    -- Apply quadratic formula (this requires a lemma about quadratic equations)
-    sorry -- Quadratic formula application
+    -- For ax² + bx + c = 0 with a=1, b=-1, c=-1
+    -- Discriminant = b² - 4ac = 1 - 4(1)(-1) = 5
+    -- Solutions: x = (-b ± √discriminant) / 2a = (1 ± √5) / 2
+    -- We use that if p(x) = x² - x - 1, then p((1+√5)/2) = 0 and p((1-√5)/2) = 0
+    have h_root1 : ((1 + Real.sqrt 5)/2)^2 - (1 + Real.sqrt 5)/2 - 1 = 0 := by
+      field_simp
+      ring_nf
+      rw [sq_sqrt (by norm_num : (0 : ℝ) ≤ 5)]
+      ring
+    have h_root2 : ((1 - Real.sqrt 5)/2)^2 - (1 - Real.sqrt 5)/2 - 1 = 0 := by
+      field_simp
+      ring_nf
+      rw [sq_sqrt (by norm_num : (0 : ℝ) ≤ 5)]
+      ring
+    -- Since quadratic has at most 2 roots and we found 2, x must be one of them
+    have h_poly : ∀ y : ℝ, y^2 - y - 1 = (y - (1 + Real.sqrt 5)/2) * (y - (1 - Real.sqrt 5)/2) := by
+      intro y
+      field_simp
+      ring_nf
+      rw [sq_sqrt (by norm_num : (0 : ℝ) ≤ 5)]
+      ring
+    rw [← h_poly] at h_quad
+    have h_factor := mul_eq_zero.mp h_quad
+    cases h_factor with
+    | inl h =>
+      left
+      linarith
+    | inr h =>
+      right
+      linarith
   cases h1 with
   | inl h =>
     -- x = (1 + √5)/2 = phi

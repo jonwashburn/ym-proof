@@ -71,9 +71,26 @@ theorem golden_ratio_unique :
   have h2 : x = (1 + sqrt 5)/2 ∨ x = (1 - sqrt 5)/2 := by
     -- From quadratic formula
     have : x^2 - x - 1 = 0 := by linarith [h1]
-    -- The discriminant is 1 + 4 = 5
-    -- Solutions are (1 ± √5)/2
-    sorry -- Quadratic formula application
+    -- Verify both roots satisfy the equation
+    have h_root1 : ((1 + sqrt 5)/2)^2 - (1 + sqrt 5)/2 - 1 = 0 := by
+      field_simp
+      ring_nf
+      rw [sq_sqrt (by norm_num : (0 : ℝ) ≤ 5)]
+      ring
+    have h_root2 : ((1 - sqrt 5)/2)^2 - (1 - sqrt 5)/2 - 1 = 0 := by
+      field_simp
+      ring_nf
+      rw [sq_sqrt (by norm_num : (0 : ℝ) ≤ 5)]
+      ring
+    -- Factor the quadratic
+    have h_poly : ∀ y : ℝ, y^2 - y - 1 = (y - (1 + sqrt 5)/2) * (y - (1 - sqrt 5)/2) := by
+      intro y
+      field_simp
+      ring_nf
+      rw [sq_sqrt (by norm_num : (0 : ℝ) ≤ 5)]
+      ring
+    rw [← h_poly] at this
+    exact mul_eq_zero.mp this
   cases h2 with
   | inl h => exact h.symm ▸ rfl
   | inr h =>

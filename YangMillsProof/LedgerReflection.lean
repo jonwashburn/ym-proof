@@ -47,7 +47,20 @@ theorem reflection_preserves_cost (S : LedgerState) :
   unfold zeroCostFunctional ledgerReflection
   simp only
   -- The cost functional is symmetric in debit/credit
-  sorry
+  -- C(d,c) = |d-c| + |d| + |c|
+  -- C(c,d) = |c-d| + |c| + |d|
+  -- These are equal since |d-c| = |c-d| and addition is commutative
+  congr 1
+  ext n
+  -- For each entry, show cost is preserved
+  have h_diff : |(S.entries n).credit - (S.entries n).debit| =
+                |(S.entries n).debit - (S.entries n).credit| := by
+    rw [abs_sub_comm]
+  -- The cost at level n is |d_n - c_n| + |d_n| + |c_n|
+  -- After reflection: |c_n - d_n| + |c_n| + |d_n|
+  -- These are equal
+  simp [h_diff]
+  ring
 
 /-- Inner product on ledger states -/
 noncomputable def ledgerInnerProduct (S T : LedgerState) : ℝ :=

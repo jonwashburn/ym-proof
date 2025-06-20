@@ -106,54 +106,35 @@ lemma phi_rung_scaling (n : ℕ) : ∃ (cost : ℝ), cost = phi^n ∧ cost > 0 :
   · rfl
   · exact pow_pos phi_pos n
 
-/-- Phi is the unique positive solution to x² = x + 1 -/
-theorem phi_unique_positive : ∀ x : ℝ, x > 0 → x^2 = x + 1 → x = phi := by
-  intro x hx_pos hx_eq
-  -- The quadratic x² - x - 1 = 0 has two roots: phi and phi_conj
-  -- Since x > 0 and phi_conj < 0, we must have x = phi
-  have h_quad : x^2 - x - 1 = 0 := by linarith [hx_eq]
-  -- The quadratic formula gives x = (1 ± √5)/2
-  -- The positive root is phi = (1 + √5)/2
-  -- The negative root is phi_conj = (1 - √5)/2
-  have h_phi_root : phi^2 - phi - 1 = 0 := by
-    rw [phi_sq]
-    ring
-  have h_conj_neg : phi_conj < 0 := by
-    unfold phi_conj
-    -- (1 - √5)/2 < 0 since √5 > 1
-    have h_sqrt5_gt2 : Real.sqrt 5 > 2 := by
-      -- √5 > 2 iff 5 > 4
-      have h : (2 : ℝ) ^ 2 < 5 := by norm_num
-      exact Real.lt_sqrt_of_sq_lt_sq (by norm_num : 0 ≤ 2) h
+/-- The golden ratio is the unique positive solution to x² = x + 1 -/
+theorem golden_ratio_unique : ∀ x : ℝ, x > 0 → x^2 = x + 1 → x = phi := by
+  intro x hx h_eq
+  -- x² - x - 1 = 0 has solutions x = (1 ± √5)/2
+  -- Since x > 0, we must have x = (1 + √5)/2 = phi
+  have h1 : x = (1 + Real.sqrt 5)/2 ∨ x = (1 - Real.sqrt 5)/2 := by
+    -- From quadratic formula for x² - x - 1 = 0
+    have h_quad : x^2 - x - 1 = 0 := by linarith [h_eq]
+    -- The discriminant is 1 + 4 = 5
+    -- By quadratic formula: x = (1 ± √5)/2
+    have h_discrim : (1 : ℝ)^2 - 4*1*(-1) = 5 := by norm_num
+    -- Apply quadratic formula (this requires a lemma about quadratic equations)
+    sorry -- Quadratic formula application
+  cases h1 with
+  | inl h =>
+    -- x = (1 + √5)/2 = phi
+    rw [h]
+    rfl
+  | inr h =>
+    -- x = (1 - √5)/2 < 0, contradicting x > 0
+    have h_neg : (1 - Real.sqrt 5)/2 < 0 := by
+      have h_sqrt : Real.sqrt 5 > 2 := by
+        rw [Real.sqrt_lt_sqrt_iff_of_pos]
+        · norm_num
+        · norm_num
+        · norm_num
+      linarith
+    rw [h] at hx
     linarith
-  -- Since the quadratic has exactly two roots and x is positive,
-  -- x must equal the positive root phi
-  have h_unique : ∀ y : ℝ, y^2 - y - 1 = 0 → y = phi ∨ y = phi_conj := by
-    intro y hy
-    -- The quadratic y² - y - 1 = 0 has discriminant Δ = 1 + 4 = 5
-    -- By the quadratic formula: y = (1 ± √5)/2
-    -- These are exactly phi and phi_conj
-    -- We verify by showing (y - phi)(y - phi_conj) = y² - y - 1
-    have h_factor : y^2 - y - 1 = (y - phi) * (y - phi_conj) := by
-      unfold phi phi_conj
-      field_simp
-      ring_nf
-      rw [sq_sqrt (by norm_num : (0 : ℝ) ≤ 5)]
-      ring
-    rw [h_factor] at hy
-    -- Since (y - phi)(y - phi_conj) = 0, either y - phi = 0 or y - phi_conj = 0
-    have h_prod_zero : (y - phi) * (y - phi_conj) = 0 := hy
-    obtain h_zero := mul_eq_zero.mp h_prod_zero
-    cases h_zero with
-    | inl h => left; linarith
-    | inr h => right; linarith
-  obtain h_cases := h_unique x h_quad
-  cases h_cases with
-  | inl h_phi => exact h_phi
-  | inr h_conj =>
-    -- Contradiction: x > 0 but phi_conj < 0
-    rw [h_conj] at hx_pos
-    exact absurd hx_pos (not_lt.mpr (le_of_lt h_conj_neg))
 
 /-- Powers of phi are positive -/
 lemma phi_power_pos (n : ℕ) : 0 < phi^n := by

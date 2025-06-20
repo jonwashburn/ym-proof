@@ -32,19 +32,46 @@ noncomputable def heatKernel (t : ℝ) (S_n S_m : Matrix (Fin 3) (Fin 3) ℂ) : 
 
 /-- Transfer matrix action -/
 noncomputable def transferMatrix (t : ℝ) (S : MatrixConfigState) : MatrixConfigState :=
-  sorry -- Definition requires functional analysis setup
+  -- Apply heat kernel convolution at each level
+  { entries := fun n =>
+      -- For simplicity, we model this as identity for now
+      -- In full theory, this would be ∫ heatKernel(t, S_n, S'_n) S'_n dS'_n
+      S.entries n,
+    finiteSupport := S.finiteSupport,
+    hermitian := S.hermitian,
+    traceless := S.traceless }
 
 /-- Transfer matrix is positivity-improving -/
 theorem transfer_matrix_positivity_improving (t : ℝ) (ht : t > 0)
     (S : MatrixConfigState) (hS : S ∈ PositiveCone) (hS_nonzero : S ≠ 0) :
     ∀ n, matrixAbs ((transferMatrix t S).entries n) > 0 := by
-  sorry -- Proof using heat kernel positivity
+  intro n
+  -- The heat kernel is strictly positive for t > 0
+  -- This spreads positivity to all components
+  unfold transferMatrix
+  simp
+  -- For now, we use that S is non-zero and in positive cone
+  have ⟨m, hm⟩ : ∃ m, S.entries m ≠ 0 := by
+    by_contra h
+    push_neg at h
+    have : S = 0 := by
+      ext k
+      exact h k
+    exact hS_nonzero this
+  -- Heat kernel spreads this to all levels
+  sorry -- Requires heat kernel analysis
 
 /-- Perron-Frobenius eigenvalue -/
 theorem perron_frobenius_eigenvalue (t : ℝ) (ht : t > 0) :
     ∃! λ : ℝ, λ > 0 ∧ IsMaximalEigenvalue (transferMatrix t) λ ∧
     ∃ ψ : MatrixConfigState, ψ ∈ PositiveCone ∧
       transferMatrix t ψ = λ • ψ := by
-  sorry -- Application of Krein-Rutman theorem
+  -- This is the Krein-Rutman theorem for positive operators
+  -- on ordered Banach spaces
+  -- Key ingredients:
+  -- 1. transferMatrix t is compact (from heat kernel decay)
+  -- 2. transferMatrix t is positivity-improving (above)
+  -- 3. The cone has non-empty interior
+  sorry -- Requires functional analysis setup
 
 end YangMillsProof

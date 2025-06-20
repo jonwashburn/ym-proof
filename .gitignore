@@ -1,32 +1,8 @@
-# LaTeX auxiliary files
+.lake/
 *.aux
 *.log
 *.out
 *.toc
-*.fls
-*.fdb_latexmk
-*.synctex.gz
-
-# Lean build artifacts
-.lake/
-build/
-lake-packages/
-
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
 venv/
-.env
-
-# IDE
-.vscode/
-.idea/
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Backup files
-*~
-*.bak
+__pycache__/
+*.pyc

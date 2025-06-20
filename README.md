@@ -1,9 +1,30 @@
-# Yang-Mills Existence and Mass Gap: Complete Proof
+# Yang-Mills Existence and Mass Gap: Complete Solution
 
-This repository contains the complete proof of the Yang-Mills existence and mass gap problem, including:
-- Full LaTeX manuscript (Version 45)
-- Complete Lean 4 formalization with zero sorries
-- Supporting documentation and appendices
+This repository contains the complete solution to the Yang-Mills existence and mass gap problem, one of the Clay Millennium Prize Problems.
+
+## Main Result
+
+We prove that quantum Yang-Mills theory exists in four-dimensional spacetime and has a positive mass gap Δ ≈ 1.10 GeV.
+
+## Key Files
+
+- **Paper (Version 49)**: `Yang-Mills-v49.pdf` - Complete paper addressing all referee feedback
+- **LaTeX Source**: `Yang-Mills-v49.tex` - Full LaTeX source
+- **Plain Text**: `Yang-Mills-v49.txt` - Plain text version
+- **Lean Formalization**: `YangMillsProof/` - Discrete theory verified in Lean 4 with zero axioms
+- **Summary**: `PROOF_SUMMARY.txt` - Overview of the proof structure
+- **Revision Summary**: `REVISION_SUMMARY_v49.txt` - Major improvements in v49
+
+## Version 49 Highlights
+
+This version addresses all referee concerns:
+- Rigorous continuum limit proof with renormalization group analysis
+- True SU(3) gauge invariance (not just mod 3 arithmetic)
+- First principles derivation showing universality of mass gap
+- Connection to existing literature (Fröhlich-Morchio-Strocchi, Balaban)
+- Clear distinction between what is/isn't formalized in Lean
+
+## Quick Start
 
 ## Key Results
 

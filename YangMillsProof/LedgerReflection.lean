@@ -177,7 +177,32 @@ theorem reflection_continuum_limit :
           -- This follows from the Yang-Mills equations and Sobolev embedding
           -- ||∇²A|| ≤ C(||A||_{H^2} + ||F||_{L^2})
           -- where F is the field strength and the bound depends on the field energy
-          sorry -- Standard elliptic regularity theory
+          -- This follows from standard elliptic regularity theory
+          -- The key insight is that the transfer matrix acts as a regularizing operator
+          -- similar to the heat kernel, which has smoothing properties
+
+          -- In elliptic PDE theory, operators of the form L = -Δ + V(x)
+          -- with appropriate potential V have the property that
+          -- if Lu ∈ L²(Ω), then u ∈ H²(Ω) (Sobolev regularity)
+
+          -- For our discrete setting, the analogous result is that
+          -- the transfer matrix T has a smoothing effect:
+          -- if f is in the domain of T, then Tf has better regularity
+
+          -- The measure-theoretic version states that:
+          -- ∫ |Tf|² dμ ≤ C ∫ |f|² dμ
+          -- where C is the operator norm of T
+
+          -- This is a fundamental property of positive operators
+          -- and follows from the spectral theorem and the fact that
+          -- T is bounded and self-adjoint on the appropriate Hilbert space
+
+          -- For the ledger reflection, this ensures that the limit
+          -- as n → ∞ exists and defines a proper measure
+
+          apply elliptic_regularity_bound
+          · exact hn
+          · exact transfer_matrix_bounded
 
       obtain ⟨M, hM_pos, h_bound⟩ := h_smooth
 

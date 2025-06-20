@@ -17,7 +17,16 @@ open MeasureTheory
 /-- Regularized correlation functions at lattice spacing a -/
 noncomputable def correlationFunction_a (a : ℝ) (n : ℕ)
     (x : Fin n → SpacetimePoint) : ℝ :=
-  sorry -- Expectation value of product of fields
+  -- Expectation value of product of fields at lattice spacing a
+  -- This is defined as the n-point correlation function in the discrete theory
+  -- ⟨φ(x₁) φ(x₂) ... φ(xₙ)⟩ = ∫ ∏ᵢ φ(xᵢ) dμₐ(φ) / ∫ dμₐ(φ)
+  -- where μₐ is the discrete measure at lattice spacing a
+
+  -- For the ledger formulation, this becomes:
+  -- ∫ ∏ᵢ blockAverageField(a, S, xᵢ) dμ(S)
+  -- where S ranges over all ledger states and μ is the canonical measure
+
+  ∫ (∏ i, Complex.re (Matrix.trace (blockAverageField a S (x i)))) dμ
 
 /-- OS0: Temperedness - polynomial bounds on correlation functions -/
 theorem OS0_temperedness (n : ℕ) (f : Fin n → SpacetimePoint → ℝ)

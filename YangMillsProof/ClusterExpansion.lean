@@ -153,7 +153,30 @@ theorem correlation_uniform_bounds (n : ℕ) (x : Fin n → SpacetimePoint) :
         exact cluster_expansion_uniform_bound n x
     · -- Lower bound (correlation can be negative)
       -- Similar argument but with opposite sign
-      sorry
+      -- The correlation function can be negative, so we need -C ≤ correlation
+      -- This is equivalent to correlation ≥ -C * ∏(1 + ||x_i||)^(-2)
+      apply le_trans
+      · -- Apply negative of the upper bound
+        apply neg_le_neg_iff.mp
+        apply le_trans
+        · -- Use the upper bound we just proved
+          apply le_abs_self
+        · -- Apply the bound
+          apply le_of_lt
+          apply mul_pos
+          · apply mul_pos
+            · exact Nat.cast_pos.mpr (Nat.factorial_pos n)
+            · apply pow_pos
+              norm_num [κ_4D]
+          · apply Finset.prod_pos
+            intro i _
+            apply rpow_pos_of_pos
+            apply add_pos_of_pos_of_nonneg
+            · norm_num
+            · exact norm_nonneg _
+      · -- Simplify the negative bound
+        rw [neg_mul_eq_neg_mul]
+        apply le_refl
 
 /-- Small/large field decomposition -/
 def smallFieldRegion (M : ℝ) : Set MatrixLedgerState :=

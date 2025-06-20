@@ -18,7 +18,15 @@ open RSImport
 
 -- Provide Nontrivial instance for VoxelFace
 instance : Nontrivial VoxelFace := by
-  sorry -- Constructor syntax issues, needs investigation
+  -- We need to show there exist at least two distinct VoxelFace values
+  -- We can use different rung values
+  use ⟨0, ⟨0, 0, 0⟩, 0⟩  -- face with rung 0
+  use ⟨1, ⟨0, 0, 0⟩, 0⟩  -- face with rung 1
+  -- Show they are different
+  simp only [ne_eq, VoxelFace.mk.injEq]
+  push_neg
+  left
+  norm_num
 
 /-- Colour residues are the three possible values of a ledger rung modulo 3. -/
 abbrev ColourResidue := Fin 3

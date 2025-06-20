@@ -68,11 +68,80 @@ theorem embedding_hierarchical (a : ℝ) (ha : a > 0) (n : ℕ) :
           simp
           intro i
           -- Verify the block containment
-          sorry -- Detailed arithmetic with powers of 2
+          -- We need to show that q is in the hypercubic block at scale n
+          -- with position 2k + b where b is the binary digit (0 or 1)
+
+          -- For the i-th coordinate:
+          -- p.x i is in block (n+1, k) means: k_i * 2^(n+1) * a ≤ p.x i < (k_i + 1) * 2^(n+1) * a
+          -- We split this into two halves at (k_i + 1/2) * 2^(n+1) * a
+
+          -- If p.x i < (k_i + 1/2) * 2^(n+1) * a:
+          --   Then b_i = 0 and q.x i = p.x i
+          --   We need: (2k_i) * 2^n * a ≤ q.x i < (2k_i + 1) * 2^n * a
+          --   This simplifies to: k_i * 2^(n+1) * a ≤ p.x i < (k_i + 1/2) * 2^(n+1) * a
+          --   which holds by assumption
+
+          -- If p.x i ≥ (k_i + 1/2) * 2^(n+1) * a:
+          --   Then b_i = 1 and q.x i = p.x i - 2^n * a
+          --   We need: (2k_i + 1) * 2^n * a ≤ q.x i < (2k_i + 2) * 2^n * a
+          --   Substituting: (2k_i + 1) * 2^n * a ≤ p.x i - 2^n * a < (2k_i + 2) * 2^n * a
+          --   Adding 2^n * a: (2k_i + 2) * 2^n * a ≤ p.x i < (2k_i + 3) * 2^n * a
+          --   This simplifies to: (k_i + 1/2) * 2^(n+1) * a ≤ p.x i < (k_i + 1) * 2^(n+1) * a
+          --   which holds by assumption
+
+          by_cases h : p.x i < ((k i : ℝ) + 1/2) * 2^(n+1) * a
+          · -- Case: b_i = 0
+            simp [h]
+            constructor
+            · -- Lower bound
+              have h_lower := (hk i).1
+              rw [mul_comm (2 * k i : ℝ), mul_assoc, ← pow_succ]
+              exact h_lower
+            · -- Upper bound
+              rw [add_mul, one_mul, mul_comm (2 * k i : ℝ), mul_assoc, ← pow_succ]
+              rw [← mul_two, mul_comm 2, mul_assoc, ← mul_assoc (k i : ℝ)]
+              rw [mul_comm 2, ← add_mul]
+              convert h using 1
+              ring
+          · -- Case: b_i = 1
+            simp [h]
+            push_neg at h
+            constructor
+            · -- Lower bound: (2k + 1) * 2^n * a ≤ p.x i - 2^n * a
+              rw [sub_le_iff_le_add]
+              rw [add_mul, one_mul, add_comm]
+              rw [← mul_two, mul_comm 2, mul_assoc, ← pow_succ]
+              rw [mul_comm ((k i : ℝ) * 2^(n+1) * a), ← add_mul]
+              convert h using 1
+              ring
+            · -- Upper bound: p.x i - 2^n * a < (2k + 2) * 2^n * a
+              rw [sub_lt_iff_lt_add]
+              have h_upper := (hk i).2
+              rw [add_mul, mul_assoc] at h_upper
+              convert h_upper using 1
+              ring_nf
+              rw [← pow_succ]
+              ring
         · -- Show the coordinate relationship
           intro i
           simp
-          sorry -- Arithmetic simplification
+          -- We need to show: p.x i = q.x i + b i * 2^n * a
+          -- where q.x i = p.x i - (if p.x i < ... then 0 else 2^n * a)
+          -- and b i = if p.x i < ... then 0 else 1
+
+          by_cases h : p.x i < ((k i : ℝ) + 1/2) * 2^(n+1) * a
+          · -- Case: b i = 0
+            simp [h]
+            -- q.x i = p.x i - 0 = p.x i
+            -- b i = 0
+            -- So: p.x i = p.x i + 0 * 2^n * a = p.x i ✓
+            ring
+          · -- Case: b i = 1
+            simp [h]
+            -- q.x i = p.x i - 2^n * a
+            -- b i = 1
+            -- So: p.x i = (p.x i - 2^n * a) + 1 * 2^n * a = p.x i ✓
+            ring
 
     obtain ⟨b, hb_binary, q, hq_mem, hq_coords⟩ := h_binary
     use b, hb_binary
@@ -95,7 +164,56 @@ theorem embedding_hierarchical (a : ℝ) (ha : a > 0) (n : ℕ) :
     simp
     intro i
     -- Use the coordinate relationship and block containment
-    sorry -- Detailed verification of block containment
+    -- We need to show p is in hypercubicBlock (n+1) (k_small / 2) a
+    -- Given: q ∈ hypercubicBlock n k_small a and p.x i = q.x i + b i * 2^n * a
+
+    -- From q ∈ hypercubicBlock n k_small a, we have:
+    -- k_small i * 2^n * a ≤ q.x i < (k_small i + 1) * 2^n * a
+
+    -- From p.x i = q.x i + b i * 2^n * a and b i ∈ {0, 1}, we get:
+    -- k_small i * 2^n * a + b i * 2^n * a ≤ p.x i < (k_small i + 1) * 2^n * a + b i * 2^n * a
+    -- = (k_small i + b i) * 2^n * a ≤ p.x i < (k_small i + b i + 1) * 2^n * a
+
+    -- Now we need to relate this to the block at scale n+1 with position k_small i / 2
+    -- Key insight: k_small i = 2 * (k_small i / 2) + (k_small i % 2)
+    -- And b i must equal k_small i % 2 for consistency
+
+    -- The block at scale n+1 with position k_small i / 2 has bounds:
+    -- (k_small i / 2) * 2^(n+1) * a ≤ x < ((k_small i / 2) + 1) * 2^(n+1) * a
+
+    have h_q_bounds := hk_small i
+    have h_p_coords := hq_coords i
+
+    -- Substitute p.x i = q.x i + b i * 2^n * a
+    rw [h_p_coords]
+
+    -- We need to show:
+    -- (k_small i / 2) * 2^(n+1) * a ≤ q.x i + b i * 2^n * a < ((k_small i / 2) + 1) * 2^(n+1) * a
+
+    -- This requires showing that b i = k_small i % 2
+    -- which follows from the construction in the forward direction
+    have h_b_mod : b i = k_small i % 2 := by
+      -- From the binary construction, b encodes the position within the larger block
+      -- This is exactly the remainder when dividing by 2
+      sorry -- This requires tracking through the construction
+
+    rw [h_b_mod]
+
+    -- Now use the identity: k_small i = 2 * (k_small i / 2) + k_small i % 2
+    have h_div_mod : k_small i = 2 * (k_small i / 2) + k_small i % 2 := by
+      exact Int.ediv_add_emod (k_small i) 2
+
+    constructor
+    · -- Lower bound
+      have h_lower := h_q_bounds.1
+      rw [h_div_mod, add_mul, mul_assoc] at h_lower
+      rw [pow_succ, mul_comm 2, ← mul_assoc] at h_lower
+      linarith
+    · -- Upper bound
+      have h_upper := h_q_bounds.2
+      rw [h_div_mod, add_mul, mul_assoc, add_one_mul] at h_upper
+      rw [pow_succ, mul_comm 2, ← mul_assoc, ← mul_assoc] at h_upper
+      linarith
 
 /-- Locality: nearby ledger indices map to nearby spacetime regions -/
 theorem embedding_locality (a : ℝ) (ha : a > 0) (n m : ℕ) :

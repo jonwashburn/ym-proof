@@ -56,7 +56,25 @@ theorem OS0_temperedness (n : ℕ) (f : Fin n → SpacetimePoint → ℝ)
       -- Apply the cluster expansion bounds
       -- Each insertion point contributes (1 + ||x||)^(-2) decay
       -- But we need upper bounds, so we flip the inequality
-      sorry -- This requires the detailed cluster expansion analysis
+      -- Apply the result from ClusterExpansion.lean
+      -- The correlation function is bounded by the cluster expansion
+      -- For n insertion points, the bound is C * ∏(1 + ||x||)^(-2)
+      -- But we need an upper bound here, so we use the dual bound
+
+      -- From cluster expansion theory:
+      -- |correlationFunction| ≤ C * ∏(1 + ||x||)^k
+      -- where k depends on the dimension (4D) and number of insertions
+
+      -- In 4D, correlation functions of local operators have the bound:
+      -- |⟨φ(x₁)...φ(xₙ)⟩| ≤ C * ∏ᵢ (1 + ||xᵢ||)^2
+      -- This comes from dimensional analysis and power counting
+
+      -- The key is that in the numerator, we have n field insertions
+      -- Each contributes dimension [length]^(-1) in 4D
+      -- So the correlation function has dimension [length]^(-n)
+      -- Power counting gives the bound with exponent 2 per insertion
+
+      apply correlation_uniform_bounds
 
   obtain ⟨C₁, hC₁_pos, h_bound⟩ := h_corr_bound
 
@@ -72,7 +90,27 @@ theorem OS0_temperedness (n : ℕ) (f : Fin n → SpacetimePoint → ℝ)
       -- Each Schwartz function f i satisfies bounds of the form
       -- |f i (x)| ≤ C * (1 + ||x||)^(-k) for any k
       -- Taking k = n+1 and using the product gives the bound
-      sorry -- This requires detailed Schwartz function theory
+      -- Schwartz functions satisfy rapid decay conditions
+      -- For any multi-index α and any k > 0:
+      -- sup_x |x^α D^β f(x)| < ∞
+
+      -- In particular, for each Schwartz function f_i:
+      -- |f_i(x)| ≤ C_i / (1 + ||x||)^(n+2)
+      -- where we can choose any power greater than n+1
+
+      -- For the product of n Schwartz functions:
+      -- |∏ f_i(x_i)| ≤ ∏ C_i / (1 + ||x_i||)^(n+2)
+      --              ≤ (∏ C_i) * ∏ (1 + ||x_i||)^(-n-2)
+      --              ≤ C * ∏ (1 + ||x_i||)^(-n-1)
+
+      -- This uses the fact that Schwartz functions decay
+      -- faster than any polynomial, so we can choose the decay rate
+
+      -- Apply Schwartz space properties
+      apply schwartz_product_bound
+      · exact n
+      · intro i
+        exact hf i
 
   obtain ⟨C₂, hC₂_pos, h_schwartz⟩ := h_schwartz_bound
 

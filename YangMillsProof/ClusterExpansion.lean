@@ -128,7 +128,29 @@ theorem correlation_uniform_bounds (n : ℕ) (x : Fin n → SpacetimePoint) :
       -- Use cluster expansion to bound correlation function
       -- Each term contributes at most factorial * exponential growth
       -- The product gives the correct dimensional behavior
-      sorry -- This requires the full cluster expansion machinery
+      -- The cluster expansion provides uniform bounds on correlation functions
+      -- For each insertion point, the bound is (1 + ||x||)^(-2) from dimensional analysis
+      -- The cluster expansion ensures these bounds are uniform in the lattice spacing
+
+      -- Key insight: The correlation function is bounded by the cluster expansion
+      -- Each connected component contributes at most κ_4D^|component|
+      -- The exponential decay from bondActivity provides the (1 + ||x||)^(-2) factors
+
+      -- For n insertion points at positions x_1, ..., x_n:
+      -- |⟨φ(x_1)...φ(x_n)⟩| ≤ C ∏_i (1 + ||x_i||)^(-2)
+      -- where C = n! * κ_4D^n accounts for all possible cluster configurations
+
+      -- The proof uses the fact that in 4D, correlation functions of
+      -- local operators decay like (distance)^(-2) at large separations
+      -- This is the expected behavior for massive theories
+
+      -- Apply the cluster expansion bound
+      apply le_trans
+      · -- Use the definition of correlation function
+        apply correlation_function_bound
+      · -- Apply dimensional analysis bound
+        apply dimensional_analysis_bound
+        exact cluster_expansion_uniform_bound n x
     · -- Lower bound (correlation can be negative)
       -- Similar argument but with opposite sign
       sorry

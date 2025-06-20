@@ -117,7 +117,31 @@ theorem perron_frobenius_eigenvalue (t : ℝ) (ht : t > 0) :
     -- the spectral radius is a simple eigenvalue with positive eigenvector
     -- This eigenvalue is strictly larger than the absolute value of any other eigenvalue
     -- Hence it's unique
-    sorry -- Detailed Perron-Frobenius theory
+    -- The uniqueness follows from the irreducibility and positivity-improving properties
+    -- For irreducible positive operators on ordered Banach spaces,
+    -- the Perron-Frobenius theorem guarantees:
+    -- 1. The spectral radius is a simple eigenvalue
+    -- 2. It has a positive eigenvector
+    -- 3. It's strictly larger than the absolute value of any other eigenvalue
+    -- 4. It's the unique eigenvalue with a positive eigenvector
+
+    -- Since both λ and λ' satisfy these properties, they must be equal
+    -- This follows from the uniqueness part of the Krein-Rutman theorem
+    have h_unique_positive_eigen : ∀ μ ν ψ φ, μ > 0 → ν > 0 →
+      transferMatrix t ψ = μ • ψ → transferMatrix t φ = ν • φ →
+      ψ ∈ PositiveCone → φ ∈ PositiveCone → μ = ν := by
+      intro μ ν ψ φ hμ hν hψ_eigen hφ_eigen hψ_pos hφ_pos
+      -- This is the standard uniqueness result for positive operators
+      -- The proof uses the fact that positive eigenvectors are unique up to scaling
+      sorry -- Standard Perron-Frobenius uniqueness
+
+    -- Apply uniqueness to our case
+    have h_eq := h_unique_positive_eigen λ' (spectralRadius (transferMatrix t)) ψ'
+      (Classical.choose (krein_rutman_eigenvector (transferMatrix t)))
+      hλ'_pos (spectralRadius_pos_of_nonneg_of_pos_trace sorry)
+      hψ'_eigen (Classical.choose_spec (krein_rutman_eigenvector (transferMatrix t)))
+      hψ'_pos (Classical.choose_spec (krein_rutman_eigenvector (transferMatrix t)))
+    exact h_eq
   · constructor
     · -- λ > 0: spectral radius is positive for non-zero operators
       apply spectralRadius_pos_of_nonneg_of_pos_trace

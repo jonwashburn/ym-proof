@@ -16,6 +16,10 @@ namespace YangMillsProof
 -- Import key definitions from RSImport
 open RSImport
 
+-- Provide Nontrivial instance for VoxelFace
+instance : Nontrivial VoxelFace := by
+  sorry -- Constructor syntax issues, needs investigation
+
 /-- Colour residues are the three possible values of a ledger rung modulo 3. -/
 abbrev ColourResidue := Fin 3
 
@@ -42,8 +46,8 @@ def toRSLedgerState (_s : GaugeLedgerState) : RSImport.LedgerState where
   entries := fun _ =>
     -- Map the n-th voxel face to a ledger entry
     -- This is a simplification; in practice we'd enumerate voxel faces
-    ⟨0, 0⟩
-  finite_support := ⟨0, fun _ _ => ⟨rfl, rfl⟩⟩
+    ⟨0, 0, 0, 0⟩
+  finite_support := ⟨0, fun _ _ => ⟨rfl, rfl, rfl, rfl⟩⟩
 
 /-- The vacuum state has zero debit and credit everywhere -/
 def vacuumStateGauge : GaugeLedgerState where

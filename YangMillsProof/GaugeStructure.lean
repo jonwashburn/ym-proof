@@ -137,7 +137,16 @@ theorem mod3_triality_correspondence (n : ℕ) :
               ring_nf
             have h_not_one : Complex.exp (2 * π * Complex.I * 2 / 3) ≠ 1 := by
               -- Similar argument: this is also a primitive cube root
-              sorry -- This is a standard fact about cube roots of unity
+              -- exp(4πi/3) = exp(2πi·2/3) is the complex conjugate of exp(2πi/3)
+              -- Both are primitive cube roots of unity, so they satisfy x³ = 1 but x ≠ 1
+              -- We can verify directly: Re(exp(4πi/3)) = cos(4π/3) = -1/2 ≠ 1
+              intro h_eq
+              have h_re : (Complex.exp (2 * π * Complex.I * 2 / 3)).re = -1/2 := by
+                rw [Complex.exp_mul_I]
+                simp [Complex.cos_div_two_pi]
+                norm_num
+              rw [h_eq] at h_re
+              simp at h_re
             exact h_not_one h_eq_one
         exact h_ne_one h_exp
       exact h this

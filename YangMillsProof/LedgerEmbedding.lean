@@ -32,7 +32,70 @@ theorem embedding_hierarchical (a : ℝ) (ha : a > 0) (n : ℕ) :
   ledgerEmbedding a (n + 1) = ⋃ b ∈ {0, 1}^4,
     {p : SpacetimePoint | ∃ q ∈ ledgerEmbedding a n,
       ∀ i, p.x i = q.x i + b i * 2^n * a} := by
-  sorry
+  -- The hierarchical structure reflects the scale doubling in the ledger
+  -- Each block at scale n+1 is subdivided into 2^4 = 16 blocks at scale n
+  ext p
+  constructor
+  · -- Forward direction: p ∈ ledgerEmbedding a (n + 1) → p ∈ RHS
+    intro h
+    unfold ledgerEmbedding at h
+    simp at h
+    obtain ⟨k, hk⟩ := h
+    unfold hypercubicBlock at hk
+    -- p is in block (n+1, k), so we need to find which subblock at scale n
+    -- The key insight: block (n+1, k) contains 2^4 blocks at scale n
+    -- These correspond to positions 2k, 2k+1 in each coordinate
+
+    -- Find the binary representation of the position within the larger block
+    have h_binary : ∃ b : Fin 4 → ℤ, (∀ i, b i ∈ {0, 1}) ∧
+      ∃ q ∈ ledgerEmbedding a n, ∀ i, p.x i = q.x i + (b i : ℝ) * 2^n * a := by
+      -- For each coordinate, determine if p is in the first or second half
+      use fun i => if p.x i < ((k i : ℝ) + 1/2) * 2^(n+1) * a then 0 else 1
+      constructor
+      · intro i
+        simp only [Set.mem_insert_iff, Set.mem_singleton_iff]
+        by_cases h : p.x i < ((k i : ℝ) + 1/2) * 2^(n+1) * a
+        · simp [h]; left; rfl
+        · simp [h]; right; rfl
+      · -- Construct the corresponding point q at scale n
+        use ⟨fun i => p.x i - (if p.x i < ((k i : ℝ) + 1/2) * 2^(n+1) * a then 0 else 2^n * a)⟩
+        constructor
+        · -- Show q ∈ ledgerEmbedding a n
+          unfold ledgerEmbedding
+          simp
+          use fun i => 2 * k i + (if p.x i < ((k i : ℝ) + 1/2) * 2^(n+1) * a then 0 else 1)
+          unfold hypercubicBlock
+          simp
+          intro i
+          -- Verify the block containment
+          sorry -- Detailed arithmetic with powers of 2
+        · -- Show the coordinate relationship
+          intro i
+          simp
+          sorry -- Arithmetic simplification
+
+    obtain ⟨b, hb_binary, q, hq_mem, hq_coords⟩ := h_binary
+    use b, hb_binary
+    use q, hq_mem
+    exact hq_coords
+
+  · -- Reverse direction: p ∈ RHS → p ∈ ledgerEmbedding a (n + 1)
+    intro h
+    simp at h
+    obtain ⟨b, hb_binary, q, hq_mem, hq_coords⟩ := h
+    unfold ledgerEmbedding
+    simp
+    -- From q ∈ ledgerEmbedding a n, find the corresponding block at scale n+1
+    unfold ledgerEmbedding at hq_mem
+    simp at hq_mem
+    obtain ⟨k_small, hk_small⟩ := hq_mem
+    -- The block at scale n+1 has position k_large = k_small / 2 (integer division)
+    use fun i => k_small i / 2
+    unfold hypercubicBlock
+    simp
+    intro i
+    -- Use the coordinate relationship and block containment
+    sorry -- Detailed verification of block containment
 
 /-- Locality: nearby ledger indices map to nearby spacetime regions -/
 theorem embedding_locality (a : ℝ) (ha : a > 0) (n m : ℕ) :
@@ -40,7 +103,102 @@ theorem embedding_locality (a : ℝ) (ha : a > 0) (n m : ℕ) :
   ∃ (p q : SpacetimePoint), p ∈ ledgerEmbedding a n ∧
     q ∈ ledgerEmbedding a m ∧
     ‖p.x - q.x‖ ≤ 2 * 2^(max n m) * a := by
-  sorry
+  intro h_nearby
+  -- When ledger indices are close, their spacetime regions overlap or are adjacent
+  -- The distance bound reflects the hierarchical block structure
+
+  cases' Nat.le_iff_lt_or_eq.mp (Int.natAbs_le.mp h_nearby) with h_lt h_eq
+  · -- Case: n ≠ m, so |n - m| = 1
+    wlog h_order : n < m
+    · -- Without loss of generality, assume n < m
+      cases' Nat.lt_or_gt_of_ne (Nat.ne_of_not_eq h_eq) with h_nm h_mn
+      · exact this ha h_nearby h_nm
+      · rw [abs_sub_comm] at h_nearby
+        rw [max_comm]
+        obtain ⟨q, p, hq, hp, h_dist⟩ := this ha h_nearby h_mn
+        exact ⟨p, q, hp, hq, h_dist⟩
+
+    -- Now n < m and |n - m| = 1, so m = n + 1
+    have h_succ : m = n + 1 := by
+      cases' h_lt with h_lt_succ
+      · rw [Nat.lt_succ_iff] at h_lt_succ
+        cases' h_lt_succ with h_eq h_lt_n
+        · exact h_eq.symm
+        · -- If n + 1 < m, then |n - m| ≥ 2, contradiction
+          exfalso
+          have : 2 ≤ Int.natAbs (Int.ofNat n - Int.ofNat m) := by
+            rw [Int.natAbs_of_nonneg (Int.sub_nonneg_of_le (Int.ofNat_le_ofNat_of_le (Nat.le_of_succ_le_succ h_lt_n)))]
+            simp only [Int.natCast_sub, Int.natCast_ofNat]
+            exact Nat.succ_le_iff.mpr h_lt_n
+          linarith [h_nearby]
+
+    -- At scales n and n+1, blocks have sizes 2^n * a and 2^(n+1) * a
+    -- Adjacent blocks can be at most 2 * 2^(n+1) * a apart
+    rw [h_succ]
+    simp only [max_self]
+
+    -- Choose points from overlapping or adjacent blocks
+    -- Use the hierarchical structure: blocks at scale n+1 contain blocks at scale n
+    use ⟨fun _ => 0⟩, ⟨fun _ => 0⟩  -- Origin points in their respective blocks
+    constructor
+    · -- p ∈ ledgerEmbedding a n
+      unfold ledgerEmbedding
+      simp
+      use fun _ => 0  -- Choose the block containing origin at scale n
+      unfold hypercubicBlock
+      simp
+      intro i
+      constructor
+      · norm_num
+      · simp only [zero_add, one_mul]
+        exact mul_pos (pow_pos (by norm_num : (0 : ℝ) < 2) n) ha
+    constructor
+    · -- q ∈ ledgerEmbedding a (n + 1)
+      unfold ledgerEmbedding
+      simp
+      use fun _ => 0  -- Choose the block containing origin at scale n+1
+      unfold hypercubicBlock
+      simp
+      intro i
+      constructor
+      · norm_num
+      · simp only [zero_add, one_mul]
+        exact mul_pos (pow_pos (by norm_num : (0 : ℝ) < 2) (n + 1)) ha
+    · -- Distance bound
+      simp only [sub_zero, norm_zero]
+      apply mul_nonneg
+      · norm_num
+      · exact mul_nonneg (pow_nonneg (by norm_num) _) (le_of_lt ha)
+
+  · -- Case: n = m
+    rw [h_eq]
+    simp only [max_self]
+    -- Choose the same point in both embeddings
+    use ⟨fun _ => 0⟩, ⟨fun _ => 0⟩
+    constructor
+    · unfold ledgerEmbedding
+      simp
+      use fun _ => 0
+      unfold hypercubicBlock
+      simp
+      intro i
+      constructor
+      · norm_num
+      · exact mul_pos (pow_pos (by norm_num : (0 : ℝ) < 2) m) ha
+    constructor
+    · unfold ledgerEmbedding
+      simp
+      use fun _ => 0
+      unfold hypercubicBlock
+      simp
+      intro i
+      constructor
+      · norm_num
+      · exact mul_pos (pow_pos (by norm_num : (0 : ℝ) < 2) m) ha
+    · simp only [sub_self, norm_zero]
+      apply mul_nonneg
+      · norm_num
+      · exact mul_nonneg (pow_nonneg (by norm_num) _) (le_of_lt ha)
 
 /-- The embedding covers all of spacetime in the continuum limit -/
 theorem embedding_covers_spacetime (a : ℝ) (ha : a > 0) :

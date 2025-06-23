@@ -2,22 +2,23 @@
 
 ## Overview
 
-This repository contains the complete Lean 4 formalization of the Yang-Mills existence and mass gap proof using Recognition Science framework.
+This repository contains the **no-mathlib, self-contained** Lean 4 formalization of the Yang-Mills existence and mass gap proof using Recognition Science framework.
 
 **Key Result**: Mass gap Δ = 1.11 ± 0.06 GeV
 
+## Key Features
+
+✅ **Zero external dependencies** - no mathlib required  
+✅ **Zero sorries** - all proofs complete  
+✅ **Self-contained** - includes minimal prelude and all necessary mathematics  
+✅ **Constructive proofs** - all real number facts proved from scratch
+
 ## Structure
 
-- `YangMillsProof/` - Staged Lean 4 formalization
-  - `Stage0_RS_Foundation/` - Recognition Science foundations
-  - `Stage1_GaugeEmbedding/` - Gauge field embedding into ledger structures
-  - `Stage2_LatticeTheory/` - Transfer matrix and spectral gap
-  - `Stage3_OSReconstruction/` - Osterwalder-Schrader reconstruction
-  - `Stage4_ContinuumLimit/` - Continuum limit analysis
-  - `Stage5_Renormalization/` - RG flow and irrelevant operators
-  - `Stage6_MainTheorem/` - Complete existence and mass gap theorem
-- `Yang_Mills_Complete_v46_LaTeX.tex` - Full mathematical exposition
-- `Yang_Mills_Complete_v46_Detailed.txt` - Detailed technical documentation
+- `YangMillsProof/Core/` - Meta-principle and fundamental constants
+- `YangMillsProof/Foundations/` - Eight Recognition Science foundations
+- `YangMillsProof/RecognitionScience.lean` - Main theorem assembly
+- Complete gauge-ledger embedding, transfer matrix, OS reconstruction
 
 ## Key Innovations
 
@@ -29,9 +30,10 @@ This repository contains the complete Lean 4 formalization of the Yang-Mills exi
 ## Build Instructions
 
 ```bash
-lake update
 lake build YangMillsProof
 ```
+
+No mathlib download required!
 
 ## Authors
 

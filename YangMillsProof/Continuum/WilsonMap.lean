@@ -54,18 +54,66 @@ noncomputable def ledgerToWilson (s : GaugeLedgerState) : WilsonLink a :=
         apply div_nonneg
         simp
         norm_num
-      · sorry  -- TODO: prove phase < 2π
+      · -- Prove phase < 2π
+        have h1 : (s.colour_charges 1 : ℝ) / 3 < 1 := by
+          rw [div_lt_one]
+          · simp
+            exact Nat.lt_succ_of_le (Nat.le_of_lt_succ (Fin.is_lt (s.colour_charges 1)))
+          · norm_num
+        calc
+          2 * Real.pi * ((s.colour_charges 1 : ℝ) / 3) < 2 * Real.pi * 1 := by
+            apply mul_lt_mul_of_pos_left h1
+            simp [Real.pi_pos]
+          _ = 2 * Real.pi := by ring
   }
 
 /-- Theorem: The map preserves the cost functional structure -/
 theorem ledger_wilson_cost_correspondence (s : GaugeLedgerState) (h : a > 0) :
   ∃ (c : ℝ), c > 0 ∧ gaugeCost s = c * wilsonCost a (ledgerToWilson a s) := by
-  sorry  -- TODO: prove correspondence
+  -- The correspondence factor depends on the normalization
+  use (s.debits : ℝ) * 1.618033988749895 / (1 - Real.cos (ledgerToWilson a s).plaquette_phase)
+  constructor
+  · -- Prove c > 0
+    apply div_pos
+    · apply mul_pos
+      · exact Nat.cast_pos.mpr (Nat.zero_lt_of_ne_zero (fun h => by
+          have : s.debits = s.credits := s.balanced
+          sorry))  -- Need to handle vacuum state separately
+      · norm_num
+    · -- 1 - cos(θ) > 0 for θ ∈ (0, 2π)
+      have : 0 < (ledgerToWilson a s).plaquette_phase := by
+        unfold ledgerToWilson
+        simp
+        apply mul_pos
+        apply mul_pos
+        norm_num
+        apply div_pos
+        · exact Nat.cast_pos.mpr (Nat.zero_pos)
+        · norm_num
+      exact sub_pos.mpr (Real.cos_lt_one_of_zero_lt_of_lt_pi this sorry)
+  · -- Prove the equality
+    unfold gaugeCost wilsonCost
+    field_simp
+    ring
 
 /-- The map is injective modulo gauge equivalence -/
 theorem ledger_to_wilson_injective (s t : GaugeLedgerState) (a : ℝ) :
   ledgerToWilson a s = ledgerToWilson a t →
   s.colour_charges = t.colour_charges := by
-  sorry  -- TODO: prove injectivity
+  intro h
+  -- Extract phase equality from Wilson link equality
+  have phase_eq : (ledgerToWilson a s).plaquette_phase = (ledgerToWilson a t).plaquette_phase := by
+    rw [h]
+  -- Unfold the definition
+  unfold ledgerToWilson at phase_eq
+  simp at phase_eq
+  -- From phase equality, derive charge equality
+  have : (s.colour_charges 1 : ℝ) / 3 = (t.colour_charges 1 : ℝ) / 3 := by
+    have h_cancel : 2 * Real.pi ≠ 0 := by simp [Real.pi_ne_zero]
+    exact mul_right_cancel₀ h_cancel phase_eq
+  -- This gives us one component; we need all three
+  funext i
+  -- For now, we only have info about component 1
+  sorry  -- Need to extend to all components using charge constraint
 
 end YangMillsProof.Continuum

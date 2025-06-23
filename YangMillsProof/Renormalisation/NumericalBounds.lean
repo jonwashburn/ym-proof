@@ -32,7 +32,10 @@ def Interval.mul (I J : Interval) : Interval :=
                      I.upper * J.lower, I.upper * J.upper]
   { lower := candidates.minimum?. getD 0
     upper := candidates.maximum?. getD 1
-    valid := by sorry }  -- Min ≤ Max
+    valid := by
+      -- The minimum of a list is ≤ the maximum
+      simp [List.minimum?, List.maximum?]
+      sorry  -- List min/max properties }
 
 /-- Golden ratio interval -/
 def φ_interval : Interval :=
@@ -57,9 +60,13 @@ theorem bare_gap_bounds :
   simp [Interval.mul, E_coh, E_coh_interval, φ_interval]
   constructor
   · -- Lower bound: 0.08999 * 1.6180339887 ≤ 0.0900 * 1.618033988749895
-    sorry  -- Arithmetic
+    calc 0.08999 * 1.6180339887
+      ≤ 0.0900 * 1.6180339887 := by linarith
+    _ ≤ 0.0900 * 1.618033988749895 := by linarith
   · -- Upper bound: 0.0900 * 1.618033988749895 ≤ 0.09001 * 1.6180339888
-    sorry  -- Arithmetic
+    calc 0.0900 * 1.618033988749895
+      ≤ 0.09001 * 1.618033988749895 := by linarith
+    _ ≤ 0.09001 * 1.6180339888 := by linarith
 
 /-- Running coupling at 1 GeV -/
 def g_at_1GeV : Interval :=
@@ -93,17 +100,35 @@ theorem numerical_verification :
   have h2 : contains c₆_interval c₆ := by
     unfold c₆ contains c₆_interval
     constructor
-    · sorry  -- Lower bound on c₆
-    · sorry  -- Upper bound on c₆
+    · -- 7500 ≤ c₆
+      unfold c₆ gap_running
+      -- c₆ = (1 GeV / 90 meV)^(γ * 2π) where γ ≈ 0.2
+      -- = (11111)^(0.2 * 6.28) ≈ 11111^1.256 ≈ 7552
+      sorry  -- Numerical lower bound
+    · -- c₆ ≤ 7600
+      sorry  -- Numerical upper bound
   -- Product gives physical gap
   have h3 : contains physicalGap_interval (gap_running μ_QCD) := by
     unfold gap_running contains physicalGap_interval
     simp
     constructor
     · -- 1.04 ≤ gap_running μ_QCD
-      sorry
+      -- gap = massGap * c₆ ≥ 0.08999 * 1.6180 * 7500 > 1.04
+      have h_gap : gap_running μ_QCD = massGap * c₆ := by
+        unfold c₆
+        field_simp
+      rw [h_gap]
+      -- Use interval bounds
+      have : 0.08999 * 1.6180339887 * 7500 > 1.04 := by norm_num
+      sorry  -- Complete with interval arithmetic
     · -- gap_running μ_QCD ≤ 1.16
-      sorry
+      have h_gap : gap_running μ_QCD = massGap * c₆ := by
+        unfold c₆
+        field_simp
+      rw [h_gap]
+      -- 0.09001 * 1.6180339888 * 7600 < 1.16
+      have : 0.09001 * 1.6180339888 * 7600 < 1.16 := by norm_num
+      sorry  -- Complete with interval arithmetic
   -- This implies |gap - 1.10| < 0.06
   unfold contains at h3
   have : 1.04 ≤ gap_running μ_QCD ∧ gap_running μ_QCD ≤ 1.16 := h3
@@ -115,7 +140,12 @@ theorem eight_beat_scaling :
   let scale_factor := (μ_QCD.val / μ₀.val)
   abs (Real.log scale_factor / Real.log n - 3.5) < 0.1 := by
   -- log(1 GeV / 90 meV) / log(8) ≈ log(11111) / log(8) ≈ 4.5
-  sorry  -- Numerical computation
+  unfold μ_QCD μ₀
+  simp [E_coh]
+  -- scale_factor = 1.0 / 0.090 ≈ 11.111
+  -- log(11.111) / log(8) ≈ 2.408 / 0.903 ≈ 2.67
+  -- But we claimed 3.5, so there's a discrepancy
+  sorry  -- Fix numerical value
 
 /-- Recognition contribution is small -/
 theorem recognition_small :
@@ -137,7 +167,14 @@ theorem numerical_summary :
     · -- Recognition small relative to gap
       have h1 := recognition_small
       have h2 : gap_running μ_QCD > 1.04 := by
-        sorry  -- From interval bounds
+        -- From interval bounds in h3
+        have h3 : contains physicalGap_interval (gap_running μ_QCD) := by
+          unfold gap_running contains physicalGap_interval
+          simp
+          constructor
+          · sorry  -- Re-use earlier proof
+          · sorry  -- Re-use earlier proof
+        exact h3.1
       linarith
     · exact bare_gap_bounds
 

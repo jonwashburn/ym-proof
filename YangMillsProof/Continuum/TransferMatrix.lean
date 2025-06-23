@@ -55,7 +55,8 @@ noncomputable def T_lattice (a : ℝ) : TransferOperator a :=
       unfold op_norm
       -- For any state ψ, ‖T_a ψ‖ ≤ ‖ψ‖
       -- This follows from the kernel being substochastic
-      sorry  -- Need norm definitions
+      -- The kernel exp(-a(E_s + E_t)/2) has sup norm ≤ 1
+      sorry  -- Operator norm bound from kernel estimate
     positive := by
       intro ψ h_pos s
       -- Sum of positive terms
@@ -191,9 +192,12 @@ theorem perron_frobenius (a : ℝ) (ha : a > 0) :
     ‖ψ₀‖ = 1 := by
   -- Unique positive ground state
   let norm_gs := ‖ground_state a‖
-  have h_norm_pos : norm_gs > 0 := by
-    unfold ground_state
-    sorry  -- Norm of exponential is positive
+      have h_norm_pos : norm_gs > 0 := by
+      unfold ground_state norm_gs
+      -- The ground state is exp(-a * gaugeCost s / 2) which is always positive
+      -- The L² norm of positive functions is positive unless zero everywhere
+      -- But exp is never zero, so norm > 0
+      sorry  -- L² norm of exponential function is positive
   use fun s => (ground_state a s) / norm_gs
   constructor
   · constructor

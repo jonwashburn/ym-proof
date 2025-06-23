@@ -147,9 +147,11 @@ theorem golden_ratio_equation :
       norm_num
   · -- Second component (b)
     simp [SimpleRat.mk.injEq]
-    -- The b component: 1 * 0 + 1 * 1 = 1
+    -- The b component: 1 * 1 + 1 * 1 = 2
     -- Denominator: 2 * 1 = 2
-    -- So we get 1/2, which matches
+    -- So we get 2/2 = 1, but we need 1/2
+    -- Actually: b component of mul is (a₁b₂ + b₁a₂)
+    -- = (1/2)(1/2) + (1/2)(1/2) = 1/4 + 1/4 = 2/4 = 1/2 ✓
     norm_num
 
 /-- Self-similar structures scale by φ -/

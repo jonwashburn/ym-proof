@@ -98,7 +98,9 @@ theorem coboundary_squared {n : ℕ} (ω : GaugeCochain n) :
                        states (Fin.succAbove (j.succ) (Fin.succAbove i k)) := by
       intro k
       -- Index commutativity for succAbove
-      sorry  -- Fin.succAbove properties
+      -- When i < j, succAbove i (succAbove j k) = succAbove (j+1) (succAbove i k)
+      -- This is a standard property of the succAbove function
+      sorry  -- Fin.succAbove commutativity lemma
     simp [h_comm]
     -- Now the terms cancel by sign
     rw [← mul_assoc, ← mul_assoc]
@@ -178,7 +180,12 @@ theorem ledger_balance_gauge_invariance (s : GaugeLedgerState) :
   · intro h
     -- Gauge invariant states are balanced by construction
     cases h with
-    | inl h_inv => exact s.balanced
-    | inr ⟨g, h_g⟩ => exact s.balanced  -- Balance preserved by gauge transform
+    | inl h_inv =>
+      -- Already balanced by the structure of GaugeLedgerState
+      exact s.balanced
+    | inr ⟨g, h_g⟩ =>
+      -- Gauge transformation preserves balance since it only permutes colours
+      -- The total debits and credits are unchanged
+      exact s.balanced
 
 end YangMillsProof.Gauge

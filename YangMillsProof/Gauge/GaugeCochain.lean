@@ -52,6 +52,14 @@ structure GaugeCochain (n : ℕ) where
   gauge_invariant : ∀ (g : GaugeTransform) (states : Fin n → GaugeLedgerState),
     cochain states = cochain (fun i => apply_gauge_transform g (states i))
 
+/-- Zero cochain -/
+instance {n : ℕ} : Zero (GaugeCochain n) where
+  zero := ⟨fun _ => 0, fun _ _ => rfl⟩
+
+/-- Cochain equality -/
+instance {n : ℕ} : BEq (GaugeCochain n) where
+  beq ω₁ ω₂ := ∀ states, ω₁.cochain states = ω₂.cochain states
+
 /-- The coboundary operator -/
 def coboundary {n : ℕ} (ω : GaugeCochain n) : GaugeCochain (n + 1) :=
   { cochain := fun states =>
@@ -64,10 +72,31 @@ def coboundary {n : ℕ} (ω : GaugeCochain n) : GaugeCochain (n + 1) :=
       congr 1
       apply ω.gauge_invariant }
 
+/-- Helper lemma for d² = 0 -/
+lemma coboundary_sign_cancel (n : ℕ) (i j : Fin (n + 3)) (h : i < j) :
+  (-1 : ℝ)^(i : ℕ) * (-1)^(j - 1 : ℕ) + (-1)^(j : ℕ) * (-1)^(i : ℕ) = 0 := by
+  have : (j : ℕ) = (j - 1 : ℕ) + 1 := by
+    have : 1 ≤ j := Nat.succ_le_of_lt (Nat.lt_of_lt_of_le (Fin.pos i) (Nat.le_of_lt h))
+    exact (Nat.sub_add_cancel this).symm
+  rw [this, pow_add, mul_comm ((-1)^(j-1:ℕ)) _, mul_assoc]
+  simp [mul_comm]
+  ring
+
 /-- The coboundary squares to zero -/
 theorem coboundary_squared {n : ℕ} (ω : GaugeCochain n) :
   coboundary (coboundary ω) = 0 := by
-  sorry  -- TODO: prove d² = 0
+  ext states
+  simp [coboundary]
+  -- The key is that each term appears twice with opposite signs
+  have : ∀ i j : Fin (n + 3), i < j →
+    (-1)^(i:ℕ) * ω.cochain (fun k => states (Fin.succAbove i (Fin.succAbove j k))) +
+    (-1)^(j:ℕ) * ω.cochain (fun k => states (Fin.succAbove j (Fin.succAbove i k))) = 0 := by
+    intro i j hij
+    -- When i < j, we have: succAbove i (succAbove j k) = succAbove (j+1) (succAbove i k)
+    -- This gives the cancellation
+    sorry  -- Technical index manipulation
+  -- Sum over all pairs cancels
+  sorry  -- Complete the sum argument
 
 /-- Gauge invariant states form a subcomplex -/
 def gauge_invariant_states : Set GaugeLedgerState :=
@@ -80,15 +109,45 @@ structure CohomologyClass (n : ℕ) where
 
 /-- Two cochains are cohomologous -/
 def cohomologous {n : ℕ} (ω₁ ω₂ : GaugeCochain n) : Prop :=
-  ∃ η : GaugeCochain (n - 1), ω₂ = GaugeCochain.mk (ω₁.cochain + (coboundary η).cochain) sorry
+  ∃ η : GaugeCochain (n - 1),
+    ω₂.cochain = ω₁.cochain + (coboundary η).cochain
+
+/-- Cohomologous is an equivalence relation -/
+theorem cohomologous_equiv (n : ℕ) : Equivalence (@cohomologous n) := by
+  constructor
+  · -- Reflexive
+    intro ω
+    use 0
+    simp [coboundary]
+  · -- Symmetric
+    intro ω₁ ω₂ ⟨η, h⟩
+    use -η
+    sorry  -- Algebra
+  · -- Transitive
+    intro ω₁ ω₂ ω₃ ⟨η₁, h₁⟩ ⟨η₂, h₂⟩
+    use η₁ + η₂
+    sorry  -- Algebra
 
 /-- The cohomology group -/
-def H_gauge (n : ℕ) := Quotient (⟨cohomologous, sorry⟩ : Setoid (CohomologyClass n))
+def H_gauge (n : ℕ) := Quotient (⟨cohomologous, cohomologous_equiv n⟩ : Setoid (CohomologyClass n))
 
 /-- Main theorem: Gauge ledger balance encodes gauge invariance -/
 theorem ledger_balance_gauge_invariance (s : GaugeLedgerState) :
   s.balanced ↔ s ∈ gauge_invariant_states ∨
     ∃ g : GaugeTransform, apply_gauge_transform g s ∈ gauge_invariant_states := by
-  sorry  -- TODO: prove equivalence
+  constructor
+  · intro h_balanced
+    -- If balanced, either already gauge invariant or can be made so
+    by_cases h : s ∈ gauge_invariant_states
+    · left; exact h
+    · right
+      -- Use the fact that balanced states have gauge orbit representatives
+      use ⟨fun i => i, Function.bijective_id⟩  -- Identity for now
+      sorry  -- Find appropriate gauge transform
+  · intro h
+    -- Gauge invariant states are balanced by construction
+    cases h with
+    | inl h_inv => exact s.balanced
+    | inr ⟨g, h_g⟩ => exact s.balanced  -- Balance preserved by gauge transform
 
 end YangMillsProof.Gauge

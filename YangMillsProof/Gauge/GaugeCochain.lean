@@ -94,9 +94,26 @@ theorem coboundary_squared {n : ℕ} (ω : GaugeCochain n) :
     intro i j hij
     -- When i < j, we have: succAbove i (succAbove j k) = succAbove (j+1) (succAbove i k)
     -- This gives the cancellation
-    sorry  -- Technical index manipulation
+    have h_comm : ∀ k, states (Fin.succAbove i (Fin.succAbove j k)) =
+                       states (Fin.succAbove (j.succ) (Fin.succAbove i k)) := by
+      intro k
+      -- Index commutativity for succAbove
+      sorry  -- Fin.succAbove properties
+    simp [h_comm]
+    -- Now the terms cancel by sign
+    rw [← mul_assoc, ← mul_assoc]
+    have : (-1)^(i:ℕ) * (-1)^(j:ℕ) + (-1)^(j:ℕ) * (-1)^(i:ℕ) = 0 := by
+      ring
+    simp [this]
   -- Sum over all pairs cancels
-  sorry  -- Complete the sum argument
+  -- We group terms by pairs (i,j) with i < j
+  -- Each pair contributes 0 by the above lemma
+  have h_pair_sum : (Finset.univ : Finset (Fin (n + 3))).sum (fun i =>
+    (Finset.univ : Finset (Fin (n + 2))).sum (fun j =>
+      (-1)^(i:ℕ) * (-1)^(j:ℕ) * ω.cochain (fun k =>
+        states (Fin.succAbove i (Fin.succAbove j k))))) = 0 := by
+    sorry  -- Rearrange double sum to pairs
+  exact h_pair_sum
 
 /-- Gauge invariant states form a subcomplex -/
 def gauge_invariant_states : Set GaugeLedgerState :=
@@ -122,11 +139,15 @@ theorem cohomologous_equiv (n : ℕ) : Equivalence (@cohomologous n) := by
   · -- Symmetric
     intro ω₁ ω₂ ⟨η, h⟩
     use -η
-    sorry  -- Algebra
+    ext states
+    simp [h, coboundary]
+    ring
   · -- Transitive
     intro ω₁ ω₂ ω₃ ⟨η₁, h₁⟩ ⟨η₂, h₂⟩
     use η₁ + η₂
-    sorry  -- Algebra
+    ext states
+    simp [h₁, h₂, coboundary]
+    ring
 
 /-- The cohomology group -/
 def H_gauge (n : ℕ) := Quotient (⟨cohomologous, cohomologous_equiv n⟩ : Setoid (CohomologyClass n))
@@ -142,8 +163,18 @@ theorem ledger_balance_gauge_invariance (s : GaugeLedgerState) :
     · left; exact h
     · right
       -- Use the fact that balanced states have gauge orbit representatives
-      use ⟨fun i => i, Function.bijective_id⟩  -- Identity for now
-      sorry  -- Find appropriate gauge transform
+      -- For SU(3), we can always gauge to a standard form
+      -- where colour charge 0 has the maximal value
+      let max_charge := Finset.univ.argmax s.colour_charges
+      have h_max : ∃ i, s.colour_charges i = Finset.univ.image s.colour_charges |>.max' sorry := by
+        sorry  -- Existence of maximum
+      obtain ⟨i_max, hi_max⟩ := h_max
+      -- Permute to put max charge at position 0
+      use ⟨fun j => if j = 0 then i_max else if j = i_max then 0 else j, by
+        sorry⟩  -- Bijection proof
+      unfold gauge_invariant_states apply_gauge_transform
+      simp
+      sorry  -- Show result is gauge invariant
   · intro h
     -- Gauge invariant states are balanced by construction
     cases h with

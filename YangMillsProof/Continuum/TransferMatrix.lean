@@ -52,11 +52,21 @@ noncomputable def T_lattice (a : ℝ) : TransferOperator a :=
     bounded := by
       intro ψ
       -- Use Cauchy-Schwarz
-      sorry
+      unfold op_norm
+      -- For any state ψ, ‖T_a ψ‖ ≤ ‖ψ‖
+      -- This follows from the kernel being substochastic
+      sorry  -- Need norm definitions
     positive := by
       intro ψ h_pos s
       -- Sum of positive terms
-      sorry }
+      unfold op
+      -- ∑' t, exp(-a(E_s + E_t)/2) * ψ(t) where ψ(t) ≥ 0
+      apply tsum_nonneg
+      intro t
+      apply mul_nonneg
+      · -- exp is always positive
+        exact Complex.exp_pos _
+      · exact h_pos t }
 
 /-- Ground state at lattice spacing a -/
 noncomputable def ground_state (a : ℝ) : GaugeLedgerState → ℂ :=
@@ -67,9 +77,22 @@ theorem ground_state_eigenstate (a : ℝ) (ha : a > 0) :
   (T_lattice a).op (ground_state a) = spectral_radius a • ground_state a := by
   ext s
   unfold T_lattice ground_state spectral_radius
-  simp
-  -- The gaussian ground state is preserved
-  sorry
+  simp [TransferOperator.op]
+  -- (T_a ψ₀)(s) = ∑_t exp(-a(E_s + E_t)/2) * exp(-aE_t/2)
+  --             = exp(-aE_s/2) * ∑_t exp(-aE_t)
+  --             = exp(-aE_s/2) * Z(a)
+  -- where Z(a) = exp(-massGap * a) is the partition function
+  conv_lhs =>
+    unfold TransferOperator.op
+    simp
+  -- The sum ∑_t exp(-a * gaugeCost t) gives the eigenvalue
+  have h_sum : ∑' t : GaugeLedgerState, Complex.exp (-a * gaugeCost t) =
+               Complex.exp (-massGap * a) := by
+    -- This is the key: sum is dominated by ground state
+    sorry  -- Partition function calculation
+  rw [h_sum]
+  simp [Complex.exp_add]
+  ring
 
 /-- Spectral gap of transfer matrix -/
 noncomputable def transfer_gap (a : ℝ) : ℝ :=
@@ -97,9 +120,31 @@ theorem operator_norm_convergence :
   intro a b ha hb h_order
   -- Both norms are bounded by spectral radius
   have h1 : op_norm (T_lattice a) ≤ spectral_radius a := by
-    sorry  -- Spectral radius theorem
+    -- For positive operators, norm equals spectral radius
+    unfold op_norm spectral_radius
+    -- The supremum over unit vectors is achieved at ground state
+    apply ciSup_le
+    intro ψ
+    apply ciSup_le
+    intro hψ
+    -- ‖T_a ψ‖ ≤ exp(-massGap * a) * ‖ψ‖ = exp(-massGap * a)
+    calc ‖(T_lattice a).op ψ‖ ≤ ‖ψ‖ := (T_lattice a).bounded ψ
+    _ = 1 := hψ
+    _ ≤ Real.exp (-massGap * a) := by
+      apply Real.one_le_exp_of_nonneg
+      simp [massGap_positive]
   have h2 : op_norm (T_lattice b) ≤ spectral_radius b := by
-    sorry  -- Spectral radius theorem
+    -- Same argument for b
+    unfold op_norm spectral_radius
+    apply ciSup_le
+    intro ψ
+    apply ciSup_le
+    intro hψ
+    calc ‖(T_lattice b).op ψ‖ ≤ ‖ψ‖ := (T_lattice b).bounded ψ
+    _ = 1 := hψ
+    _ ≤ Real.exp (-massGap * b) := by
+      apply Real.one_le_exp_of_nonneg
+      simp [massGap_positive]
   -- Spectral radius decreases with a
   have h3 : spectral_radius b < spectral_radius a := by
     unfold spectral_radius
@@ -112,7 +157,27 @@ theorem transfer_self_adjoint (a : ℝ) (ha : a > 0) :
   ∀ ψ φ : GaugeLedgerState → ℂ,
     inner_product ((T_lattice a).op ψ) φ =
     inner_product ψ ((T_lattice a).op φ) := by
-  sorry  -- Use detailed balance
+  intro ψ φ
+  unfold inner_product T_lattice
+  simp [TransferOperator.op]
+  -- Use detailed balance: K(s,t) exp(-E_s) = K(t,s) exp(-E_t)
+  -- where K(s,t) = exp(-a(E_s + E_t)/2)
+  conv_lhs =>
+    arg 1
+    ext s
+    arg 2
+    ext t
+    rw [mul_comm (Complex.exp _) (ψ t)]
+  conv_rhs =>
+    arg 1
+    ext s
+    rw [mul_comm]
+    arg 1
+    arg 1
+    ext t
+    rw [mul_comm (Complex.exp _) (φ t)]
+  -- Now both sides have the same kernel structure
+  sorry  -- Complete the detailed balance argument
   where
     inner_product (ψ φ : GaugeLedgerState → ℂ) : ℂ :=
       ∑' s : GaugeLedgerState, Complex.conj (ψ s) * φ s *
@@ -125,8 +190,30 @@ theorem perron_frobenius (a : ℝ) (ha : a > 0) :
     (T_lattice a).op ψ₀ = spectral_radius a • ψ₀ ∧
     ‖ψ₀‖ = 1 := by
   -- Unique positive ground state
-  use fun s => (ground_state a s) / ‖ground_state a‖
-  sorry  -- Uniqueness and properties
+  let norm_gs := ‖ground_state a‖
+  have h_norm_pos : norm_gs > 0 := by
+    unfold ground_state
+    sorry  -- Norm of exponential is positive
+  use fun s => (ground_state a s) / norm_gs
+  constructor
+  · constructor
+    · -- Positivity
+      intro s
+      simp [ground_state]
+      apply div_pos
+      · exact Complex.exp_pos _
+      · exact h_norm_pos
+    · constructor
+      · -- Eigenstate property
+        ext s
+        simp [ground_state_eigenstate a ha]
+        field_simp
+      · -- Normalized
+        sorry  -- ‖ψ / ‖ψ‖‖ = 1
+  · -- Uniqueness
+    intro ψ' ⟨h_pos', h_eigen', h_norm'⟩
+    -- Perron-Frobenius: positive eigenstate is unique
+    sorry  -- Standard PF argument
 
 /-- Summary: Transfer matrix theory complete -/
 theorem transfer_matrix_complete :
@@ -140,6 +227,10 @@ theorem transfer_matrix_complete :
   · intro a ha
     have ⟨ψ₀, h_unique⟩ := perron_frobenius a ha
     use ψ₀
-    sorry  -- Extract from existential
+    obtain ⟨⟨h_pos, h_eigen, h_norm⟩, h_uniq⟩ := h_unique
+    constructor
+    · exact ⟨h_pos, h_eigen, h_norm⟩
+    · intro ψ' h'
+      exact h_uniq ψ' h'
 
 end YangMillsProof.Continuum

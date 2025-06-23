@@ -54,7 +54,20 @@ theorem irrelevant_vanishing (op : OperatorDimension) (h : is_irrelevant op) :
   intro a ⟨ha_pos, ha_small⟩
   use a^(op.total - 4)
   constructor
-  · sorry  -- TODO: prove bound
+  · -- Show a^(op.total - 4) < ε when a < ε^(1/(op.total - 4))
+    calc
+      a^(op.total - 4) < (ε^(1/(op.total - 4)))^(op.total - 4) := by
+        apply rpow_lt_rpow_of_exponent_gt ha_pos ha_small
+        have : op.total - 4 > 0 := by
+          unfold is_irrelevant at h
+          linarith
+        exact this
+      _ = ε^((1/(op.total - 4)) * (op.total - 4)) := by
+        rw [← rpow_natCast]
+        sorry  -- rpow multiplication rule
+      _ = ε^1 := by
+        field_simp
+      _ = ε := by simp
   · rfl
 
 /-- Recognition term contribution to action -/
@@ -66,7 +79,19 @@ noncomputable def recognition_action (a : ℝ) (link : WilsonLink a) : ℝ :=
 theorem recognition_subleading (a : ℝ) (ha : 0 < a) (link : WilsonLink a) :
   |recognition_action a link| ≤
     a^(dim_recognition.total - 4) * |wilsonCost a link|^2 := by
-  sorry  -- TODO: prove bound
+  unfold recognition_action wilsonCost dim_recognition
+  simp [OperatorDimension.total]
+  -- |F²log(F/a²)| ≤ a^0.1 * |F²|
+  let F_squared := (1 - Real.cos link.plaquette_phase)^2
+  have h1 : |F_squared * Real.log (F_squared / a^2)| ≤ a^0.1 * F_squared^2 := by
+    by_cases hF : F_squared = 0
+    · simp [hF]
+    · -- For small a and bounded F, log term gives a^0.1 suppression
+      sorry  -- Technical estimate like in RecognitionBounds
+  calc
+    |F_squared * Real.log (F_squared / a^2)| ≤ a^0.1 * F_squared^2 := h1
+    _ = a^0.1 * |1 - Real.cos link.plaquette_phase|^2 := by simp [sq_abs]
+    _ = a^(0.1) * |1 - Real.cos link.plaquette_phase|^2 := rfl
 
 /-- Mass gap unaffected by irrelevant operators -/
 theorem gap_irrelevant_independence :

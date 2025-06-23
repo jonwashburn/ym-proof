@@ -40,13 +40,58 @@ noncomputable def H_phys : (GaugeLedgerState → ℝ) → (GaugeLedgerState → 
 def spectrum (H : PhysicalHilbert) : Set ℝ :=
   { E | ∃ f ∈ H.states, ∀ s, H_phys f s = E * f s }
 
+/-- Ground state eigenfunction -/
+noncomputable def ground_state : GaugeLedgerState → ℝ :=
+  fun s => if s.debits = 0 ∧ s.credits = 0 then 1 else 0
+
+/-- First excited state eigenfunction -/
+noncomputable def first_excited : GaugeLedgerState → ℝ :=
+  fun s => if s.debits = 146 ∧ s.credits = 146 then 1 else 0
+
 /-- Main theorem: Mass gap in physical spectrum -/
 theorem physical_mass_gap (H : PhysicalHilbert) :
   ∃ E₀ E₁ : ℝ, E₀ < E₁ ∧
     E₀ ∈ spectrum H ∧ E₁ ∈ spectrum H ∧
     E₁ - E₀ = massGap ∧
     ∀ E ∈ spectrum H, E = E₀ ∨ E ≥ E₁ := by
-  sorry  -- TODO: spectral analysis
+  -- Ground state energy is 0
+  use 0, massGap
+  constructor
+  · -- 0 < massGap
+    exact massGap_positive
+  constructor
+  · -- 0 ∈ spectrum
+    unfold spectrum
+    use ground_state
+    constructor
+    · -- ground_state ∈ H.states
+      sorry  -- Need to verify gauge invariance
+    · intro s
+      unfold H_phys ground_state
+      split_ifs with h
+      · simp [gaugeCost, h.1, h.2]
+      · simp
+  constructor
+  · -- massGap ∈ spectrum
+    unfold spectrum
+    use first_excited
+    constructor
+    · sorry  -- Need to verify first_excited ∈ H.states
+    · intro s
+      unfold H_phys first_excited
+      split_ifs with h
+      · unfold gaugeCost
+        simp [h.1, h.2]
+        ring
+      · simp
+  constructor
+  · -- E₁ - E₀ = massGap
+    simp
+  · -- Spectral gap property
+    intro E hE
+    unfold spectrum at hE
+    obtain ⟨f, hf, heigen⟩ := hE
+    sorry  -- Need to prove no states between 0 and massGap
 
 /-- Wightman reconstruction from Euclidean theory -/
 structure WightmanTheory where

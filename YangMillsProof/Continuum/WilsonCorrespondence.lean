@@ -46,7 +46,32 @@ theorem gauge_wilson_exact_correspondence (a : ℝ) (ha : a > 0) (s : GaugeLedge
   have h_cos : Real.cos h_phase = Real.cos (2 * Real.pi * (s.colour_charges 1 : ℝ) / 3) := by
     rw [h_phase]
   -- Cost is proportional to minimal plaquette action
-  sorry  -- Complete calculation
+  -- For colour charge q, minimal plaquette has phase 2πq/3
+  -- Action = 1 - cos(2πq/3)
+  -- Cost = E_coh * 2 * (1 - cos(2πq/3))
+  calc
+    gaugeCost s = E_coh * 2 * (1 - Real.cos (2 * Real.pi * (s.colour_charges 1 : ℝ) / 3)) := by
+      unfold gaugeCost
+      -- The cost is exactly this for minimal excitation
+      sorry  -- Need to relate debits/credits to colour charge
+    _ = E_coh * 2 * plaquette_action W := by
+      unfold plaquette_action
+      simp [wilson_loop, h_phase]
+      -- Complex exponential calculation
+      have : (Complex.exp (Complex.I * (2 * Real.pi * (s.colour_charges 1 : ℝ) / 3)) +
+              Complex.exp (-Complex.I * (2 * Real.pi * (s.colour_charges 1 : ℝ) / 3))).re / 2 =
+              Real.cos (2 * Real.pi * (s.colour_charges 1 : ℝ) / 3) := by
+        rw [Complex.exp_eq_cos_add_sin_mul_I, Complex.exp_eq_cos_add_sin_mul_I]
+        simp [Complex.conj_eq_re_sub_im]
+        ring
+      rw [this]
+    _ = (2 * E_coh / (1 - Real.cos (2 * Real.pi / 3))) *
+         ((1 - Real.cos (2 * Real.pi / 3)) * plaquette_action W) := by
+      field_simp
+      ring
+    _ = (2 * E_coh / (1 - Real.cos (2 * Real.pi / 3))) * plaquette_action W := by
+      -- Need to show normalization factor cancels
+      sorry
 
 /-- Gauge transformations act as SU(3) on links -/
 def gauge_transform_wilson (g : GaugeTransform) (link : WilsonLink a) : WilsonLink a :=

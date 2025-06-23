@@ -100,7 +100,10 @@ theorem reflection_positivity_uniform (a : ℝ) (ha : 0 < a) :
       ∑' s : GaugeLedgerState, f s * g s * Real.exp (-gaugeCost s)
     sum_nonneg (h : ∀ s, 0 ≤ f s * g s * Real.exp (-gaugeCost s)) :
       (∑' s : GaugeLedgerState, f s * g s * Real.exp (-gaugeCost s)) ≥ 0 := by
-      sorry  -- Need summability
+      -- The sum of non-negative terms is non-negative
+      -- We need summability, which follows from exponential damping
+      apply tsum_nonneg
+      exact h
 
 /-- The continuum Hilbert space as projective limit -/
 structure ContinuumHilbert where

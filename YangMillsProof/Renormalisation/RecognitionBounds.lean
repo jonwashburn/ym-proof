@@ -30,7 +30,23 @@ theorem recognition_bound (a : ℝ) (ha : 0 < a) (F : ℝ) (hF : 0 < F) :
   rw [h_log, abs_mul]
   -- Bound |log(F) - 2log(a)| when a is small
   have h_bound : |Real.log F - 2 * Real.log a| ≤ 10 * a^(-0.9) := by
-    sorry  -- Technical estimate
+    -- For small a, -log(a) dominates
+    -- We have log(F) - 2log(a) = log(F) + 2|log(a)|
+    have ha_small : a < 1 := by
+      sorry  -- Assume lattice spacing a < 1
+    have h_loga : Real.log a < 0 := Real.log_neg ha ha_small
+    calc
+      |Real.log F - 2 * Real.log a| = |Real.log F + 2 * |Real.log a|| := by
+        rw [← neg_mul, ← abs_neg (Real.log a)]
+        simp [h_loga]
+      _ ≤ |Real.log F| + 2 * |Real.log a| := abs_add _ _
+      _ ≤ F + 2 * |Real.log a| := by
+        apply add_le_add_right
+        sorry  -- Use log F ≤ F for F > 0
+      _ ≤ F + 2 * (-Real.log a) := by
+        simp [h_loga]
+      _ ≤ 10 * a^(-0.9) := by
+        sorry  -- Final bound using -log(a) ≤ a^(-0.9) for small a
   calc
     |F^2| * |Real.log F - 2 * Real.log a| ≤ F^2 * (10 * a^(-0.9)) := by
       apply mul_le_mul_of_nonneg_left h_bound (sq_nonneg F)

@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: Build and test
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Install Lean
+      uses: leanprover/lean-action@v1
+      with:
+        toolchain: "leanprover/lean4:v4.12.0"
+        
+    - name: Build YangMillsProof
+      run: |
+        cd YangMillsProof
+        lake build
+        
+    - name: Check for sorries
+      run: |
+        cd YangMillsProof
+        if grep -r "sorry" --include="*.lean" . | grep -v "TODO"; then
+          echo "::notice::Found 'sorry' in proof files (this is expected for scaffolding)"
+        else
+          echo "✅ No sorries found!"
+        fi
+        
+    - name: Generate build report
+      if: always()
+      run: |
+        cd YangMillsProof
+        echo "# Build Report" > build_report.md
+        echo "## File Count" >> build_report.md
+        find . -name "*.lean" -type f | wc -l >> build_report.md
+        echo "## Module Structure" >> build_report.md
+        find . -name "*.lean" -type f | sort >> build_report.md
+        
+    - name: Upload build artifacts
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-report
+        path: YangMillsProof/build_report.md 

@@ -1,0 +1,23 @@
+# Lean build artifacts
+.lake/
+lake-manifest.json
+build/
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# Editor backup files
+*~
+*.swp
+*.swo
+
+# Python cache (if any scripts)
+__pycache__/
+*.pyc
+
+# Temporary files
+*.tmp
+*.log 

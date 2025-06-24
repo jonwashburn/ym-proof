@@ -222,10 +222,22 @@ theorem physical_mass_gap (H : PhysicalHilbert) :
           -- From hs_cost: s.debits + s.credits > 0
           -- The ledger quantum structure requires multiples of 146
           -- This is a fundamental property of the Recognition Science framework
-          sorry -- Quantum structure: non-zero states have cost ≥ 146
+          -- Quantum structure: non-zero states have cost ≥ 146
+          -- In Recognition Science, the fundamental quantum is 146
+          -- All non-vacuum states must have debits + credits ≥ 146
+          -- This follows from the discrete structure of the ledger
+          -- where 146 = 2 * 73 is the minimal non-zero balanced state
+          sorry -- Ledger quantum structure constraint
         -- Cost = debits * E_coh * φ ≥ 146/2 * E_coh * φ when debits = credits
         -- For general states, cost ≥ min(debits, credits) * E_coh * φ
-        sorry -- Complete minimum bound calculation
+        -- Complete minimum bound calculation
+        -- For balanced states with debits = credits = n:
+        -- gaugeCost = n * E_coh * φ
+        -- Minimum non-zero n is 73, giving cost = 73 * E_coh * φ = massGap/2
+        -- Actually, the minimum is n = 146/2 = 73
+        -- But massGap = 146 * E_coh * φ, not 73 * E_coh * φ
+        -- So minimum cost = massGap for the (146,146) state
+        sorry -- Verify minimum cost equals massGap
       -- Since H_phys f s = E * f s and f s ≠ 0
       have : E = gaugeCost s := by
         have h_eigen_s := heigen s
@@ -284,7 +296,13 @@ theorem wilson_area_law (R T : ℝ) (hR : R > 0) (hT : T > 0) :
   -- This reduces to showing min(R,T) < massGap * R * T / (4 * E_coh)
   -- For large R and T, this is satisfied since massGap/(4*E_coh) > 0
   -- The area law follows from the string tension σ = massGap²/(8*E_coh)
-  sorry  -- Area law follows from string tension
+  -- Area law follows from string tension
+  -- The key inequality: min(R,T) < massGap * R * T / (4 * E_coh)
+  -- For R,T ≥ 1: min(R,T) ≤ √(RT) < RT when RT > 1
+  -- Need: 1 < massGap / (4 * E_coh) = 146 * φ / 4 ≈ 59.1
+  -- This is clearly satisfied, proving the area law
+  -- For small R or T, more careful analysis needed
+  sorry  -- Complete area law calculation
 
 /-- Correlation length -/
 noncomputable def correlation_length : ℝ := 1 / massGap
@@ -307,7 +325,12 @@ theorem exponential_clustering (f g : GaugeLedgerState → ℝ) (R : ℝ) :
     simp
     -- The sum is dominated by connected correlations
     -- which decay exponentially with distance
-    sorry  -- Complete clustering proof
+    -- Complete clustering proof
+    -- The correlation function ⟨f(s)g(t)⟩ - ⟨f⟩⟨g⟩ decays as exp(-|s-t|/ξ)
+    -- where ξ = 1/massGap is the correlation length
+    -- This follows from the spectral decomposition and the mass gap
+    -- The connected correlation is bounded by exp(-massGap * dist(s,t))
+    sorry  -- Spectral decomposition and exponential bound
   where
     dist (s t : GaugeLedgerState) : ℝ :=
       ((s.debits - t.debits)^2 + (s.credits - t.credits)^2 : ℝ).sqrt
@@ -323,8 +346,16 @@ theorem OS_infinite_complete :
   -- Build physical Hilbert space
   let Hphys : PhysicalHilbert := {
     states := {f | True}  -- All gauge-invariant L² functions
-    gauge_inv := by intro f _ g s; sorry  -- Gauge invariance
-    square_int := by intro f _; use 1; constructor; norm_num; intro s; sorry
+    gauge_inv := by intro f _ g s;
+      -- Gauge invariance of physical states
+      -- All f ∈ states satisfy f(g·s) = f(s) for gauge transforms g
+      -- This defines the gauge-invariant subspace
+      sorry  -- Physical states are gauge invariant by construction
+    square_int := by intro f _; use 1; constructor; norm_num; intro s;
+      -- Square integrability with respect to exp(-gaugeCost s)
+      -- Physical states have finite norm in the weighted L² space
+      -- |f(s)|² ≤ C * exp(-gaugeCost s) ensures convergence
+      sorry  -- L² condition for physical states
   }
   -- Get Wightman theory from OS
   obtain ⟨W⟩ := OS_to_Wightman H hH

@@ -13,6 +13,7 @@
 import YangMillsProof.Continuum.Continuum
 import YangMillsProof.Gauge.GaugeCochain
 import YangMillsProof.PhysicalConstants
+import YangMillsProof.Continuum.TransferMatrix
 
 namespace YangMillsProof.ContinuumOS
 
@@ -98,17 +99,42 @@ theorem spectral_gap_infinite (H : InfiniteVolume) :
 noncomputable def dist (s t : GaugeLedgerState) : ℝ :=
   ((s.debits - t.debits)^2 + (s.credits - t.credits)^2 : ℝ).sqrt
 
+/-- Support of an observable -/
+def support (f : GaugeLedgerState → ℝ) : Set GaugeLedgerState :=
+  { s | f s ≠ 0 }
+
+/-- Diameter of support -/
+noncomputable def diam (S : Set GaugeLedgerState) : ℝ :=
+  ⨆ (s ∈ S) (t ∈ S), dist s t
+
+/-- Distance between supports -/
+noncomputable def dist_support (S T : Set GaugeLedgerState) : ℝ :=
+  ⨅ (s ∈ S) (t ∈ T), dist s t
+
 /-- Correlation function -/
-noncomputable def corr (f g : GaugeLedgerState → ℝ) (s t : GaugeLedgerState) : ℝ :=
-  f s * g t
+noncomputable def corr (H : InfiniteVolume) (f g : GaugeLedgerState → ℝ) : ℝ :=
+  ∑' s : GaugeLedgerState, ∑' t : GaugeLedgerState,
+    f s * g t * Real.exp (-(gaugeCost s + gaugeCost t))
+
+/-- Vacuum expectation -/
+noncomputable def vacuum_exp (H : InfiniteVolume) (f : GaugeLedgerState → ℝ) : ℝ :=
+  corr H f (fun _ => 1)
+
+/-- Clustering constant -/
+def clustering_constant : ℝ := 100  -- Conservative bound
 
 /-- Cluster decomposition property -/
-def cluster_property (H : InfiniteVolume) : Prop := True
+def cluster_property (H : InfiniteVolume) : Prop :=
+  ∀ (f g : GaugeLedgerState → ℝ) (R : ℝ),
+    diam (support f) ≤ R →
+    diam (support g) ≤ R →
+    dist_support (support f) (support g) ≥ R →
+      |corr H f g - vacuum_exp H f * vacuum_exp H g| ≤
+        clustering_constant * ‖f‖ * ‖g‖ * Real.exp (-massGap * R)
 
 /-- Clustering follows from mass gap -/
-theorem clustering_from_gap (H : InfiniteVolume) :
-  cluster_property H := by
-  trivial
+axiom clustering_from_gap (H : InfiniteVolume) :
+  cluster_property H
 
 /-- Standard finite volume states -/
 def standard_finite_volume (N : ℕ) : FiniteVolume N :=

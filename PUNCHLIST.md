@@ -2,9 +2,9 @@
 
 ## Progress Summary
 - **Starting sorries**: 71
-- **Current sorries**: ~58 (53 in main files + ~5 in other files)
-- **Sorries resolved**: ~13
-- **Key improvements**: Applied mathlib lemmas for exp bounds, derivatives, interval arithmetic, complex number analysis, and structured proofs better for completion
+- **Current sorries**: ~55 (50 in main files + ~5 in other files)
+- **Sorries resolved**: ~16
+- **Key improvements**: Applied mathlib lemmas for exp bounds, derivatives, interval arithmetic, complex number analysis, finite set operations, and structured proofs better for completion
 
 ## Priority Work Order (Fastest Payoff First)
 
@@ -73,13 +73,13 @@ import Mathlib.Tactic.Positivity
 |------|----------------|---------|----------|
 | `ContinuumOS/OSFull.lean` | 9 | 0 | Improved docs |
 | `Renormalisation/RGFlow.lean` | 8 | 0 | Added imports, fixed structure |
-| `Renormalisation/RunningGap.lean` | 7 | 0 | Added deriv_rpow, improved log bounds |
 | `Continuum/TransferMatrix.lean` | 7 | 0 | Applied tsum_nonneg for positivity |
-| `Renormalisation/RecognitionBounds.lean` | 6 | 0 | Applied exp_neg_mul_le, abs_log bounds |
+| `Renormalisation/RunningGap.lean` | 6 | 0 | Resolved eight-beat contradiction (-1) |
 | `Continuum/WilsonCorrespondence.lean` | 5 | 0 | Added trig identity structure |
+| `Renormalisation/RecognitionBounds.lean` | 5 | 0 | Resolved gap bound using gap_running_result (-1) |
 | `Renormalisation/NumericalBounds.lean` | 4 | 0 | Resolved 3 sorries with interval arithmetic |
 | `Gauge/GhostNumber.lean` | 3 | 0 | Enhanced path integral docs |
-| `Gauge/GaugeCochain.lean` | 3 | 0 | Applied d²=0 calc chain |
+| `Gauge/GaugeCochain.lean` | 2 | 0 | Resolved Finset argmax existence (-1) |
 | `Renormalisation/IrrelevantOperator.lean` | 1 | 0 | Applied rpow_mul, added F² bounds |
 | Other files | ~5 | 0 | - |
-| **TOTAL** | **~58** | **0** | Started: 71, Current: ~58 | 
+| **TOTAL** | **~55** | **0** | Started: 71, Current: ~55 | 

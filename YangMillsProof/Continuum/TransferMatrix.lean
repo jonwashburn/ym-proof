@@ -55,11 +55,14 @@ noncomputable def T_lattice (a : ℝ) : TransferOperator a :=
         Complex.exp (-a * (gaugeCost s + gaugeCost t) / 2) * ψ t
     bounded := by
       intro ψ
-      -- Use that exp(-a(E_s + E_t)/2) ≤ 1 for positive E_s, E_t
-      -- This makes the operator a contraction
-      -- The detailed proof requires showing ∑_t |K(s,t)| ≤ 1
-      -- where K(s,t) = exp(-a(E_s + E_t)/2)
-      sorry
+      -- Use that exp(-a(E_s + E_t)/2) ≤ 1 for positive E_s, E_t, a > 0
+      -- The kernel K(s,t) = exp(-a(E_s + E_t)/2) satisfies:
+      -- ∑_t |K(s,t)| = ∑_t exp(-a(E_s + E_t)/2)
+      --              = exp(-aE_s/2) ∑_t exp(-aE_t/2)
+      --              ≤ exp(-aE_s/2) * C for some constant C
+      -- This gives ‖T_a ψ‖ ≤ C‖ψ‖, but we need C = 1
+      -- The key is proper normalization of the transfer matrix
+      sorry -- Operator norm bound: requires kernel estimates
     positive := by
       intro ψ h_pos s
       -- Sum of positive terms

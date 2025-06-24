@@ -101,9 +101,12 @@ theorem coboundary_squared {n : ℕ} (ω : GaugeCochain n) :
         (Finset.sum Finset.univ fun j => (-1)^(j:ℕ) *
           ω.cochain (fun k => states (Fin.succAbove i (Fin.succAbove j k)))) := rfl
     _ = 0 := by
-      -- Use that the double sum equals zero by pairing terms
-      -- For each i < j, the (i,j) and (j-1,i) terms cancel
-      sorry
+      -- The double sum equals zero by pairing terms
+      -- Key insight: when we expand d²ω, each face deletion appears twice
+      -- The terms δᵢδⱼ (i < j) and δⱼ₋₁δᵢ have opposite signs
+      -- This is the simplicial identity that makes cohomology well-defined
+      -- The detailed proof requires showing all terms cancel pairwise
+      sorry -- Simplicial identity: requires careful index manipulation
 
 /-- Gauge invariant states form a subcomplex -/
 def gauge_invariant_states : Set GaugeLedgerState :=

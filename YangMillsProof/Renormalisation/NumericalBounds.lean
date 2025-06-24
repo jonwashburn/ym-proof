@@ -125,10 +125,12 @@ theorem numerical_verification :
     constructor
     · -- 7500 ≤ c₆
       -- c₆ = gap_running μ_QCD / massGap
-      -- We know gap_running μ_QCD ≈ 1.10 GeV and massGap ≈ 0.146 meV
-      -- So c₆ ≈ 1100 / 0.146 ≈ 7534
-      -- This is a physical input from RG calculation
-      sorry
+      -- We need gap_running μ_QCD ≥ 1.04 and massGap ≤ upper bound
+      -- This gives c₆ ≥ 1.04 / massGap_interval.upper
+      have h_gap_lower : gap_running μ_QCD ≥ 1.04 := by
+        -- This will be established in h3 below
+        -- For now, accept as physical constraint
+        sorry -- Circular dependency: need to restructure proof
     · -- c₆ ≤ 7600
       -- Upper bound follows from gap_running μ_QCD < 1.16 (from h3)
       -- c₆ = gap_running μ_QCD / massGap < 1.16 / 0.1456 < 7968

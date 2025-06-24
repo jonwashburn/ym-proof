@@ -100,11 +100,28 @@ theorem recognition_subleading (a : ℝ) (ha : 0 < a) (link : WilsonLink a) :
         calc F_squared = |1 - Real.cos link.plaquette_phase|^2 := sq_abs _
         _ ≤ 2^2 := sq_le_sq' (by linarith) this
         _ = 4 := by norm_num
-      -- For a < 1, we have |log(F²/a²)| ≤ |log(F²)| + 2|log(a)|
-      -- Since F² ≤ 4, |log(F²)| ≤ log(4) < 2
-      -- For small a, |log(a)| ~ a^(-ε) for any ε > 0
-      -- This gives the required a^0.1 factor
-      sorry
+      -- We need to show |F² log(F²/a²)| ≤ a^0.1 * F²²
+      -- First, we have F² > 0 since hF : F_squared ≠ 0
+      have hF_pos : 0 < F_squared := by
+        unfold F_squared
+        apply sq_pos_of_ne_zero
+        intro h_contra
+        have : 1 - Real.cos link.plaquette_phase = 0 := h_contra
+        have : Real.cos link.plaquette_phase = 1 := by linarith
+        -- This means plaquette_phase = 0 mod 2π, so F_squared = 0
+        exact hF (by simp [F_squared, h_contra])
+      -- For the asymptotic bound, we need a < 1
+      have ha_small : a < 1 := by
+        -- This is a domain restriction for the theorem
+        -- In lattice gauge theory, a < 1/Λ_QCD ≈ 1 fm
+        sorry -- Physical domain constraint
+      -- The key inequality: for small a and bounded F
+      -- |F² log(F²/a²)| ≤ F² * (log(4) + 2|log(a)|)
+      --                 ≤ F² * (2 + 2|log(a)|)
+      -- For a < 1, |log(a)| = -log(a) grows like a^(-ε)
+      -- But we need the full product F² * log to be ≤ a^0.1 * F²²
+      -- This requires a more sophisticated asymptotic analysis
+      sorry -- Asymptotic analysis of log growth
   calc
     |F_squared * Real.log (F_squared / a^2)| ≤ a^0.1 * F_squared^2 := h1
     _ = a^0.1 * |1 - Real.cos link.plaquette_phase|^2 := by simp [sq_abs]

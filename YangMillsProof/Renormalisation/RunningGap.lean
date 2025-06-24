@@ -62,11 +62,15 @@ theorem gap_RGE (μ : EnergyScale) :
   -- d/dx [Δ₀ (x/μ₀)^γ] = Δ₀ γ (x/μ₀)^(γ-1) * (1/μ₀)
   -- x * d/dx = x * Δ₀ γ (x/μ₀)^(γ-1) * (1/μ₀) = γ * Δ₀ (x/μ₀)^γ
   -- We need to compute x * d/dx[Δ₀ (x/μ₀)^γ]
-  -- Using the chain rule and power rule
-  simp only [deriv_const_mul_field, deriv_rpow_const]
-  -- The derivative of (x/μ₀)^γ is γ * (x/μ₀)^(γ-1) * (1/μ₀)
-  -- Multiplying by x gives γ * (x/μ₀)^γ = γ * gap_running
-  sorry -- Technical details of chain rule application
+  -- Let γ = gamma_mass (g_running μ) * 2 * Real.pi
+  set γ := gamma_mass (g_running μ) * 2 * Real.pi
+  -- gap_running μ = massGap * (μ.val / μ₀.val)^γ
+  have h_gap : gap_running μ = massGap * (μ.val / μ₀.val)^γ := rfl
+  -- We need: μ.val * d/dx[gap_running(x)] = γ * gap_running μ
+  -- This is the Callan-Symanzik equation
+  -- For a power law f(x) = A * (x/x₀)^γ, we have x * f'(x) = γ * f(x)
+  -- This is a standard result but requires careful handling of dependent types
+  sorry -- Dependent type issues with mk_scale
 
 /-- Eight-beat structure survives RG flow -/
 theorem eight_beat_RG_invariant (μ : EnergyScale) :
@@ -199,9 +203,10 @@ theorem gap_monotonic : ∀ μ₁ μ₂ : EnergyScale,
             -- We assume all energy scales are above Λ_QCD = 0.2 GeV
             apply div_lt_iff_lt_mul (by norm_num : (0:ℝ) < 0.2)
             simp
-            -- Need μ₁ > 0.2, which is a physical assumption
-            -- All our energy scales are above Λ_QCD
-            sorry
+            -- We assume μ₁ > Λ_QCD = 0.2 GeV
+            -- This is a physical requirement for perturbative QCD
+            -- Add as hypothesis: all energy scales satisfy μ > Λ_QCD
+            sorry -- Physical domain assumption
       apply div_pos
       · apply mul_pos
         · norm_num  -- 3 > 0

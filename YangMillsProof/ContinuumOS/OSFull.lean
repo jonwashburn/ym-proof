@@ -194,7 +194,19 @@ theorem physical_mass_gap (H : PhysicalHilbert) :
       -- Minimum non-zero cost is massGap
       obtain ⟨s, hs_nonzero, hs_cost⟩ := h_nonzero
       have : gaugeCost s ≥ massGap := by
-        sorry  -- Minimum cost property
+        -- The minimum non-zero cost is achieved when debits = credits = 146
+        -- This gives cost = 146 * E_coh * φ = massGap
+        unfold gaugeCost massGap
+        -- For any non-vacuum state, debits + credits ≥ 146
+        -- because 146 is the fundamental quantum
+        have h_min : s.debits + s.credits ≥ 146 := by
+          -- From hs_cost: s.debits + s.credits > 0
+          -- The ledger quantum structure requires multiples of 146
+          -- This is a fundamental property of the Recognition Science framework
+          sorry -- Quantum structure: non-zero states have cost ≥ 146
+        -- Cost = debits * E_coh * φ ≥ 146/2 * E_coh * φ when debits = credits
+        -- For general states, cost ≥ min(debits, credits) * E_coh * φ
+        sorry -- Complete minimum bound calculation
       -- Since H_phys f s = E * f s and f s ≠ 0
       have : E = gaugeCost s := by
         have h_eigen_s := heigen s
@@ -251,7 +263,9 @@ theorem wilson_area_law (R T : ℝ) (hR : R > 0) (hT : T > 0) :
   have h_sigma : σ = massGap^2 / (8 * E_coh) := rfl
   rw [h_sigma]
   -- This reduces to showing min(R,T) < massGap * R * T / (4 * E_coh)
-  sorry  -- Complete area law bound
+  -- For large R and T, this is satisfied since massGap/(4*E_coh) > 0
+  -- The area law follows from the string tension σ = massGap²/(8*E_coh)
+  sorry  -- Area law follows from string tension
 
 /-- Correlation length -/
 noncomputable def correlation_length : ℝ := 1 / massGap
@@ -304,13 +318,16 @@ theorem OS_infinite_complete :
     · -- Wilson loops decay
       intro R T hR hT
       unfold wilson_loop_expectation
+      -- exp(-σRT) < 1 when σRT > 0
       apply Real.exp_lt_one_of_neg
       apply mul_neg_of_neg_of_pos
       · apply mul_neg_of_neg_of_pos
-        · simp [σ, massGap_positive, E_coh]
-          apply div_neg_of_pos_of_neg
+        · -- -σ < 0 since σ > 0
+          simp only [σ]
+          apply neg_neg_of_pos
+          apply div_pos
           · exact sq_pos_of_ne_zero (ne_of_gt massGap_positive)
-          · norm_num
+          · apply mul_pos; norm_num; exact E_coh_positive
         · exact hR
       · exact hT
 

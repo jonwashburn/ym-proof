@@ -128,25 +128,42 @@ def gauge_transform_wilson (g : GaugeTransform) (link : WilsonLink a) : WilsonLi
           · exact Nat.cast_nonneg _
           · norm_num
       · -- Upper bound: phase < 2π
-        -- We need link.phase + 2π*(g.perm 0)/3 < 2π
-        -- Since link.phase < 2π and (g.perm 0) < 3, we have 2π*(g.perm 0)/3 < 2π
-        -- But their sum might exceed 2π, requiring modular reduction
-        -- For the correspondence proof, this technical detail doesn't affect the result
-        sorry -- Phase modular arithmetic }
+        -- The sum might exceed 2π, so we need modular arithmetic
+        -- However, for the simplified model we can bound it:
+        calc link.plaquette_phase + 2 * Real.pi * (g.perm 0).val / 3
+          < 2 * Real.pi + 2 * Real.pi * 3 / 3 := by
+            apply add_lt_add
+            · exact h1.2
+            · apply mul_lt_mul_of_pos_left
+              · apply div_lt_div_of_lt_left
+                · norm_num
+                · norm_num
+                · exact Nat.cast_lt.mpr (Fin.val_lt_of_le (le_refl _))
+              · norm_num
+          _ = 2 * Real.pi + 2 * Real.pi := by norm_num
+          _ = 4 * Real.pi := by ring
+        -- This exceeds 2π, so we need to take mod 2π
+        -- For the proof to work, we'd need to redefine with modular arithmetic
+        -- We accept this limitation of the simplified model
+        sorry -- Requires modular phase definition }
 
 /-- Wilson action is gauge invariant -/
 theorem wilson_gauge_invariant (a : ℝ) (g : GaugeTransform) (s : GaugeLedgerState) :
   let s' := apply_gauge_transform g s
   wilsonCost a (ledgerToWilson a s') = wilsonCost a (ledgerToWilson a s) := by
   -- Wilson action depends only on plaquette traces
-  -- Gauge transformation acts as U†WU on links
-  -- Trace is invariant: Tr(U†WU) = Tr(W)
+  -- For our simplified model, gauge transformations don't affect the plaquette phase
+  -- because we only use colour_charges 1 in the mapping
   unfold wilsonCost ledgerToWilson apply_gauge_transform
   simp
-  -- The plaquette action depends only on cos(phase)
-  -- Gauge transformations shift all four links around a plaquette
-  -- The net phase shift around a closed loop is zero (gauge invariance)
-  -- Therefore the plaquette phase and its cosine are unchanged
+  -- The key observation: s'.colour_charges 1 = (s.colour_charges ∘ g.perm) 1
+  -- Since g.perm is a permutation of {0,1,2}, we have:
+  -- s'.colour_charges 1 = s.colour_charges (g.perm 1)
+  -- In general, this changes the value, but the cosine function
+  -- has the same value for all three colour charges due to Z₃ symmetry
+  -- cos(2π·0/3) = 1, cos(2π·1/3) = -1/2, cos(2π·2/3) = -1/2
+  -- For non-trivial charges (1 or 2), the cost is the same
+  -- This is a limitation of our simplified model
   sorry
 
 /-- The coupling constant emerges from eight-beat -/

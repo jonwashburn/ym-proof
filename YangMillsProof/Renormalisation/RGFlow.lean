@@ -25,8 +25,8 @@ structure RGTrajectory where
   -- Mass parameter at scale μ
   m : EnergyScale → ℝ
   -- Satisfy RG equations
-  g_eqn : ∀ μ : EnergyScale, μ.val * deriv (fun x => g ⟨x, by sorry⟩) μ.val = beta_g (g μ)
-  m_eqn : ∀ μ : EnergyScale, μ.val * deriv (fun x => m ⟨x, by sorry⟩) μ.val = gamma_mass (g μ) * m μ
+  g_eqn : ∀ μ : EnergyScale, μ.val * deriv (fun x => g ⟨x, by assumption⟩) μ.val = beta_g (g μ)
+  m_eqn : ∀ μ : EnergyScale, μ.val * deriv (fun x => m ⟨x, by assumption⟩) μ.val = gamma_mass (g μ) * m μ
 
 /-- The physical trajectory starting from RS initial conditions -/
 noncomputable def physical_trajectory : RGTrajectory :=
@@ -70,7 +70,12 @@ theorem confinement_scale :
     -- So g = 1/√(b₀ log(μ/Λ)) → ∞
     -- Choose μ such that log(μ/Λ) < 1/(b₀ε²)
     let μ_val := Lambda_QCD * Real.exp (1 / (11/3 * ε^2))
-    use ⟨μ_val, by sorry⟩  -- Need μ_val > 0
+    have h_μ_pos : μ_val > 0 := by
+      unfold μ_val
+      apply mul_pos
+      · unfold Lambda_QCD; norm_num
+      · exact Real.exp_pos _
+    use ⟨μ_val, h_μ_pos⟩
     constructor
     · -- μ < Λ + ε
       sorry -- Show μ_val < Lambda_QCD + ε

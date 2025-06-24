@@ -89,11 +89,12 @@ noncomputable def T_lattice (a : ℝ) : TransferOperator a :=
           · exact le_of_lt h_exp_pos
           · exact h_pos t
         · -- Summability condition
-          -- We need the series ∑ t, |exp(-a(E_s + E_t)/2) * ψ t| to converge
-          -- Since |exp(...)| = exp(...) for real arguments and ψ is bounded
-          -- The series converges by comparison with ∑ t, exp(-a * E_t)
-          -- which converges because gaugeCost ≥ 0 with only finitely many zero-cost states
-          sorry -- Summability: requires L² theory
+          -- The series converges because:
+          -- 1) exp(-a(E_s + E_t)/2) ≤ exp(-a*E_t/2) when E_s ≥ 0
+          -- 2) ψ is in L² with respect to the measure exp(-E_t)
+          -- 3) The product is summable by Cauchy-Schwarz
+          -- This is a standard result in quantum statistical mechanics
+          sorry -- L² summability via Cauchy-Schwarz
       exact this }
 
 /-- Ground state at lattice spacing a -/
@@ -252,8 +253,10 @@ theorem perron_frobenius (a : ℝ) (ha : a > 0) :
         simp [ground_state_eigenstate a ha]
         field_simp
       · -- Normalized
-        -- By construction: ‖ψ / ‖ψ‖‖ = ‖ψ‖ / ‖ψ‖ = 1
-        sorry
+        -- By construction: ‖ψ / c‖ = ‖ψ‖ / |c| = 1 when |c| = ‖ψ‖
+        simp only [norm_div]
+        rw [norm_gs]
+        exact div_self (ne_of_gt h_norm_pos)
   · -- Uniqueness
     intro ψ' ⟨h_pos', h_eigen', h_norm'⟩
     -- Perron-Frobenius theorem: for a positive operator,

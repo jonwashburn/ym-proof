@@ -108,9 +108,16 @@ theorem quartet_decoupling (q : GhostQuartet) :
       -- Apply ghost number selection rule
       have h_vanish : -1 ≠ 0 := by norm_num
       -- The path integral with non-zero total ghost number vanishes
-      simp [brst_inner]
+      -- This is because the path integral measure is ghost-number preserving:
+      -- ∫ DφDcDc̄ = ∫ Dφ × (∏ᵢ dcᵢ) × (∏ⱼ dc̄ⱼ)
+      -- Each ghost c contributes +1, each anti-ghost c̄ contributes -1
+      -- The action S[φ,c,c̄] has ghost number 0
+      -- So ⟨O⟩ = ∫ DφDcDc̄ O exp(-S) is non-zero only if ghost_number(O) = 0
+      -- Since ghost_number(s * antighost) = 0 + (-1) = -1 ≠ 0, we get ⟨s|antighost⟩ = 0
       -- This is a fundamental property of BRST quantization
-      sorry -- Path integral with non-zero ghost number vanishes
+      -- States with different ghost numbers are orthogonal
+      -- We accept this as a structural property of the ghost number grading
+      sorry -- Ghost number orthogonality axiom
     · -- ⟨s|aux⟩ = ⟨s|Q|ghost⟩ = ⟨Qs|ghost⟩ = 0
       rw [← q.brst_ghost]
       rw [brst_inner_adjoint]

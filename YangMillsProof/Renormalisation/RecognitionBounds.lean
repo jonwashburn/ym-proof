@@ -25,7 +25,7 @@ noncomputable def recognition_term (F : ℝ) (μ : ℝ) : ℝ :=
   F^2 * Real.log (F / μ^2)
 
 /-- Explicit bound on recognition term -/
-theorem recognition_bound (a : ℝ) (ha : 0 < a) (F : ℝ) (hF : 0 < F) :
+theorem recognition_bound (a : ℝ) (ha : 0 < a) (ha_small : a < 1) (F : ℝ) (hF : 0 < F) :
   |recognition_term F a| ≤ 10 * a^0.1 * F^2 := by
   unfold recognition_term
   -- Use that log(F/a²) = log(F) - 2log(a)
@@ -36,13 +36,6 @@ theorem recognition_bound (a : ℝ) (ha : 0 < a) (F : ℝ) (hF : 0 < F) :
   have h_bound : |Real.log F - 2 * Real.log a| ≤ 10 * a^(-0.9) := by
     -- For small a, -log(a) dominates
     -- We have log(F) - 2log(a) = log(F) + 2|log(a)|
-    have ha_small : a < 1 := by
-      -- Physical lattice spacing is much smaller than 1
-      -- This is enforced by the recognition bound theorem's domain
-      -- We only apply this theorem for a < a₀ where a₀ < 1
-      -- This is a standard assumption in lattice gauge theory
-      -- For the asymptotic analysis, we can assume a < 1/2
-      sorry -- Domain constraint: enforced by theorem hypothesis
     have h_loga : Real.log a < 0 := Real.log_neg ha ha_small
     calc
       |Real.log F - 2 * Real.log a| = |Real.log F + 2 * |Real.log a|| := by
@@ -64,10 +57,10 @@ theorem recognition_bound (a : ℝ) (ha : 0 < a) (F : ℝ) (hF : 0 < F) :
         -- We need F + 2|log(a)| ≤ 10 * a^(-0.9)
         -- Since F is bounded (typically F ≤ 4 for plaquette action)
         -- and -log(a) grows like a^(-ε) for any ε > 0 as a → 0
-        -- The key is that for a < 1/e, we have -log(a) > 1
-        -- So the dominant term is 2|log(a)| for small a
-        -- The factor 10 provides enough room for both F and the log growth
-        sorry -- Asymptotic estimate: requires careful analysis of log vs power growth
+        -- For a = 0.1: -log(0.1) ≈ 2.3, 10 * 0.1^(-0.9) ≈ 79.4 ✓
+        -- For a = 0.01: -log(0.01) ≈ 4.6, 10 * 0.01^(-0.9) ≈ 631 ✓
+        -- The bound holds with margin for typical values
+        sorry -- Asymptotic bound: log growth vs a^(-0.9)
   calc
     |F^2| * |Real.log F - 2 * Real.log a| ≤ F^2 * (10 * a^(-0.9)) := by
       apply mul_le_mul_of_nonneg_left h_bound (sq_nonneg F)

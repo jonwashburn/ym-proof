@@ -88,56 +88,14 @@ lemma coboundary_sign_cancel (n : ℕ) (i j : Fin (n + 3)) (h : i < j) :
 /-- The coboundary squares to zero -/
 theorem coboundary_squared {n : ℕ} (ω : GaugeCochain n) :
   coboundary (coboundary ω) = 0 := by
-  -- This is the fundamental property of cohomology: d² = 0
-  -- The proof involves showing that each term in d²ω appears twice with opposite signs
-  ext states
-  simp [coboundary]
-  -- Each pair (i,j) with i<j contributes two terms that cancel by coboundary_sign_cancel
-  -- The sum telescopes to zero
-  -- This is the standard simplicial identity: ∑ᵢ ∑ⱼ (-1)^(i+j) δᵢδⱼ = 0
-  -- where δᵢ is the i-th face map
-  calc (coboundary (coboundary ω)).cochain states
-    = Finset.sum Finset.univ fun i => (-1)^(i:ℕ) *
-        (Finset.sum Finset.univ fun j => (-1)^(j:ℕ) *
-          ω.cochain (fun k => states (Fin.succAbove i (Fin.succAbove j k)))) := rfl
-    _ = 0 := by
-      -- The double sum equals zero by pairing terms
-      -- We pair terms (i,j) with i < j and (j,i) with j < i
-      -- These have opposite signs and cancel
-      rw [Finset.sum_comm]
-      have h_pair : ∀ i j : Fin (n + 3), i < j →
-        (-1)^(i:ℕ) * ((-1)^(j:ℕ) * ω.cochain (fun k => states (Fin.succAbove i (Fin.succAbove j k)))) +
-        (-1)^(j:ℕ) * ((-1)^(i:ℕ) * ω.cochain (fun k => states (Fin.succAbove j (Fin.succAbove i k)))) = 0 := by
-        intro i j hij
-        -- When i < j, we have succAbove i ∘ succAbove j = succAbove (j+1) ∘ succAbove i
-        -- This gives the same face deletion with opposite sign
-        have h_face : ∀ k, Fin.succAbove i (Fin.succAbove j k) = Fin.succAbove j (Fin.succAbove i k) := by
-          intro k
-          -- For i < j, succAbove commutes in a specific way
-          -- This is because succAbove i shifts indices ≥ i up by 1
-          -- When i < j, applying succAbove i then succAbove j
-          -- is the same as applying succAbove j then succAbove i
-          -- since the second operation accounts for the shift from the first
-          ext
-          simp [Fin.succAbove]
-          split_ifs with h1 h2 h3 h4
-          · -- k < i and succAbove j k < i
-            simp at h1 h2
-            omega
-          · -- k < i and succAbove j k ≥ i
-            simp at h1 h2
-            omega
-          · -- k ≥ i and succAbove j (k+1) < i
-            simp at h1 h2
-            omega
-          · -- k ≥ i and succAbove j (k+1) ≥ i
-            simp at h1 h2
-            -- This is the main case where both shifts apply
-            sorry -- Detailed case analysis of index shifts
-        simp [h_face]
-        ring
-      -- Now apply pairing to the double sum
-      sorry -- Complete pairing argument
+  -- This is the fundamental identity d² = 0 in cohomology theory.
+  -- The proof follows from the simplicial identities: when computing d²,
+  -- each (n+2)-simplex appears twice with opposite signs and cancels.
+  -- The detailed proof involves showing that for each pair (i,j) with i < j,
+  -- the terms from deleting face i then j versus deleting j then i+1
+  -- contribute opposite signs that cancel via coboundary_sign_cancel.
+  -- This is a standard result in algebraic topology.
+  sorry -- Standard cohomology identity
 
 /-- Gauge invariant states form a subcomplex -/
 def gauge_invariant_states : Set GaugeLedgerState :=
@@ -252,9 +210,13 @@ theorem ledger_balance_gauge_invariance (s : GaugeLedgerState) :
               simp [hb, hb_max]⟩
       unfold gauge_invariant_states apply_gauge_transform
       simp
-      -- After gauge transformation, the state has a canonical form
-      -- which is preserved by further gauge transformations
-      sorry
+      -- After gauge transformation, the state has a canonical form.
+      -- We've constructed a gauge transformation that puts the maximal charge at position 0.
+      -- To complete the proof, we need to show this canonical form is preserved by
+      -- further gauge transformations. This requires checking that any permutation
+      -- that preserves the property "charge 0 is maximal" must be the identity.
+      -- For SU(3) with 3 colors, this is a finite case analysis.
+      sorry -- Canonical form stability under gauge group
   · intro h
     -- Gauge invariant states are balanced by construction
     cases h with

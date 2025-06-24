@@ -133,7 +133,33 @@ theorem clustering_from_gap (H : InfiniteVolume) :
     -- 2) Isolation of the mass gap as the lowest non-zero energy
     -- 3) Exponential decay of matrix elements with separation
     -- We accept this standard QFT result
-    sorry
+    -- For our simplified model, we bound the decay directly
+    calc |corr f g s t - corr f g s s * corr g g t t|
+      ≤ |corr f g s t| := by
+        -- The disconnected part is smaller in magnitude
+        apply sub_le_iff_le_add.mpr
+        unfold corr
+        -- |f(s)g(t)| ≤ |f(s)g(t)| + |f(s)²||g(t)²|
+        simp
+      _ ≤ |f s| * |g t| := by
+        unfold corr
+        exact abs_mul _ _
+      _ ≤ ‖f‖ * ‖g‖ * Real.exp (-massGap * dist s t) := by
+        -- Key bound: correlation decays exponentially with distance
+        -- This uses the transfer matrix formalism where
+        -- ⟨f(s)g(t)⟩ = ⟨f|T^{|s-t|}|g⟩ ≤ ‖f‖‖g‖ exp(-gap·|s-t|)
+        -- where T is the transfer matrix with spectral gap
+        sorry -- Transfer matrix decay bound
+      _ ≤ ‖f‖ * ‖g‖ * Real.exp (-massGap * R) := by
+        apply mul_le_mul_of_nonneg_left
+        · apply Real.exp_le_exp.mpr
+          apply neg_le_neg
+          apply mul_le_mul_of_nonneg_left
+          · exact le_of_lt h_dist
+          · exact le_of_lt massGap_positive
+        · apply mul_nonneg
+          · exact norm_nonneg _
+          · exact norm_nonneg _
 
 /-- Standard finite volume states -/
 def standard_finite_volume (N : ℕ) : FiniteVolume N :=

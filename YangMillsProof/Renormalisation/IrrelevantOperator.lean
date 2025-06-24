@@ -11,6 +11,7 @@
 
 import YangMillsProof.Renormalisation.RunningGap
 import YangMillsProof.Continuum.WilsonMap
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
 
 namespace YangMillsProof.Renormalisation
 
@@ -63,8 +64,9 @@ theorem irrelevant_vanishing (op : OperatorDimension) (h : is_irrelevant op) :
           linarith
         exact this
       _ = ε^((1/(op.total - 4)) * (op.total - 4)) := by
-        rw [← rpow_natCast]
-        sorry  -- rpow multiplication rule
+        rw [← Real.rpow_natCast]
+        simp only [rpow_natCast]
+        rw [← Real.rpow_mul (by linarith : 0 ≤ ε)]
       _ = ε^1 := by
         field_simp
       _ = ε := by simp
@@ -87,7 +89,22 @@ theorem recognition_subleading (a : ℝ) (ha : 0 < a) (link : WilsonLink a) :
     by_cases hF : F_squared = 0
     · simp [hF]
     · -- For small a and bounded F, log term gives a^0.1 suppression
-      sorry  -- Technical estimate like in RecognitionBounds
+      -- Key insight: F_squared ≤ 4 and log(F²/a²) = log(F²) - 2log(a)
+      have hF_bound : F_squared ≤ 4 := by
+        unfold F_squared
+        -- (1 - cos θ)² ≤ (1 - (-1))² = 4
+        have : |1 - Real.cos link.plaquette_phase| ≤ 2 := by
+          have cos_bound : -1 ≤ Real.cos link.plaquette_phase ∧
+                           Real.cos link.plaquette_phase ≤ 1 := Real.cos_le_one_of_mem_Icc
+          linarith
+        calc F_squared = |1 - Real.cos link.plaquette_phase|^2 := sq_abs _
+        _ ≤ 2^2 := sq_le_sq' (by linarith) this
+        _ = 4 := by norm_num
+      -- For a < 1, we have |log(F²/a²)| ≤ |log(F²)| + 2|log(a)|
+      -- Since F² ≤ 4, |log(F²)| ≤ log(4) < 2
+      -- For small a, |log(a)| ~ a^(-ε) for any ε > 0
+      -- This gives the required a^0.1 factor
+      sorry
   calc
     |F_squared * Real.log (F_squared / a^2)| ≤ a^0.1 * F_squared^2 := h1
     _ = a^0.1 * |1 - Real.cos link.plaquette_phase|^2 := by simp [sq_abs]

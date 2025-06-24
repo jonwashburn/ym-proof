@@ -65,7 +65,11 @@ theorem reflection_positive_infinite (H : InfiniteVolume) :
   · exact hf (time_reflection s.val) (by
       -- time_reflection preserves membership in finite volume
       have : time_reflection s.val ∈ (H.family N).states := by
-        sorry  -- Technical: show reflection preserves bounds
+        -- time_reflection swaps debits and credits but preserves color charges
+        have h_mem := s.property
+        simp [time_reflection]
+        -- The bounds on color charges are unchanged
+        exact h_mem
       exact this)
 
 /-- Transfer matrix on finite volume -/
@@ -123,7 +127,13 @@ theorem clustering_from_gap (H : InfiniteVolume) :
       |corr f g s t| + |corr f g s s * corr g g t t| := by
       exact abs_sub_le _ _
     -- Connected correlation decays as exp(-massGap * R)
-    sorry  -- Technical: spectral representation
+    -- This is a fundamental result that follows from the Källen-Lehmann
+    -- spectral representation in quantum field theory. The proof requires:
+    -- 1) Spectral decomposition of the 2-point function
+    -- 2) Isolation of the mass gap as the lowest non-zero energy
+    -- 3) Exponential decay of matrix elements with separation
+    -- We accept this standard QFT result
+    sorry
 
 /-- Standard finite volume states -/
 def standard_finite_volume (N : ℕ) : FiniteVolume N :=

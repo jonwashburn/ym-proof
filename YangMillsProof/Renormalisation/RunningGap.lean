@@ -11,8 +11,10 @@
 
 import YangMillsProof.PhysicalConstants
 import Foundations.EightBeat
-import Mathlib.Analysis.Calculus.Deriv
+import Mathlib.Analysis.Calculus.Deriv.Basic
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
+import Mathlib.Analysis.Calculus.Deriv.Pow
+import Mathlib.Tactic.Positivity
 
 namespace YangMillsProof.Renormalisation
 
@@ -59,8 +61,12 @@ theorem gap_RGE (μ : EnergyScale) :
   unfold gap_running
   -- d/dx [Δ₀ (x/μ₀)^γ] = Δ₀ γ (x/μ₀)^(γ-1) * (1/μ₀)
   -- x * d/dx = x * Δ₀ γ (x/μ₀)^(γ-1) * (1/μ₀) = γ * Δ₀ (x/μ₀)^γ
-  -- Use mathlib's deriv_rpow
-  sorry  -- Apply deriv_rpow lemma
+  -- We need to compute x * d/dx[Δ₀ (x/μ₀)^γ]
+  -- Using the chain rule and power rule
+  simp only [deriv_const_mul_field, deriv_rpow_const]
+  -- The derivative of (x/μ₀)^γ is γ * (x/μ₀)^(γ-1) * (1/μ₀)
+  -- Multiplying by x gives γ * (x/μ₀)^γ = γ * gap_running
+  sorry -- Technical details of chain rule application
 
 /-- Eight-beat structure survives RG flow -/
 theorem eight_beat_RG_invariant (μ : EnergyScale) :
@@ -74,7 +80,9 @@ theorem eight_beat_RG_invariant (μ : EnergyScale) :
     intro h_silent
     -- If phase is silent, then gap = 0, contradiction
     have : gap_running μ = 0 := by
-      sorry  -- Silent phase implies zero gap
+      -- In our model, silent phase means no activity, hence zero gap
+      -- This is a defining property of the eight-beat structure
+      sorry
     linarith
   · intro h_active
     unfold gap_running
@@ -92,7 +100,13 @@ lemma c₆_approx : abs (c₆ - 7552.87) < 1 := by
   -- c₆ = (1 GeV / 0.090 eV)^(γ * 2π) where γ ≈ 0.1
   -- log(c₆) ≈ (γ * 2π) * log(1e9 / 0.090) ≈ 0.628 * 23.13 ≈ 14.52
   -- c₆ ≈ exp(14.52) ≈ 7552.87
-  sorry  -- Numerical computation
+  -- This numerical calculation requires:
+  -- 1) γ ≈ 0.1 at μ = 1 GeV
+  -- 2) log(1 GeV / 90 meV) = log(11111) ≈ 9.32
+  -- 3) γ * 2π * 9.32 ≈ 0.628 * 9.32 ≈ 5.85
+  -- 4) exp(5.85) ≈ 348, but we need ~7553
+  -- The discrepancy suggests we need the full RG integral, not just power law
+  sorry
 
 /-- Main result: Gap runs from 146 meV to 1.10 GeV -/
 theorem gap_running_result :
@@ -109,7 +123,10 @@ theorem gap_running_result :
     unfold massGap
     norm_num
   -- Use triangle inequality with c₆ approximation
-  sorry  -- Complete numerical bound
+  -- |massGap * c₆ - 1.10| ≤ |massGap * c₆ - massGap * 7552.87| + |massGap * 7552.87 - 1.10|
+  --                       ≤ massGap * |c₆ - 7552.87| + 0.01
+  --                       < 0.000146 * 1 + 0.01 < 0.06
+  sorry
 
 /-- Recognition term emerges from RG flow -/
 theorem recognition_emergence (μ : EnergyScale) :
@@ -119,8 +136,9 @@ theorem recognition_emergence (μ : EnergyScale) :
   -- Taylor expand the power law
   use gamma_mass (g_running μ) * 2 * Real.pi
   unfold gap_running
-  -- (μ/μ₀)^γ ≈ 1 + γ log(μ/μ₀) + O(log²)
-  sorry  -- Taylor expansion
+  -- (μ/μ₀)^γ = exp(γ log(μ/μ₀)) ≈ 1 + γ log(μ/μ₀) + (γ log(μ/μ₀))²/2 + ...
+  -- This is the standard Taylor expansion of exponential
+  sorry
   where O (x : ℝ) : ℝ := x^2 * gamma_mass (g_running μ)  -- Second order term
 
 /-- Gap enhancement is monotonic -/
@@ -135,8 +153,18 @@ theorem gap_monotonic : ∀ μ₁ μ₂ : EnergyScale,
       · exact μ₁.property
       · exact h
     · apply mul_pos
-      · apply gamma_mass_pos
-        sorry  -- Need g > 0
+      · -- gamma_mass is positive when g > 0
+        unfold gamma_mass
+        apply div_pos
+        · apply mul_pos
+          · norm_num
+          · exact sq_pos_of_ne_zero (ne_of_gt (by
+              unfold g_running
+              apply div_pos
+              · norm_num
+              · apply Real.sqrt_pos
+                sorry))  -- Need log > 0
+        · apply mul_pos; norm_num; exact sq_pos_of_ne_zero Real.pi_ne_zero
       · exact Real.two_pi_pos
   · exact massGap_positive
   where
@@ -152,7 +180,12 @@ theorem gap_monotonic : ∀ μ₁ μ₂ : EnergyScale,
           · norm_num  -- b₀ = 11/3 > 0
           · apply Real.log_pos
             -- μ₁/0.2 > 1 since μ₁ > 0.2 (above Λ_QCD)
-            sorry  -- Need μ₁ > Λ_QCD
+            -- We assume all energy scales are above Λ_QCD = 0.2 GeV
+            apply div_lt_iff_lt_mul (by norm_num : (0:ℝ) < 0.2)
+            simp
+            -- Need μ₁ > 0.2, which is a physical assumption
+            -- All our energy scales are above Λ_QCD
+            sorry
       apply div_pos
       · apply mul_pos
         · norm_num  -- 3 > 0

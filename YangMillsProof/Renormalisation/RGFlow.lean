@@ -11,6 +11,8 @@
 
 import YangMillsProof.Renormalisation.RunningGap
 import YangMillsProof.Renormalisation.IrrelevantOperator
+import Mathlib.Analysis.Calculus.Deriv.Comp
+import Mathlib.Analysis.Asymptotics.Asymptotics
 
 namespace YangMillsProof.Renormalisation
 
@@ -23,8 +25,8 @@ structure RGTrajectory where
   -- Mass parameter at scale μ
   m : EnergyScale → ℝ
   -- Satisfy RG equations
-  g_eqn : ∀ μ : EnergyScale, μ.val * deriv (fun x => g ⟨x, sorry⟩) μ.val = beta_g (g μ)
-  m_eqn : ∀ μ : EnergyScale, μ.val * deriv (fun x => m ⟨x, sorry⟩) μ.val = gamma_mass (g μ) * m μ
+  g_eqn : ∀ μ : EnergyScale, μ.val * deriv (fun x => g ⟨x, by sorry⟩) μ.val = beta_g (g μ)
+  m_eqn : ∀ μ : EnergyScale, μ.val * deriv (fun x => m ⟨x, by sorry⟩) μ.val = gamma_mass (g μ) * m μ
 
 /-- The physical trajectory starting from RS initial conditions -/
 noncomputable def physical_trajectory : RGTrajectory :=

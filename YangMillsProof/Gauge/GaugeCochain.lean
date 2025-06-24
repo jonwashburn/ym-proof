@@ -12,7 +12,8 @@
 import YangMillsProof.Continuum.WilsonMap
 import Foundations.DualBalance
 import Mathlib.AlgebraicTopology.SimplicialSet
-import Mathlib.Algebra.Homology.Complex
+import Mathlib.Algebra.Homology.HomologicalComplex
+import Mathlib.GroupTheory.Perm.Fin
 
 namespace YangMillsProof.Gauge
 
@@ -88,8 +89,21 @@ lemma coboundary_sign_cancel (n : ℕ) (i j : Fin (n + 3)) (h : i < j) :
 theorem coboundary_squared {n : ℕ} (ω : GaugeCochain n) :
   coboundary (coboundary ω) = 0 := by
   -- This is the fundamental property of cohomology: d² = 0
-  -- It follows from the alternating sum structure and index manipulation
-  sorry  -- Standard result: simplicial coboundary squares to zero
+  -- The proof involves showing that each term in d²ω appears twice with opposite signs
+  ext states
+  simp [coboundary]
+  -- Each pair (i,j) with i<j contributes two terms that cancel by coboundary_sign_cancel
+  -- The sum telescopes to zero
+  -- This is the standard simplicial identity: ∑ᵢ ∑ⱼ (-1)^(i+j) δᵢδⱼ = 0
+  -- where δᵢ is the i-th face map
+  calc (coboundary (coboundary ω)).cochain states
+    = Finset.sum Finset.univ fun i => (-1)^(i:ℕ) *
+        (Finset.sum Finset.univ fun j => (-1)^(j:ℕ) *
+          ω.cochain (fun k => states (Fin.succAbove i (Fin.succAbove j k)))) := rfl
+    _ = 0 := by
+      -- Use that the double sum equals zero by pairing terms
+      -- For each i < j, the (i,j) and (j-1,i) terms cancel
+      sorry
 
 /-- Gauge invariant states form a subcomplex -/
 def gauge_invariant_states : Set GaugeLedgerState :=
@@ -142,15 +156,64 @@ theorem ledger_balance_gauge_invariance (s : GaugeLedgerState) :
       -- For SU(3), we can always gauge to a standard form
       -- where colour charge 0 has the maximal value
       let max_charge := Finset.univ.argmax s.colour_charges
-      have h_max : ∃ i, s.colour_charges i = Finset.univ.image s.colour_charges |>.max' sorry := by
-        sorry  -- Existence of maximum
+      have h_max : ∃ i, ∀ j, s.colour_charges i ≥ s.colour_charges j := by
+        -- Finite set always has a maximum
+        use Finset.univ.argmax s.colour_charges
+        intro j
+        sorry
       obtain ⟨i_max, hi_max⟩ := h_max
       -- Permute to put max charge at position 0
       use ⟨fun j => if j = 0 then i_max else if j = i_max then 0 else j, by
-        sorry⟩  -- Bijection proof
+        -- This is a transposition swapping 0 and i_max
+        -- Transpositions are always bijective
+        constructor
+        · -- Injective: if f(a) = f(b) then a = b
+          intro a b hab
+          by_cases ha : a = 0
+          · by_cases hb : b = 0
+            · exact ha ▸ hb
+            · simp [ha, hb] at hab
+              by_cases hb_max : b = i_max
+              · simp [hb_max] at hab
+                exact False.elim (hb hab)
+              · simp [hb_max] at hab
+                exact False.elim (hb_max hab)
+          · by_cases ha_max : a = i_max
+            · by_cases hb : b = 0
+              · simp [ha, ha_max, hb] at hab
+                exact False.elim (ha hab.symm)
+              · by_cases hb_max : b = i_max
+                · exact ha_max ▸ hb_max
+                · simp [ha, ha_max, hb, hb_max] at hab
+                  exact False.elim (hb hab.symm)
+            · by_cases hb : b = 0
+              · simp [ha, ha_max, hb] at hab
+                by_cases hb_max : b = i_max
+                · contradiction
+                · exact False.elim (ha_max hab.symm)
+              · by_cases hb_max : b = i_max
+                · simp [ha, ha_max, hb, hb_max] at hab
+                  exact False.elim (ha hab)
+                · simp [ha, ha_max, hb, hb_max] at hab
+                  exact hab
+        · -- Surjective: for all b, exists a with f(a) = b
+          intro b
+          by_cases hb : b = 0
+          · use i_max
+            simp [hb]
+            by_cases h : i_max = 0
+            · exact h
+            · simp [h]
+          · by_cases hb_max : b = i_max
+            · use 0
+              simp [hb_max]
+            · use b
+              simp [hb, hb_max]⟩
       unfold gauge_invariant_states apply_gauge_transform
       simp
-      sorry  -- Show result is gauge invariant
+      -- After gauge transformation, the state has a canonical form
+      -- which is preserved by further gauge transformations
+      sorry
   · intro h
     -- Gauge invariant states are balanced by construction
     cases h with

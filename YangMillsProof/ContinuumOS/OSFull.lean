@@ -14,6 +14,8 @@ import YangMillsProof.Gauge.BRST
 import Mathlib.Analysis.InnerProductSpace.Basic
 import Mathlib.Analysis.SpecialFunctions.Exp
 import Mathlib.MeasureTheory.Function.L2Space
+import Mathlib.MeasureTheory.Constructions.Prod.Basic
+import Mathlib.Topology.Algebra.InfiniteSum.Basic
 
 namespace YangMillsProof.ContinuumOS
 
@@ -80,7 +82,10 @@ theorem physical_mass_gap (H : PhysicalHilbert) :
           exact h
         · intro h
           -- If transformed state is vacuum, original was vacuum
-          sorry  -- Need gauge transform properties
+          -- Gauge transforms preserve the vacuum state (0,0)
+          -- This is because gauge transforms act on fields, not on the
+          -- vacuum quantum numbers
+          sorry
       · -- Square integrability
         use 1
         constructor

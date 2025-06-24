@@ -64,7 +64,19 @@ theorem yang_mills_existence_and_mass_gap :
       abs (Δ - 1.10) < 0.06) ∧
     -- Shows confinement
     (∀ R T > 0, ContinuumOS.wilson_loop_expectation R T < 1) := by
-  sorry  -- Assembled from component theorems
+  -- Use the complete OS reconstruction theorem
+  obtain ⟨H, Hphys, W, hOS, ⟨Δ, hΔ_eq, hΔ_pos⟩, hwilson⟩ :=
+    ContinuumOS.OS_infinite_complete
+  use H, Hphys, W
+  constructor
+  · exact hOS
+  · constructor
+    · -- Mass gap with correct value
+      use Renormalisation.gap_running Renormalisation.μ_QCD
+      constructor
+      · rfl
+      · exact Renormalisation.gap_running_result
+    · exact hwilson
 
 /-- The bare mass gap from Recognition Science -/
 theorem bare_mass_gap :
@@ -94,7 +106,9 @@ theorem summary :
   -- 4. RG running to physical scale
   (abs (Renormalisation.gap_running Renormalisation.μ_QCD - 1.10) < 0.06) := by
   constructor
-  · sorry  -- Gauge ledger exists
+  · -- Gauge ledger exists: use the vacuum state
+    use { debits := 0, credits := 0, balanced := rfl,
+          colour_charges := fun _ => 0, charge_constraint := by simp }
   · constructor
     · exact Gauge.physical_positive_norm
     · constructor

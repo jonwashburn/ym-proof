@@ -59,7 +59,10 @@ theorem gauge_wilson_exact_correspondence (a : ℝ) (ha : a > 0) (s : GaugeLedge
       -- and colour charge q, we have cost = E_coh * 2n * (1 - cos(2πq/3))
       -- For minimal n=1, this gives the formula
       have h_min : s.debits = 146 ∧ s.credits = 146 ∧ s.colour_charges 1 ≠ 0 := by
-        sorry  -- Assume minimal non-vacuum state
+        -- This is a key assumption: we're considering the minimal non-vacuum state
+        -- In the full theory, we would sum over all possible states
+        -- For now, we focus on the minimal excitation to establish the correspondence
+        sorry
       simp [h_min.1, h_min.2]
       ring
     _ = E_coh * 2 * plaquette_action W := by
@@ -85,7 +88,12 @@ theorem gauge_wilson_exact_correspondence (a : ℝ) (ha : a > 0) (s : GaugeLedge
       -- So we need to adjust the normalization
       have h_norm : 1 - Real.cos (2 * Real.pi / 3) = 3/2 := by
         -- Use mathlib's cos(2π/3) = -1/2
-        rw [Real.cos_two_pi_div_three]
+        have : Real.cos (2 * Real.pi / 3) = -1/2 := by
+          -- cos(2π/3) = cos(120°) = -1/2
+          -- This is a standard trig value
+          norm_num
+          sorry -- Need exact lemma name from mathlib
+        rw [this]
         norm_num
       rw [h_norm]
       field_simp
@@ -101,7 +109,9 @@ def gauge_transform_wilson (g : GaugeTransform) (link : WilsonLink a) : WilsonLi
       have h2 : 0 ≤ (g.perm 0).val ∧ (g.perm 0).val < 3 := by
         simp [Fin.val_lt_of_le]
       -- Adding phases modulo 2π keeps in range
-      sorry  -- Modular arithmetic }
+      -- We need to take the result modulo 2π
+      -- This is a technical detail about circular arithmetic
+      sorry }
 
 /-- Wilson action is gauge invariant -/
 theorem wilson_gauge_invariant (a : ℝ) (g : GaugeTransform) (s : GaugeLedgerState) :
@@ -113,8 +123,10 @@ theorem wilson_gauge_invariant (a : ℝ) (g : GaugeTransform) (s : GaugeLedgerSt
   unfold wilsonCost ledgerToWilson apply_gauge_transform
   simp
   -- The plaquette action depends only on cos(phase)
-  -- which is invariant under gauge transformations
-  sorry  -- Complete trace invariance argument
+  -- Gauge transformations shift all four links around a plaquette
+  -- The net phase shift around a closed loop is zero (gauge invariance)
+  -- Therefore the plaquette phase and its cosine are unchanged
+  sorry
 
 /-- The coupling constant emerges from eight-beat -/
 def gauge_coupling : ℝ := 2 * Real.pi / Real.sqrt 8  -- g² = 2π/√8
@@ -124,7 +136,12 @@ theorem continuum_yang_mills (ε : ℝ) (hε : ε > 0) :
   ∃ a₀ > 0, ∀ a ∈ Set.Ioo 0 a₀,
     ∀ s : GaugeLedgerState,
       |gaugeCost s / a^4 - (1 / (2 * gauge_coupling^2)) * F_squared s| < ε := by
-  sorry  -- Continuum limit
+  -- In the continuum limit a → 0:
+  -- 1) The lattice action S = (1/g²) Σ (1 - cos θ) approaches (1/2g²) ∫ F²
+  -- 2) Our gauge cost matches the lattice action
+  -- 3) Therefore gauge cost / a⁴ → (1/2g²) F² as a → 0
+  -- The detailed proof requires careful expansion of cos θ ≈ 1 - θ²/2 for small θ
+  sorry
   where
     F_squared (s : GaugeLedgerState) : ℝ :=
       (1 - Real.cos (2 * Real.pi * (s.colour_charges 1 : ℝ) / 3))^2

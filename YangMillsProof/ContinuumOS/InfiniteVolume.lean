@@ -149,7 +149,15 @@ theorem clustering_from_gap (H : InfiniteVolume) :
         -- This uses the transfer matrix formalism where
         -- ⟨f(s)g(t)⟩ = ⟨f|T^{|s-t|}|g⟩ ≤ ‖f‖‖g‖ exp(-gap·|s-t|)
         -- where T is the transfer matrix with spectral gap
-        sorry -- Transfer matrix decay bound
+        -- Transfer matrix decay bound
+        -- In the transfer matrix formalism:
+        -- ⟨f(s)g(t)⟩ = ⟨f|T^n|g⟩ where n = dist(s,t)
+        -- Using spectral decomposition: T = Σᵢ λᵢ|i⟩⟨i|
+        -- with λ₀ = 1 (vacuum) and λ₁ = exp(-massGap) (first excited)
+        -- For large separations, the correlation is dominated by λ₁^n
+        -- This gives the bound ‖f‖‖g‖ exp(-massGap·dist)
+        -- We accept this standard result from transfer matrix theory
+        sorry -- Standard transfer matrix spectral bound
       _ ≤ ‖f‖ * ‖g‖ * Real.exp (-massGap * R) := by
         apply mul_le_mul_of_nonneg_left
         · apply Real.exp_le_exp.mpr

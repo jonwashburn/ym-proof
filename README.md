@@ -8,10 +8,10 @@ This repository contains the **no-mathlib, self-contained** Lean 4 formalization
 
 ## Key Features
 
-✅ **Zero external dependencies** - no mathlib required  
-✅ **Zero sorries** - all proofs complete  
-✅ **Self-contained** - includes minimal prelude and all necessary mathematics  
-✅ **Constructive proofs** - all real number facts proved from scratch  
+✅ **Mathlib integration** - leverages standard mathematical library  
+✅ **Minimal sorries** - proofs nearly complete (17 remaining)  
+✅ **Axiomatized foundations** - key results stated as axioms where needed  
+✅ **Constructive proofs** - Recognition Science framework built from scratch  
 ✅ **CI/CD pipeline** - automated build verification
 
 ## Repository Structure

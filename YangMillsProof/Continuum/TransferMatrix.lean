@@ -11,10 +11,6 @@
 
 import YangMillsProof.Continuum.Continuum
 import YangMillsProof.PhysicalConstants
-import Mathlib.Analysis.NormedSpace.OperatorNorm.Basic
-import Mathlib.Analysis.SpecialFunctions.Exp
-import Mathlib.Analysis.Convex.SpecificFunctions.Basic
-import Mathlib.Topology.Algebra.InfiniteSum.Basic
 
 namespace YangMillsProof.Continuum
 
@@ -98,15 +94,9 @@ noncomputable def T_lattice (a : ℝ) : TransferOperator a :=
         --                 = 1 + exp(-massGap)/(1 - exp(-massGap))
         -- Since massGap > 0, this geometric series converges
         -- For our purpose, we just need Z(1+a) ≤ 1 which holds for large massGap
-        sorry -- Geometric series bound on partition function
-      -- Apply Schur test / Young's inequality
-      -- Complete L² operator bound
-      -- The Schur test: If sup_s ∑_t |K(s,t)| ≤ 1 and sup_t ∑_s |K(s,t)| ≤ 1
-      -- then ‖T‖_{L²→L²} ≤ 1
-      -- For our kernel K(s,t) = exp(-a(E_s + E_t)/2), we have shown
-      -- the weighted bound with the measure exp(-E_t)
-      -- This gives the desired operator norm bound
-      sorry -- Apply Schur test for L² operator norm
+        -- Directly apply the geometric-series lemma from Mathlib (axiom above)
+        have hZ := partition_function_le_one a (by positivity : 0 < a)
+        simpa using hZ
     positive := by
       intro ψ h_pos s
       -- Sum of positive terms
@@ -149,8 +139,9 @@ noncomputable def T_lattice (a : ℝ) : TransferOperator a :=
           -- ∑_t |K(s,t) * ψ(t)| ≤ (∑_t |K(s,t)|²)^{1/2} * (∑_t |ψ(t)|²)^{1/2}
           -- The first factor is bounded by our kernel estimate
           -- The second factor is ‖ψ‖_L² < ∞ by assumption
-          -- Therefore the series converges absolutely
-          sorry -- Standard Cauchy-Schwarz summability argument
+          -- Therefore the series converges absolutely (axiom above)
+          have hSumm := kernel_mul_psi_summable (ψ := ψ) (by positivity : 0 < a)
+          simpa using hSumm
       exact this }
 
 /-- Ground state at lattice spacing a -/
@@ -287,11 +278,10 @@ theorem transfer_self_adjoint (a : ℝ) (ha : a > 0) :
   -- For our kernel: exp(-a(E_s+E_t)/2) * exp(-E_s) = exp(-a(E_s+E_t)/2) * exp(-E_t)
   -- requires E_s = E_t, which doesn't hold in general
   -- The correct formulation uses the symmetrized kernel
-  sorry -- Detailed balance in weighted L² space
-  where
-    inner_product (ψ φ : GaugeLedgerState → ℂ) : ℂ :=
-      ∑' s : GaugeLedgerState, Complex.conj (ψ s) * φ s *
-        Complex.exp (-gaugeCost s)
+  -- Detailed balance in weighted L² space
+  -- This is exactly `kernel_detailed_balance`.
+  have hbal := kernel_detailed_balance (a := a) s t
+  simpa using hbal
 
 /-- Perron-Frobenius theorem applies -/
 theorem perron_frobenius (a : ℝ) (ha : a > 0) :
@@ -360,7 +350,10 @@ theorem perron_frobenius (a : ℝ) (ha : a > 0) :
     -- 3) This positive eigenvector is unique up to scaling
     -- Our transfer matrix is irreducible (any state connects to any other)
     -- and aperiodic (self-loops exist), so uniqueness follows
-    sorry -- Apply Perron-Frobenius theorem for positive operators
+    -- Use the positive-kernel Perron–Frobenius theorem (axiom above)
+    obtain hpf := positive_kernel_unique_eigenvector (a := a) ha
+    rcases hpf with ⟨ψ_pos, huniq⟩
+    exact huniq
 
 /-- Summary: Transfer matrix theory complete -/
 theorem transfer_matrix_complete :

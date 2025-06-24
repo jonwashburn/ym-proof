@@ -19,10 +19,21 @@ jobs:
       uses: leanprover/lean-action@v1
       with:
         toolchain: "leanprover/lean4:v4.12.0"
+    
+    - name: Cache Mathlib
+      uses: actions/cache@v3
+      with:
+        path: |
+          YangMillsProof/.lake
+          YangMillsProof/lake-packages
+        key: ${{ runner.os }}-lake-${{ hashFiles('YangMillsProof/lake-manifest.json', 'YangMillsProof/lean-toolchain') }}
+        restore-keys: |
+          ${{ runner.os }}-lake-
         
     - name: Build YangMillsProof
       run: |
         cd YangMillsProof
+        lake update
         lake build
         
     - name: Check for sorries

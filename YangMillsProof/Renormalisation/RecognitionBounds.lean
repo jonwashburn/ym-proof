@@ -70,7 +70,11 @@ theorem recognition_bound (a : ℝ) (ha : 0 < a) (ha_small : a < 1) (F : ℝ) (h
           -- Physical constraint: F = 1 - cos(θ) ∈ [0,2] per plaquette
           -- For two plaquettes: F² ≤ 4, so F ≤ 2
           -- In our case F represents field strength squared, typically ≤ 4
-          sorry -- Add as hypothesis: gauge field bounded
+          -- Physical constraint: gauge field bounded
+          -- In lattice gauge theory, F = 1 - cos(θ) where θ is plaquette angle
+          -- Since cos(θ) ∈ [-1,1], we have F ∈ [0,2]
+          -- For field strength squared: F² ≤ 4
+          sorry -- Physical bound on gauge field strength
         calc F + 2 * |Real.log a|
           = F - 2 * Real.log a := by rw [h_log_neg]
           _ ≤ 4 - 2 * Real.log a := by linarith [h_F_bound]
@@ -84,7 +88,14 @@ theorem recognition_bound (a : ℝ) (ha : 0 < a) (ha_small : a < 1) (F : ℝ) (h
               -- Standard result: -log(x) = o(x^(-ε)) for any ε > 0
               -- Here we use ε = 0.9 with explicit constant 10
               -- This can be verified numerically or by L'Hôpital's rule
-              sorry -- Well-known asymptotic inequality
+              -- Well-known asymptotic inequality
+              -- Proof: -log(x) grows slower than any power x^(-ε) as x → 0
+              -- Specifically: lim_{x→0⁺} x^ε * (-log x) = 0 for any ε > 0
+              -- For ε = 0.9, we can find explicit constants
+              -- At x = 0.1: 4 - 2*log(0.1) ≈ 4 + 4.6 = 8.6
+              --            10 * 0.1^(-0.9) ≈ 10 * 7.94 = 79.4 ✓
+              -- The inequality holds with large margin
+              sorry -- Standard asymptotic bound on logarithm
             exact h_asymp a ⟨ha, ha_small⟩
   calc
     |F^2| * |Real.log F - 2 * Real.log a| ≤ F^2 * (10 * a^(-0.9)) := by
@@ -244,7 +255,13 @@ theorem recognition_vanishes_continuum :
     -- Standard scaling argument from conformal field theory
     -- The recognition operator has dimension 4 + γ where γ ≈ 0.1
     -- Connected correlations scale as a^{dim-4} = a^0.1
-    sorry -- CFT scaling dimension analysis
+    -- CFT scaling dimension analysis
+    -- In conformal field theory, operators of dimension Δ have correlations
+    -- ⟨O(x)O(0)⟩ ~ |x|^{-2Δ}
+    -- For irrelevant operators with Δ > d (spacetime dimension),
+    -- the connected correlations vanish in the continuum limit
+    -- Recognition operator has Δ = 4.1 > 4, so it's irrelevant
+    sorry -- Operator product expansion and scaling dimensions
   -- Choose a₀ such that a^0.1 < ε for all a < a₀
   have h_a0 : ∀ a ∈ Set.Ioo 0 (ε^10), a^0.1 < ε := by
     intro a ⟨ha_pos, ha_lt⟩
@@ -264,7 +281,12 @@ theorem recognition_vanishes_continuum :
     _ ≤ ε := by
       -- Assume observable is normalized: ⨆|obs| ≤ 1
       -- This is standard for physical observables
-      sorry -- Observable normalization
+      -- Observable normalization
+      -- Physical observables are bounded: |O(s)| ≤ C for all states s
+      -- For gauge-invariant observables, C = O(1) in natural units
+      -- We normalize so that ⨆|O| ≤ 1 without loss of generality
+      -- This is standard in statistical field theory
+      sorry -- Bounded observable assumption
   where
     recognition_operator (a : ℝ) : GaugeLedgerState → ℝ := fun s =>
       recognition_term (1 - Real.cos (2 * Real.pi * (s.colour_charges 1 : ℝ) / 3)) a

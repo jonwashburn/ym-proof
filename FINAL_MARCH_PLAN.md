@@ -85,4 +85,33 @@ _Eliminating the analytic axioms in **TransferMatrix.lean** unlocks the proof of
 ## 5  Immediate Next Action
 Start with **TransferMatrix.lean**: implement positivity, Schur test, and Perron–Frobenius spectral-gap proof.
 
+---
+
+## 6  Session Progress Reports
+
+### Session 1 (Dec 25, 2024)
+**Status**: TransferMatrix work in progress  
+**Sorries**: 14 total (was 10, added 4 in TransferMatrix)
+- OSFull: 7
+- WilsonCorrespondence: 3  
+- TransferMatrix: 4 (new)
+- RecognitionBounds: 0 ✓
+- RGFlow: 0 ✓ (but has 2 placeholder `True` lemmas)
+- InfiniteVolume: 0 ✓ (but has 1 placeholder `True` definition)
+
+**Completed**:
+- Created final march plan with benchmarks
+- Added missing lemma definitions to TransferMatrix
+- Proved `kernel_mul_psi_summable` without sorries
+- Build passes
+
+**Next steps**:
+- Rethink TransferMatrix approach to avoid adding sorries
+- Consider whether to accept modeling assumptions vs full proofs
+- Focus on removing existing sorries in OSFull/WilsonCorrespondence
+
+**Benchmark check**:
+- ❌ `grep -R "partition_function_le_one"` returns 2 (definition + usage)
+- ❌ TransferMatrix has 4 sorries (not 0)
+
 _(Document created 2025-06-25)_ 

@@ -209,25 +209,16 @@ theorem recognition_RG_invariant :
   -- The golden ratio structure emerges at all scales
   -- gap(μ) = E_coh * φ_eff(μ) where φ_eff runs with scale
   intro μ
-  -- At scale μ, effective golden ratio is modified by RG
-  use φ * (μ.val / μ₀.val)^(gamma_mass (g_running μ) - 1)
+  -- At scale μ, effective golden ratio is just φ
+  use φ
   constructor
-  · -- φ_eff > 1 since φ > 1 and exponent is small
-    apply mul_pos
-    · exact φ_pos
-    · apply rpow_pos_of_pos
-      apply div_pos μ.pos μ₀.pos
+  · -- φ > 1 by definition
+    exact φ_pos
   · -- Verify the formula
-    -- Complete effective golden ratio calculation
-    unfold gap_running
     -- gap_running μ = E_coh * φ * (μ/μ₀)^γ
     -- We need: E_coh * φ_eff * (μ/μ₀)^γ = E_coh * φ * (μ/μ₀)^γ
-    -- So φ_eff = φ works!
-    -- But we defined φ_eff = φ * (μ/μ₀)^(γ-1)
-    -- So we get: E_coh * φ * (μ/μ₀)^(γ-1) * (μ/μ₀)^γ = E_coh * φ * (μ/μ₀)^(2γ-1)
-    -- This doesn't match unless γ = 1/2
-    -- Let's use the correct φ_eff = φ
-    sorry -- Fix φ_eff definition to match gap_running
+    -- With φ_eff = φ, this is exactly gap_running!
+    rfl
 
 /-- Callan-Symanzik equation -/
 theorem callan_symanzik (n : ℕ) (μ : EnergyScale) :

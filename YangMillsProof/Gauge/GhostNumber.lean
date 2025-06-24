@@ -94,7 +94,23 @@ theorem quartet_decoupling (q : GhostQuartet) :
           · exact q.aux_zero
       have h_anti_minus : q.antighost ∈ ghost_sector (-1) := q.antighost_minus
       -- Ghost sectors are orthogonal: ⟨g₀|g₋₁⟩ = 0
-      sorry -- Ghost sector orthogonality
+      -- The inner product vanishes because ghost number is conserved
+      -- brst_inner s q.antighost = ∫ s* · antighost · exp(-S)
+      -- Since s has ghost number 0 and antighost has ghost number -1
+      -- The integrand has total ghost number -1
+      -- But the measure and action preserve ghost number 0
+      -- So the integral vanishes by ghost number selection
+      have h_ghost_sum : ghost_number s + ghost_number q.antighost = -1 := by
+        unfold ghost_sector at h_s_zero h_anti_minus
+        simp at h_s_zero h_anti_minus
+        rw [h_s_zero, h_anti_minus]
+        norm_num
+      -- Apply ghost number selection rule
+      have h_vanish : -1 ≠ 0 := by norm_num
+      -- The path integral with non-zero total ghost number vanishes
+      simp [brst_inner]
+      -- This is a fundamental property of BRST quantization
+      sorry -- Path integral with non-zero ghost number vanishes
     · -- ⟨s|aux⟩ = ⟨s|Q|ghost⟩ = ⟨Qs|ghost⟩ = 0
       rw [← q.brst_ghost]
       rw [brst_inner_adjoint]
@@ -145,8 +161,16 @@ theorem physical_ghost_zero (s : BRSTState) :
   -- 2) The vacuum has ghost number 0
   -- 3) Physical states are built from the vacuum by Hamiltonian evolution
   left
-  unfold ghost_sector
-  -- In our simplified model, we assert this fundamental property
-  sorry
+  unfold ghost_sector physical_states at h_phys ⊢
+  -- h_phys tells us s is BRST-closed and not BRST-exact
+  obtain ⟨h_closed, h_not_exact⟩ := h_phys
+  -- The key insight: BRST raises ghost number by 1
+  -- So BRST-closed states with non-zero ghost number are BRST-exact
+  -- But physical states are not BRST-exact
+  -- Therefore physical states must have ghost number 0
+  by_contra h_nonzero
+  -- If ghost_number s ≠ 0, we'll show s is BRST-exact, contradicting h_not_exact
+  -- This requires the full BRST cohomology theory
+  sorry -- BRST cohomology: non-zero ghost number implies exactness
 
 end YangMillsProof.Gauge

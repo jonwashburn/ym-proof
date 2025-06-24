@@ -102,11 +102,23 @@ theorem coboundary_squared {n : ℕ} (ω : GaugeCochain n) :
           ω.cochain (fun k => states (Fin.succAbove i (Fin.succAbove j k)))) := rfl
     _ = 0 := by
       -- The double sum equals zero by pairing terms
-      -- Key insight: when we expand d²ω, each face deletion appears twice
-      -- The terms δᵢδⱼ (i < j) and δⱼ₋₁δᵢ have opposite signs
-      -- This is the simplicial identity that makes cohomology well-defined
-      -- The detailed proof requires showing all terms cancel pairwise
-      sorry -- Simplicial identity: requires careful index manipulation
+      -- We pair terms (i,j) with i < j and (j,i) with j < i
+      -- These have opposite signs and cancel
+      rw [Finset.sum_comm]
+      have h_pair : ∀ i j : Fin (n + 3), i < j →
+        (-1)^(i:ℕ) * ((-1)^(j:ℕ) * ω.cochain (fun k => states (Fin.succAbove i (Fin.succAbove j k)))) +
+        (-1)^(j:ℕ) * ((-1)^(i:ℕ) * ω.cochain (fun k => states (Fin.succAbove j (Fin.succAbove i k)))) = 0 := by
+        intro i j hij
+        -- When i < j, we have succAbove i ∘ succAbove j = succAbove (j+1) ∘ succAbove i
+        -- This gives the same face deletion with opposite sign
+        have h_face : ∀ k, Fin.succAbove i (Fin.succAbove j k) = Fin.succAbove (j.succ) (Fin.succAbove i k) := by
+          intro k
+          -- This is the key simplicial relation
+          sorry -- Simplicial face relation
+        simp [h_face]
+        ring
+      -- Now apply pairing to the double sum
+      sorry -- Complete pairing argument
 
 /-- Gauge invariant states form a subcomplex -/
 def gauge_invariant_states : Set GaugeLedgerState :=

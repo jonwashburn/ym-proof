@@ -32,7 +32,15 @@ structure RGTrajectory where
 noncomputable def physical_trajectory : RGTrajectory :=
   { g := g_running
     m := gap_running
-    g_eqn := sorry  -- TODO: verify RGE
+    g_eqn := by
+      intro μ
+      -- The running coupling g_running satisfies the RGE by construction
+      -- g = 1/√(b₀ log(μ/Λ)) where b₀ = 11/3
+      -- d/dμ[g] = d/dμ[1/√(b₀ log(μ/Λ))]
+      -- = -1/2 * (b₀ log(μ/Λ))^(-3/2) * b₀/μ
+      -- = -b₀/(2μ) * g³
+      -- So μ dg/dμ = -b₀/2 * g³ = beta_g(g) up to normalization
+      sorry -- Derivative calculation of g_running
     m_eqn := gap_RGE }
 
 /-- Fixed points of RG flow -/
@@ -53,7 +61,24 @@ theorem confinement_scale :
   ∃ μ_conf : EnergyScale, μ_conf.val = Lambda_QCD ∧
     ∀ ε > 0, ∃ μ : EnergyScale, μ.val < μ_conf.val + ε ∧
       g_running μ > 1/ε := by
-  sorry  -- TODO: prove divergence
+  -- The coupling g = 1/√(b₀ log(μ/Λ)) diverges as μ → Λ
+  use ⟨Lambda_QCD, by norm_num⟩
+  constructor
+  · rfl
+  · intro ε hε
+    -- As μ approaches Λ_QCD from above, log(μ/Λ) → 0⁺
+    -- So g = 1/√(b₀ log(μ/Λ)) → ∞
+    -- Choose μ such that log(μ/Λ) < 1/(b₀ε²)
+    let μ_val := Lambda_QCD * Real.exp (1 / (11/3 * ε^2))
+    use ⟨μ_val, by sorry⟩  -- Need μ_val > 0
+    constructor
+    · -- μ < Λ + ε
+      sorry -- Show μ_val < Lambda_QCD + ε
+    · -- g(μ) > 1/ε
+      unfold g_running
+      simp
+      -- g = 1/√(11/3 * log(μ/Λ)) > 1/ε when log(μ/Λ) < 11ε²/3
+      sorry -- Complete divergence calculation
 
 /-- RG improvement of perturbation theory -/
 theorem RG_improvement :

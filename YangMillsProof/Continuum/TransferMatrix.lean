@@ -89,7 +89,11 @@ noncomputable def T_lattice (a : ℝ) : TransferOperator a :=
           · exact le_of_lt h_exp_pos
           · exact h_pos t
         · -- Summability condition
-          sorry
+          -- We need the series ∑ t, |exp(-a(E_s + E_t)/2) * ψ t| to converge
+          -- Since |exp(...)| = exp(...) for real arguments and ψ is bounded
+          -- The series converges by comparison with ∑ t, exp(-a * E_t)
+          -- which converges because gaugeCost ≥ 0 with only finitely many zero-cost states
+          sorry -- Summability: requires L² theory
       exact this }
 
 /-- Ground state at lattice spacing a -/
@@ -227,7 +231,12 @@ theorem perron_frobenius (a : ℝ) (ha : a > 0) :
       -- The ground state is exp(-a * gaugeCost s / 2) which is always positive
       -- The L² norm includes the vacuum state where gaugeCost = 0
       -- So we have at least |exp(0)|² = 1 in the sum, making norm > 0
-      sorry
+      -- ‖ψ‖² = ∑ s, |ψ(s)|² * exp(-gaugeCost s)
+      -- For ground state: ψ(s) = exp(-a * gaugeCost s / 2)
+      -- So |ψ(s)|² = exp(-a * gaugeCost s)
+      -- The vacuum contributes: |ψ(vacuum)|² * exp(0) = exp(0) * 1 = 1
+      -- Since all terms are non-negative and at least one is positive, norm > 0
+      sorry -- Norm positivity: requires showing vacuum state exists
   use fun s => (ground_state a s) / norm_gs
   constructor
   · constructor

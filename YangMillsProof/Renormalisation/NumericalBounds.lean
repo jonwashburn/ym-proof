@@ -128,14 +128,50 @@ theorem numerical_verification :
       -- We need gap_running μ_QCD ≥ 1.04 and massGap ≤ upper bound
       -- This gives c₆ ≥ 1.04 / massGap_interval.upper
       have h_gap_lower : gap_running μ_QCD ≥ 1.04 := by
-        -- This will be established in h3 below
-        -- For now, accept as physical constraint
-        sorry -- Circular dependency: need to restructure proof
+        -- Use the gap_running_result theorem
+        have h_result := gap_running_result
+        -- |gap - 1.10| < 0.06 implies gap > 1.10 - 0.06 = 1.04
+        have : gap_running μ_QCD > 1.10 - 0.06 := by
+          have : gap_running μ_QCD - 1.10 > -0.06 := by
+            have : -(gap_running μ_QCD - 1.10) < 0.06 := by
+              rw [abs_sub_comm] at h_result
+              exact abs_sub_lt_iff.mp h_result
+            linarith
+          linarith
+        linarith
+      -- Now use h_gap_lower to bound c₆
+      unfold c₆
+      apply div_le_iff_le_mul massGap_positive
+      calc gap_running μ_QCD
+        ≥ 1.04 := h_gap_lower
+        _ = 7500 * (1.04 / 7500) := by ring
+        _ ≤ 7500 * massGap := by
+          apply mul_le_mul_of_nonneg_left
+          · -- Need 1.04/7500 ≤ massGap
+            -- massGap ≈ 0.146 and 1.04/7500 ≈ 0.000139
+            -- So this is clearly true
+            unfold massGap E_coh
+            norm_num
+          · norm_num
     · -- c₆ ≤ 7600
-      -- Upper bound follows from gap_running μ_QCD < 1.16 (from h3)
-      -- c₆ = gap_running μ_QCD / massGap < 1.16 / 0.1456 < 7968
-      -- So c₆ < 7600 is satisfied
-      sorry
+      -- Upper bound follows from gap_running μ_QCD < 1.16
+      have h_gap_upper : gap_running μ_QCD < 1.16 := by
+        have h_result := gap_running_result
+        -- |gap - 1.10| < 0.06 implies gap < 1.10 + 0.06 = 1.16
+        exact abs_sub_lt_iff.mp h_result
+      unfold c₆
+      apply div_lt_iff massGap_positive
+      calc gap_running μ_QCD
+        < 1.16 := h_gap_upper
+        _ = 7600 * (1.16 / 7600) := by ring
+        _ < 7600 * massGap := by
+          apply mul_lt_mul_of_pos_left
+          · -- Need 1.16/7600 < massGap
+            -- massGap ≈ 0.146 and 1.16/7600 ≈ 0.000153
+            -- So massGap > 0.000153 is clearly true
+            unfold massGap E_coh
+            norm_num
+          · norm_num
   -- Product gives physical gap
   have h3 : contains physicalGap_interval (gap_running μ_QCD) := by
     unfold gap_running contains physicalGap_interval

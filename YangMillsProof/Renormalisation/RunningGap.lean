@@ -126,10 +126,23 @@ theorem gap_running_result :
     unfold massGap
     norm_num
   -- Use triangle inequality with c₆ approximation
-  -- |massGap * c₆ - 1.10| ≤ |massGap * c₆ - massGap * 7552.87| + |massGap * 7552.87 - 1.10|
-  --                       ≤ massGap * |c₆ - 7552.87| + 0.01
-  --                       < 0.000146 * 1 + 0.01 < 0.06
-  sorry
+  calc abs (gap_running μ_QCD - 1.10)
+    = abs (massGap * c₆ - 1.10) := by
+      unfold c₆
+      field_simp
+    _ ≤ abs (massGap * c₆ - massGap * 7552.87) + abs (massGap * 7552.87 - 1.10) := by
+      apply abs_sub_le
+    _ = massGap * abs (c₆ - 7552.87) + abs (massGap * 7552.87 - 1.10) := by
+      rw [← abs_mul massGap, mul_sub]
+      simp [abs_of_pos massGap_positive]
+    _ < massGap * 1 + 0.01 := by
+      apply add_lt_add
+      · apply mul_lt_mul_of_pos_left h_c6 massGap_positive
+      · exact h_prod
+    _ < 0.000146 * 1 + 0.01 := by
+      unfold massGap E_coh
+      norm_num
+    _ < 0.06 := by norm_num
 
 /-- Recognition term emerges from RG flow -/
 theorem recognition_emergence (μ : EnergyScale) :

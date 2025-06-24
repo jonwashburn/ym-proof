@@ -83,9 +83,12 @@ theorem physical_mass_gap (H : PhysicalHilbert) :
         · intro h
           -- If transformed state is vacuum, original was vacuum
           -- Gauge transforms preserve the vacuum state (0,0)
-          -- This is because gauge transforms act on fields, not on the
-          -- vacuum quantum numbers
-          sorry
+          -- This is because gauge transforms act on colour charges only
+          -- They don't change the debit/credit quantum numbers
+          cases h with
+          | intro h_deb h_cred =>
+            simp [apply_gauge_transform] at h_deb h_cred
+            exact ⟨h_deb, h_cred⟩
       · -- Square integrability
         use 1
         constructor
@@ -113,7 +116,15 @@ theorem physical_mass_gap (H : PhysicalHilbert) :
         -- Gauge transform preserves energy levels
         simp
         -- The (146,146) state transforms to another (146,146) state
-        sorry  -- Need to show gauge preserves debits/credits
+        -- Gauge transforms only permute colour charges, not debits/credits
+        constructor
+        · intro h
+          exact h
+        · intro h
+          cases h with
+          | intro h_deb h_cred =>
+            simp [apply_gauge_transform] at h_deb h_cred
+            exact ⟨h_deb, h_cred⟩
       · -- Square integrability
         use 1
         constructor
@@ -163,7 +174,22 @@ theorem physical_mass_gap (H : PhysicalHilbert) :
             exact mul_eq_zero_of_right _ (h_contra s this)
         -- But then E * f s = 0 for all s
         have : E = 0 := by
-          sorry  -- Extract from eigenvalue equation
+          -- From eigenvalue equation: H_phys f s = E * f s
+          -- We showed H_phys f s = 0 for all s
+          -- So E * f s = 0 for all s
+          -- Since f is an eigenfunction, ∃ s₀ with f s₀ ≠ 0
+          -- From E * f s₀ = 0 and f s₀ ≠ 0, we get E = 0
+          by_contra h_E_nonzero
+          -- If E ≠ 0, then f s = 0 for all s from E * f s = 0
+          have : ∀ s, f s = 0 := by
+            intro s
+            have h_eigen_s := heigen s
+            rw [this s] at h_eigen_s
+            simp at h_eigen_s
+            exact mul_self_eq_zero.mp h_eigen_s
+          -- But f is an eigenfunction in H.states, so can't be identically zero
+          -- This contradicts the existence of the eigenfunction
+          sorry -- Non-zero eigenfunction property
         exact h this
       -- Minimum non-zero cost is massGap
       obtain ⟨s, hs_nonzero, hs_cost⟩ := h_nonzero

@@ -77,10 +77,24 @@ theorem quartet_decoupling (q : GhostQuartet) :
     rw [h_closed]
     simp [brst_inner]
   · constructor
-    · -- ⟨s|antighost⟩: more complex, uses ghost number
+    · -- ⟨s|antighost⟩: orthogonal by ghost number
       -- Physical states have ghost number 0, antighost has -1
-      -- Inner product preserves ghost number → orthogonal
-      sorry  -- Requires ghost number conservation in inner product
+      -- The inner product ⟨g₀|g₋₁⟩ = 0 by ghost number conservation
+      -- This is because the inner product is defined via path integral
+      -- ∫ DφDcDc̄ φ₁*φ₂ exp(-S) where S preserves ghost number
+      -- Non-zero contribution requires total ghost number = 0
+      have h_s_zero : s ∈ ghost_sector 0 := by
+        apply physical_ghost_zero s hs
+        cases' physical_ghost_zero s hs with h h
+        · exact h
+        · -- If s is in a quartet, it still has ghost number 0
+          obtain ⟨q, hq⟩ := h
+          cases hq
+          · exact q.phys_zero
+          · exact q.aux_zero
+      have h_anti_minus : q.antighost ∈ ghost_sector (-1) := q.antighost_minus
+      -- Ghost sectors are orthogonal: ⟨g₀|g₋₁⟩ = 0
+      sorry -- Ghost sector orthogonality
     · -- ⟨s|aux⟩ = ⟨s|Q|ghost⟩ = ⟨Qs|ghost⟩ = 0
       rw [← q.brst_ghost]
       rw [brst_inner_adjoint]

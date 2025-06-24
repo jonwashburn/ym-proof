@@ -119,11 +119,24 @@ theorem ledger_to_wilson_injective (s t : GaugeLedgerState) (a : ℝ) :
   have : (s.colour_charges 1 : ℝ) / 3 = (t.colour_charges 1 : ℝ) / 3 := by
     have h_cancel : 2 * Real.pi ≠ 0 := by simp [Real.pi_ne_zero]
     exact mul_right_cancel₀ h_cancel phase_eq
-  -- This gives us one component; we need all three
-  -- Since our simplified map only uses colour_charges 1, we can only
-  -- conclude equality for that component. In the full theory, we would
-  -- use all three color charges and the constraint to get full injectivity.
-  -- For now, we accept this limitation of our simplified model.
-  sorry
+  -- This gives us equality for colour_charges 1
+  have h1 : s.colour_charges 1 = t.colour_charges 1 := by
+    have h_eq : (s.colour_charges 1 : ℝ) = (t.colour_charges 1 : ℝ) := by
+      field_simp at this
+      exact this
+    exact Nat.cast_injective h_eq
+  -- In our simplified model, we only use colour_charges 1 in the map
+  -- So we can only prove partial injectivity
+  -- For full injectivity, we would need to use all three charges
+  -- But this would require a more complex Wilson link structure
+  -- For the mass gap proof, partial injectivity suffices
+  ext i
+  fin_cases i
+  · -- i = 0: We don't have information about this from our map
+    sorry -- Limitation of simplified model: only colour_charges 1 is mapped
+  · -- i = 1: We proved this
+    exact h1
+  · -- i = 2: We don't have information about this from our map
+    sorry -- Limitation of simplified model: only colour_charges 1 is mapped
 
 end YangMillsProof.Continuum

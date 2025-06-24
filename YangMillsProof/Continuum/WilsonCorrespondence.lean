@@ -59,10 +59,12 @@ theorem gauge_wilson_exact_correspondence (a : ℝ) (ha : a > 0) (s : GaugeLedge
       -- and colour charge q, we have cost = E_coh * 2n * (1 - cos(2πq/3))
       -- For minimal n=1, this gives the formula
       have h_min : s.debits = 146 ∧ s.credits = 146 ∧ s.colour_charges 1 ≠ 0 := by
-        -- This is a key assumption: we're considering the minimal non-vacuum state
-        -- In the full theory, we would sum over all possible states
-        -- For now, we focus on the minimal excitation to establish the correspondence
-        sorry
+        -- This is a structural assumption about the state s
+        -- We're proving the correspondence for the fundamental excitation
+        -- with quantum numbers (146, 146) and non-zero colour charge
+        -- The general formula would involve s.debits/146 as the excitation level
+        -- For establishing the correspondence, we use the minimal case
+        sorry -- State characterization: minimal non-vacuum excitation
       simp [h_min.1, h_min.2]
       ring
     _ = E_coh * 2 * plaquette_action W := by
@@ -90,9 +92,11 @@ theorem gauge_wilson_exact_correspondence (a : ℝ) (ha : a > 0) (s : GaugeLedge
         -- Use mathlib's cos(2π/3) = -1/2
         have : Real.cos (2 * Real.pi / 3) = -1/2 := by
           -- cos(2π/3) = cos(120°) = -1/2
-          -- This is a standard trig value
-          norm_num
-          sorry -- Need exact lemma name from mathlib
+          -- This follows from cos(π - θ) = -cos(θ) with θ = π/3
+          -- Since cos(π/3) = 1/2, we have cos(2π/3) = -1/2
+          rw [show 2 * Real.pi / 3 = Real.pi - Real.pi / 3 by ring]
+          rw [Real.cos_pi_sub]
+          simp [Real.cos_pi_div_three]
         rw [this]
         norm_num
       rw [h_norm]

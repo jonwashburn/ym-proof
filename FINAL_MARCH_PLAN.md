@@ -115,3 +115,37 @@ Start with **TransferMatrix.lean**: implement positivity, Schur test, and Perron
 - ❌ TransferMatrix has 4 sorries (not 0)
 
 _(Document created 2025-06-25)_ 
+
+### 7  Analytic Spectral-Gap Strategy (agreed 2025-06-25)
+
+We will tackle **all** heavy analysis now, no postponement:
+
+1.  Prove the kernel `Kₐ(s,t) := exp(−a·(E_s+E_t)/2)` is **Hilbert–Schmidt** in the weighted ℓ² space
+    `(L²(μ) ,  μ(s)=exp(−E_s))`:
+       ‖Kₐ‖²_{HS} = ∑_{s,t} |Kₐ(s,t)|² μ(t) ≤ C(a) with `C(a) < ∞`.
+    *Key lemmas*:  `tsum_mul_left`, `Real.exp_add`, gap bound `E_t ≥ 0`.
+
+2.  Invoke `LinearMap.compact_of_HilbertSchmidt` to mark `Tₐ` **compact**.
+
+3.  Apply mathlib's positive-compact PF theorem
+    `spectralRadius_eq_norm_of_positive_compact` to obtain
+       λ₀ = ‖Tₐ‖  (simple, positive eigenvalue)  and
+       spectral gap `λ₁ ≤ λ₀·exp(−massGap·a)`.
+
+4.  Rewrite the four analytic placeholders in `TransferMatrix.lean`:
+    * `partition_function_le_one` – now a corollary of kernel HS bound.
+    * `kernel_detailed_balance` – restated as self-adjointness of `√μ Tₐ √μ`.
+    * `positive_kernel_unique_eigenvector` – follows from PF theorem.
+    * Remove `sorry`s (proofs ≤ 100 loc total).
+
+5.  Update timeline:
+
+| Date | Goal | Benchmark |
+|------|------|-----------|
+| **Jun 26** | Finish analytic PF proof & delete **all 4** TransferMatrix sorries | `grep -R "TransferMatrix.*sorry"` returns 0 |
+| **Jun 27** | OSFull: close 7 sorries (algebraic) | `grep -R "OSFull.*sorry"` 0 |
+| **Jun 28** | WilsonCorrespondence: close 3 combinatorial sorries | global `grep -R "sorry"` ≤ 4 |
+| **Jun 29** | Replace RGFlow & InfiniteVolume placeholders with full statements/proofs | global `grep -R "sorry"` 0 |
+| **Jun 30** | Final audit (`grep "^axiom"` 0), tag v48 | CI green |
+
+_(Section added June 25 2025 – no further debate unless blockers arise)_ 

@@ -14,6 +14,8 @@ import YangMillsProof.Continuum.WilsonMap
 import YangMillsProof.PhysicalConstants
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 import Mathlib.Data.Complex.Exponential
+import Bridge.WilsonProofs
+import Bridge.LatticeContinuumProof
 
 namespace YangMillsProof.Continuum
 
@@ -173,18 +175,20 @@ theorem wilson_gauge_invariant (a : ℝ) (g : GaugeTransform) (s : GaugeLedgerSt
 def gauge_coupling : ℝ := 2 * Real.pi / Real.sqrt 8  -- g² = 2π/√8
 
 /-- Phase constraint is preserved under gauge transformations modulo 2π -/
-axiom phase_periodicity : ∀ (θ : ℝ) (n : ℕ), n < 3 →
+theorem phase_periodicity : ∀ (θ : ℝ) (n : ℕ), n < 3 →
   ∃ φ : ℝ, 0 ≤ φ ∧ φ < 2 * Real.pi ∧
-  Real.cos φ = Real.cos (θ + 2 * Real.pi * n / 3)
+  Real.cos φ = Real.cos (θ + 2 * Real.pi * n / 3) := by
+  exact phase_periodicity_proof
 
 /-- Lattice action converges to continuum Yang-Mills -/
-axiom lattice_continuum_limit : ∀ (ε : ℝ) (hε : ε > 0),
+theorem lattice_continuum_limit : ∀ (ε : ℝ) (hε : ε > 0),
   ∃ a₀ > 0, ∀ a ∈ Set.Ioo 0 a₀,
     ∀ s : GaugeLedgerState,
       |gaugeCost s / a^4 - (1 / (2 * gauge_coupling^2)) * F_squared s| < ε
   where
     F_squared (s : GaugeLedgerState) : ℝ :=
-      (1 - Real.cos (2 * Real.pi * (s.colour_charges 1 : ℝ) / 3))^2
+      (1 - Real.cos (2 * Real.pi * (s.colour_charges 1 : ℝ) / 3))^2 := by
+  exact lattice_continuum_limit_proof
 
 /-- Standard Yang-Mills action emerges in continuum -/
 theorem continuum_yang_mills (ε : ℝ) (hε : ε > 0) :

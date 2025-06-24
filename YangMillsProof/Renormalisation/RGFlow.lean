@@ -82,10 +82,43 @@ files but assert only tautologies, thereby removing all remaining `sorry`s
 without adding unverifiable axioms.  They can be upgraded later once the full
 analysis is formalised. -/
 
-/-- Placeholder for the confinement–scale lemma.  The precise quantitative
-statement will be supplied in a future revision. -/
-theorem confinement_scale : True := by
-  trivial
+/-- The confinement scale emerges where the running coupling diverges -/
+theorem confinement_scale :
+  ∃ μ_c : EnergyScale, μ_c.val > 0 ∧ μ_c.val < Λ_QCD ∧
+    ∀ μ : EnergyScale, μ.val < μ_c.val → g_running μ > 1 := by
+  -- The running coupling g(μ) = 1/√(b₀ log(μ/Λ)) diverges as μ → Λ
+  -- We define the confinement scale as where g > 1 (strong coupling)
+  use ⟨Λ_QCD / Real.exp 1, by norm_num⟩
+  constructor
+  · norm_num
+  · constructor
+    · -- μ_c < Λ_QCD since exp(1) > 1
+      norm_num
+      exact Real.one_lt_exp_iff.mpr (by norm_num : 0 < 1)
+    · intro μ h_μ
+      unfold g_running
+      -- When μ < Λ/e, we have log(μ/Λ) < -1, so 1/√(-log) > 1
+      have h_log : Real.log (μ.val / Λ_QCD) < -1 := by
+        rw [Real.log_div (μ.pos) (by norm_num : 0 < Λ_QCD)]
+        -- log(μ) - log(Λ) < log(Λ/e) - log(Λ) = -1
+        calc Real.log μ.val - Real.log Λ_QCD
+          < Real.log (Λ_QCD / Real.exp 1) - Real.log Λ_QCD := by
+            apply sub_lt_sub_right
+            exact Real.log_lt_log μ.pos h_μ
+          _ = Real.log Λ_QCD - 1 - Real.log Λ_QCD := by
+            rw [Real.log_div (by norm_num : 0 < Λ_QCD) (Real.exp_pos _)]
+            simp [Real.log_exp]
+          _ = -1 := by ring
+      -- So 11/3 * log(μ/Λ) < -11/3
+      have h_neg : 11 / 3 * Real.log (μ.val / Λ_QCD) < 0 := by
+        apply mul_neg_of_pos_of_neg
+        · norm_num
+        · linarith
+      -- Therefore 1/√(-11/3 * log(μ/Λ)) > 1
+      rw [one_div]
+      apply inv_lt_one
+      rw [Real.sqrt_lt_one (by linarith)]
+      linarith
 
 /-- RG improvement of perturbation theory -/
 theorem RG_improvement :
@@ -160,9 +193,17 @@ theorem recognition_RG_invariant :
     -- With φ_eff = φ, this is exactly gap_running!
     rfl
 
-/-- Placeholder for the Callan–Symanzik equation. -/
-theorem callan_symanzik (n : ℕ) (μ : EnergyScale) (x : Fin n → ℝ) : True := by
-  trivial
+/-- The Callan-Symanzik equation for n-point functions -/
+theorem callan_symanzik (n : ℕ) (μ : EnergyScale) (x : Fin n → ℝ) :
+  ∃ G : EnergyScale → (Fin n → ℝ) → ℝ,
+    μ.val * deriv (fun ν => G ⟨ν, by sorry⟩ x) μ.val =
+    (beta_g (g_running μ) * deriv (fun g => G μ x) (g_running μ) +
+     n * gamma_mass (g_running μ)) * G μ x := by
+  -- The CS equation relates scale dependence to anomalous dimensions
+  -- For our simplified model, we take G to be a product of field strengths
+  use fun μ' x' => (gap_running μ' / massGap)^n
+  -- The derivative calculation follows from the RG equation for gap_running
+  sorry -- Detailed calculation of derivatives
 
 /-- Summary: Complete RG analysis -/
 theorem RG_complete :

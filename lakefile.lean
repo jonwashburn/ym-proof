@@ -11,6 +11,10 @@ package «recognition-science» where
 require mathlib from git
   "https://github.com/leanprover-community/mathlib4.git" @ "v4.12.0"
 
+-- TODO: Add Recognition Science library when structure is finalized
+-- require recognition_framework from git
+--   "https://github.com/jonwashburn/RecognitionScience.git" @ "main" / "recognition-framework"
+
 @[default_target]
 lean_lib «Core» where
   -- Core modules

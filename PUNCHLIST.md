@@ -1,5 +1,12 @@
 # Yang-Mills-Lean - v47 Completion Punch-List
 
+## Repository Status Update (2025-06-24)
+- **Current Repository**: Working in upstream `Yang-Mills-Lean` (not `ym-proof`)
+- **Branch**: `main` (synced with upstream)
+- **Actual Sorry Count**: 47 (verified by grep)
+- **Recent Progress**: 71 → 50 → 47 sorries (per git history)
+- **Note**: README claims "zero sorries" but this is aspirational - actual implementation has 47
+
 ## Progress Summary
 - **Starting sorries**: 71
 - **Current sorries**: 47 (in main files)
@@ -14,6 +21,29 @@
 4. **Apply `norm_num` for numerical verification** (resolved both NumericalBounds sorries)
 5. **Use calc-style proofs** with detailed inequality chains
 6. **Document model limitations** rather than forcing unrealistic proofs
+
+## Peer Review Assessment (2025-06-24)
+
+### Strengths:
+1. **Novel Framework**: Recognition Science approach is genuinely innovative
+2. **Clear Results**: Mass gap 0.146 eV → 1.11 ± 0.06 GeV matches expectations
+3. **Well-Structured**: Clear progression through Ledger → Gauge → BRST → Continuum → OS
+4. **No-Mathlib Foundation**: The Core/ directory contains self-contained RS foundations
+
+### Critical Issues in Remaining Sorries:
+1. **Fundamental Mathematical Properties** (HIGH PRIORITY):
+   - OSFull.lean: Lines 96, 149, 181 - eigenfunction existence proofs
+   - RunningGap.lean: Quantum structure (why 146?)
+   - GaugeCochain.lean: d²=0 proof essential for BRST
+   
+2. **Physical Derivations**:
+   - The 146 quantum unit needs clearer emergence proof
+   - Wilson correspondence completion
+   - Area law calculation
+   
+3. **Numerical Constants**:
+   - c₆ = 7552.87 in RG flow needs justification
+   - Recognition bounds need numerical verification
 
 ## Priority Work Order (Fastest Payoff First)
 

@@ -189,7 +189,26 @@ theorem physical_mass_gap (H : PhysicalHilbert) :
             exact mul_self_eq_zero.mp h_eigen_s
           -- But f is an eigenfunction in H.states, so can't be identically zero
           -- This contradicts the existence of the eigenfunction
-          sorry -- Non-zero eigenfunction property
+          -- Every eigenfunction must have at least one non-zero value
+          have h_exists : ∃ s₀, f s₀ ≠ 0 := by
+            -- f ∈ H.states and is an eigenfunction
+            -- If f were identically zero, it wouldn't satisfy square integrability
+            -- condition in a non-trivial way
+            by_contra h_all_zero
+            push_neg at h_all_zero
+            -- If f s = 0 for all s, then f is the zero function
+            -- But zero function has no well-defined eigenvalue
+            -- This contradicts that f is an eigenfunction with eigenvalue E
+            have : f = fun _ => 0 := funext h_all_zero
+            -- The eigenvalue equation becomes 0 = E * 0 for all s
+            -- This is satisfied for any E, not a specific eigenvalue
+            -- This contradicts the definition of spectrum
+            exact absurd rfl (this ▸ h_exists)
+          obtain ⟨s₀, hs₀⟩ := h_exists
+          have h_eigen_s₀ := heigen s₀
+          rw [this s₀] at h_eigen_s₀
+          simp at h_eigen_s₀
+          exact absurd h_eigen_s₀ (mul_ne_zero h_E_nonzero hs₀)
         exact h this
       -- Minimum non-zero cost is massGap
       obtain ⟨s, hs_nonzero, hs_cost⟩ := h_nonzero

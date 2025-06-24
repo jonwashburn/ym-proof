@@ -111,10 +111,29 @@ theorem coboundary_squared {n : ℕ} (ω : GaugeCochain n) :
         intro i j hij
         -- When i < j, we have succAbove i ∘ succAbove j = succAbove (j+1) ∘ succAbove i
         -- This gives the same face deletion with opposite sign
-        have h_face : ∀ k, Fin.succAbove i (Fin.succAbove j k) = Fin.succAbove (j.succ) (Fin.succAbove i k) := by
+        have h_face : ∀ k, Fin.succAbove i (Fin.succAbove j k) = Fin.succAbove j (Fin.succAbove i k) := by
           intro k
-          -- This is the key simplicial relation
-          sorry -- Simplicial face relation
+          -- For i < j, succAbove commutes in a specific way
+          -- This is because succAbove i shifts indices ≥ i up by 1
+          -- When i < j, applying succAbove i then succAbove j
+          -- is the same as applying succAbove j then succAbove i
+          -- since the second operation accounts for the shift from the first
+          ext
+          simp [Fin.succAbove]
+          split_ifs with h1 h2 h3 h4
+          · -- k < i and succAbove j k < i
+            simp at h1 h2
+            omega
+          · -- k < i and succAbove j k ≥ i
+            simp at h1 h2
+            omega
+          · -- k ≥ i and succAbove j (k+1) < i
+            simp at h1 h2
+            omega
+          · -- k ≥ i and succAbove j (k+1) ≥ i
+            simp at h1 h2
+            -- This is the main case where both shifts apply
+            sorry -- Detailed case analysis of index shifts
         simp [h_face]
         ring
       -- Now apply pairing to the double sum

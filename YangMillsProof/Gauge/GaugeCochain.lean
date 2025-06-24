@@ -11,6 +11,8 @@
 
 import YangMillsProof.Continuum.WilsonMap
 import Foundations.DualBalance
+import Mathlib.AlgebraicTopology.SimplicialSet
+import Mathlib.Algebra.Homology.Complex
 
 namespace YangMillsProof.Gauge
 
@@ -85,37 +87,9 @@ lemma coboundary_sign_cancel (n : ℕ) (i j : Fin (n + 3)) (h : i < j) :
 /-- The coboundary squares to zero -/
 theorem coboundary_squared {n : ℕ} (ω : GaugeCochain n) :
   coboundary (coboundary ω) = 0 := by
-  ext states
-  simp [coboundary]
-  -- The key is that each term appears twice with opposite signs
-  have : ∀ i j : Fin (n + 3), i < j →
-    (-1)^(i:ℕ) * ω.cochain (fun k => states (Fin.succAbove i (Fin.succAbove j k))) +
-    (-1)^(j:ℕ) * ω.cochain (fun k => states (Fin.succAbove j (Fin.succAbove i k))) = 0 := by
-    intro i j hij
-    -- When i < j, we have: succAbove i (succAbove j k) = succAbove (j+1) (succAbove i k)
-    -- This gives the cancellation
-    have h_comm : ∀ k, states (Fin.succAbove i (Fin.succAbove j k)) =
-                       states (Fin.succAbove (j.succ) (Fin.succAbove i k)) := by
-      intro k
-      -- Index commutativity for succAbove
-      -- When i < j, succAbove i (succAbove j k) = succAbove (j+1) (succAbove i k)
-      -- This is a standard property of the succAbove function
-      sorry  -- Fin.succAbove commutativity lemma
-    simp [h_comm]
-    -- Now the terms cancel by sign
-    rw [← mul_assoc, ← mul_assoc]
-    have : (-1)^(i:ℕ) * (-1)^(j:ℕ) + (-1)^(j:ℕ) * (-1)^(i:ℕ) = 0 := by
-      ring
-    simp [this]
-  -- Sum over all pairs cancels
-  -- We group terms by pairs (i,j) with i < j
-  -- Each pair contributes 0 by the above lemma
-  have h_pair_sum : (Finset.univ : Finset (Fin (n + 3))).sum (fun i =>
-    (Finset.univ : Finset (Fin (n + 2))).sum (fun j =>
-      (-1)^(i:ℕ) * (-1)^(j:ℕ) * ω.cochain (fun k =>
-        states (Fin.succAbove i (Fin.succAbove j k))))) = 0 := by
-    sorry  -- Rearrange double sum to pairs
-  exact h_pair_sum
+  -- This is the fundamental property of cohomology: d² = 0
+  -- It follows from the alternating sum structure and index manipulation
+  sorry  -- Standard result: simplicial coboundary squares to zero
 
 /-- Gauge invariant states form a subcomplex -/
 def gauge_invariant_states : Set GaugeLedgerState :=

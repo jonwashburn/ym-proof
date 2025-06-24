@@ -11,6 +11,8 @@
 
 import YangMillsProof.Renormalisation.IrrelevantOperator
 import YangMillsProof.Continuum.WilsonCorrespondence
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Analysis.SpecialFunctions.Pow.Real
 
 namespace YangMillsProof.Renormalisation
 
@@ -35,7 +37,8 @@ theorem recognition_bound (a : ℝ) (ha : 0 < a) (F : ℝ) (hF : 0 < F) :
     have ha_small : a < 1 := by
       -- Physical lattice spacing is much smaller than 1
       -- We're working in units where typical scales are O(1)
-      sorry  -- Physical constraint: a ≪ 1
+      -- In natural units, lattice spacing a ≪ 1/Λ_QCD ≈ 1 fm
+      sorry  -- Physical constraint: lattice spacing
     have h_loga : Real.log a < 0 := Real.log_neg ha ha_small
     calc
       |Real.log F - 2 * Real.log a| = |Real.log F + 2 * |Real.log a|| := by
@@ -44,9 +47,8 @@ theorem recognition_bound (a : ℝ) (ha : 0 < a) (F : ℝ) (hF : 0 < F) :
       _ ≤ |Real.log F| + 2 * |Real.log a| := abs_add _ _
       _ ≤ F + 2 * |Real.log a| := by
         apply add_le_add_right
-        sorry  -- Logarithm bound
-      _ ≤ F + 2 * (-Real.log a) := by
-        simp [h_loga]
+        -- Use mathlib's log bounds
+        sorry  -- Apply Real.log_le_self_of_pos
       _ ≤ 10 * a^(-0.9) := by
         -- For small a, -log(a) ~ a^(-ε) for any small ε > 0
         -- Here we use ε = 0.9 to get the a^0.1 suppression

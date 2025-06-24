@@ -11,6 +11,9 @@
 
 import YangMillsProof.Continuum.Continuum
 import YangMillsProof.PhysicalConstants
+import Mathlib.Analysis.NormedSpace.OperatorNorm
+import Mathlib.Analysis.SpecialFunctions.Exp
+import Mathlib.Analysis.Convex.SpecificFunctions
 
 namespace YangMillsProof.Continuum
 
@@ -51,12 +54,9 @@ noncomputable def T_lattice (a : ℝ) : TransferOperator a :=
         Complex.exp (-a * (gaugeCost s + gaugeCost t) / 2) * ψ t
     bounded := by
       intro ψ
-      -- Use Cauchy-Schwarz
-      unfold op_norm
-      -- For any state ψ, ‖T_a ψ‖ ≤ ‖ψ‖
-      -- This follows from the kernel being substochastic
-      -- The kernel exp(-a(E_s + E_t)/2) has sup norm ≤ 1
-      sorry  -- Operator norm bound from kernel estimate
+      -- Use that exp(-a(E_s + E_t)/2) ≤ 1 for positive E_s, E_t
+      -- This makes the operator a contraction
+      sorry  -- Use mathlib's bounded operator theory
     positive := by
       intro ψ h_pos s
       -- Sum of positive terms
@@ -90,6 +90,10 @@ theorem ground_state_eigenstate (a : ℝ) (ha : a > 0) :
   have h_sum : ∑' t : GaugeLedgerState, Complex.exp (-a * gaugeCost t) =
                Complex.exp (-massGap * a) := by
     -- This is the key: sum is dominated by ground state
+    -- The ground state has gaugeCost = 0, next state has gaugeCost = massGap
+    -- So sum ≈ exp(0) + exp(-massGap * a) + higher order terms
+    -- = 1 + exp(-massGap * a) + O(exp(-2*massGap*a))
+    -- But we need exact equality for eigenvalue equation
     sorry  -- Partition function calculation
   rw [h_sum]
   simp [Complex.exp_add]

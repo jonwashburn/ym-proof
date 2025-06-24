@@ -11,6 +11,8 @@
 
 import YangMillsProof.PhysicalConstants
 import Foundations.EightBeat
+import Mathlib.Analysis.Calculus.Deriv
+import Mathlib.Analysis.SpecialFunctions.Pow.Real
 
 namespace YangMillsProof.Renormalisation
 
@@ -57,7 +59,8 @@ theorem gap_RGE (μ : EnergyScale) :
   unfold gap_running
   -- d/dx [Δ₀ (x/μ₀)^γ] = Δ₀ γ (x/μ₀)^(γ-1) * (1/μ₀)
   -- x * d/dx = x * Δ₀ γ (x/μ₀)^(γ-1) * (1/μ₀) = γ * Δ₀ (x/μ₀)^γ
-  sorry  -- Calculus computation needs deriv API
+  -- Use mathlib's deriv_rpow
+  sorry  -- Apply deriv_rpow lemma
 
 /-- Eight-beat structure survives RG flow -/
 theorem eight_beat_RG_invariant (μ : EnergyScale) :

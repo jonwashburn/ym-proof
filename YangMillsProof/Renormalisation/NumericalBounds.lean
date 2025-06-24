@@ -11,6 +11,9 @@
 
 import YangMillsProof.Renormalisation.RunningGap
 import YangMillsProof.PhysicalConstants
+import Mathlib.Tactic.IntervalCases
+import Mathlib.Tactic.Linarith
+import Mathlib.Data.Real.Basic
 
 namespace YangMillsProof.Renormalisation
 

@@ -11,6 +11,9 @@
 
 import YangMillsProof.ContinuumOS.InfiniteVolume
 import YangMillsProof.Gauge.BRST
+import Mathlib.Analysis.InnerProductSpace.Basic
+import Mathlib.Analysis.SpecialFunctions.Exp
+import Mathlib.MeasureTheory.Function.L2Space
 
 namespace YangMillsProof.ContinuumOS
 

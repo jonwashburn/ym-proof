@@ -158,9 +158,16 @@ theorem ledger_balance_gauge_invariance (s : GaugeLedgerState) :
       let max_charge := Finset.univ.argmax s.colour_charges
       have h_max : ∃ i, ∀ j, s.colour_charges i ≥ s.colour_charges j := by
         -- Finite set always has a maximum
-        use Finset.univ.argmax s.colour_charges
+        -- Fin 3 is nonempty, so argmax exists
+        have h_nonempty : Finset.univ.Nonempty := by
+          use 0
+          simp
+        obtain ⟨i_max, hi_max⟩ := Finset.exists_mem_eq_sup h_nonempty s.colour_charges
+        use i_max
         intro j
-        sorry
+        -- i_max achieves the supremum
+        have hj : j ∈ Finset.univ := by simp
+        exact Finset.le_sup_of_mem hj s.colour_charges ▸ hi_max.symm ▸ le_refl _
       obtain ⟨i_max, hi_max⟩ := h_max
       -- Permute to put max charge at position 0
       use ⟨fun j => if j = 0 then i_max else if j = i_max then 0 else j, by

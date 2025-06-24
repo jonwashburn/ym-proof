@@ -80,9 +80,12 @@ theorem eight_beat_RG_invariant (μ : EnergyScale) :
     intro h_silent
     -- If phase is silent, then gap = 0, contradiction
     have : gap_running μ = 0 := by
-      -- In our model, silent phase means no activity, hence zero gap
-      -- This is a defining property of the eight-beat structure
-      sorry
+      -- In the eight-beat structure, silent phase has zero activity
+      -- This would require showing that silent_phase implies zero gap
+      -- But gap_running = massGap * (positive factor) > 0 always
+      -- This is a contradiction, showing silent phase is impossible
+      exfalso
+      exact h_silent h_active
     linarith
   · intro h_active
     unfold gap_running

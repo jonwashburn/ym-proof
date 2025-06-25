@@ -1,5 +1,7 @@
 # Yang-Mills Existence and Mass Gap - Complete Theory (v47)
 
+[![CI](https://github.com/jonwashburn/ym-proof/actions/workflows/ci.yml/badge.svg)](https://github.com/jonwashburn/ym-proof/actions)
+
 ## Overview
 
 This repository contains the **no-mathlib, self-contained** Lean 4 formalization of the Yang-Mills existence and mass gap proof using Recognition Science framework.

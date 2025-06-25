@@ -648,6 +648,16 @@ theorem state_count_poly_proof (R : ℝ) (hR : 1 ≤ R) :
     -- 2. Each site has O(1) local degrees of freedom
     -- 3. Total configurations ≤ (const)^(# sites)
     -- For polynomial bound, we use a much weaker estimate
+
+    -- The key insight: states with gaugeCost ≤ R have bounded spatial support
+    -- Each excited plaquette costs at least massGap, so at most R/massGap excitations
+    -- These must fit within a bounded region, giving polynomial growth
+
+    -- For the formal bound, we use that GaugeLedgerState is effectively finite-dimensional
+    -- when restricted to bounded gaugeCost, with dimension growing as O(R³)
+    apply Nat.le_of_iff_le_iff_lt.mp
+    simp only [Nat.cast_le]
+    -- The actual bound follows from gauge theory structure
     sorry -- Lattice site counting in 3D ball
 
   -- Show this is bounded by vol_constant * R³
@@ -668,7 +678,44 @@ theorem state_count_poly_proof (R : ℝ) (hR : 1 ≤ R) :
       -- Now vol_constant = 12000 is large enough:
       -- 2187 * (4π/3 + 1) ≈ 2187 * 5.189 ≈ 11,347 < 12000
       -- So for R ≥ 1: 2187 * (4πR³/3 + 1) ≤ 2187 * 5.189 * R³ < 12000 * R³
-      sorry -- Arithmetic: 2187 * 5.189 < 12000
+      -- Arithmetic: 2187 * 5.189 < 12000
+      have h_bound : (2187 : ℝ) * 5.189 < 12000 := by norm_num
+      -- For R ≥ 1, we have 4πR³/3 + 1 ≤ 4πR³/3 + R³ ≤ 5.189 * R³
+      have h_pi_bound : 4 * Real.pi / 3 < 5.189 := by
+        have : Real.pi < 3.1416 := Real.pi_lt_31416
+        calc 4 * Real.pi / 3 < 4 * 3.1416 / 3 := by
+          apply div_lt_div_of_lt_left
+          · norm_num
+          · norm_num
+          · apply mul_lt_mul_of_pos_left
+            · exact Real.pi_lt_31416
+            · norm_num
+        _ < 5.189 := by norm_num
+      -- Therefore for R ≥ 1:
+      calc states_per_site * (4 * Real.pi * R^3 / 3 + 1)
+        = 2187 * (4 * Real.pi * R^3 / 3 + 1) := by rw [h_value]
+        _ ≤ 2187 * (4 * Real.pi * R^3 / 3 + R^3) := by
+          apply mul_le_mul_of_nonneg_left
+          · apply add_le_add_left
+            rw [pow_three]
+            exact mul_self_le_mul_self (zero_le_one) hR
+          · norm_num
+        _ = 2187 * R^3 * (4 * Real.pi / 3 + 1) := by ring
+        _ < 2187 * R^3 * 5.189 := by
+          apply mul_lt_mul_of_pos_left
+          · calc 4 * Real.pi / 3 + 1 < 5.189 + 1 - 1 := by
+              apply add_lt_add_right h_pi_bound
+            _ = 5.189 := by ring
+          · apply mul_pos
+            · norm_num
+            · apply pow_pos
+              linarith
+        _ = R^3 * (2187 * 5.189) := by ring
+        _ < R^3 * 12000 := by
+          apply mul_lt_mul_of_pos_left h_bound
+          apply pow_pos
+          linarith
+        _ = 12000 * R^3 := by ring
 
 /-- Proof of exponential summability -/
 theorem summable_exp_gap_proof (c : ℝ) (hc : 0 < c) :
@@ -770,7 +817,14 @@ theorem partition_function_le_one_proof (a : ℝ) (ha : 0 < a) :
     -- gaugeCost(vacuum) = Σ_links |U_link - 1|²
     -- For vacuum, all U_link = 1 (identity), so each term is 0
     -- Therefore gaugeCost(vacuum) = 0
-    sorry -- gaugeCost(vacuum) = 0 by definition
+    unfold vacuum gaugeCost
+    -- The vacuum state has zero ledger (debits = credits = 0)
+    -- and zero colour charges, which means no gauge field excitations
+    -- By the definition of gaugeCost in RecognitionScience:
+    simp only [Finset.sum_eq_zero_iff]
+    intro i _
+    -- Each gauge link in vacuum is the identity, contributing 0 cost
+    rfl
 
   -- Partition function includes vacuum
   have h_Z : ∑' t : GaugeLedgerState, Real.exp (-(1 + a) * gaugeCost t) =
@@ -796,7 +850,8 @@ theorem partition_function_le_one_proof (a : ℝ) (ha : 0 < a) :
       -- 1. If debits + credits > 0, the state has ledger energy ≥ 146
       -- 2. If any colour_charge ≠ 0, gauge invariance costs energy
       -- 3. massGap = 146 * E_coh * φ is the minimum excitation
-      sorry -- Apply RecognitionScience.minimum_cost
+      apply RecognitionScience.Ledger.Quantum.minimum_cost
+      exact hs
     calc exp (-(1 + a) * gaugeCost s)
       < exp 0 := by
         apply exp_lt_exp.mpr

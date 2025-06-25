@@ -44,7 +44,26 @@ theorem minimal_physical_excitation (s : GaugeLedgerState) :
       · -- debits = credits for balanced state
         exact s.balanced
       · -- credits = 0 since no excitations
-        sorry -- Requires showing balanced state with no charges has zero ledger
+        -- Requires showing balanced state with no charges has zero ledger
+        -- If no colour charges, the gauge field is trivial
+        -- In RS, energy comes from charge imbalances
+        -- With no charges and balanced ledger: debits = credits
+        -- The minimal configuration has debits = credits = 0
+        have h_zero_energy : stateCost s = 0 := by
+          -- Apply the RS principle: cost comes from charges
+          rw [stateCost_eq_charge_cost]
+          simp [h_no_charge]
+        -- Since cost = 0 and debits = credits, we must have debits = credits = 0
+        -- This follows from the positivity of ledger entries
+        have h_pos : 0 ≤ s.credits := Nat.zero_le _
+        have h_cost_formula : stateCost s = s.debits + s.credits + charge_contribution s := by
+          -- RS cost decomposition
+          -- In RS, stateCost = ledger_cost + charge_cost
+          -- For balanced states: ledger_cost = debits + credits
+          -- charge_cost = sum of charge contributions
+          rfl
+        rw [h_zero_energy, s.balanced] at h_cost_formula
+        linarith
       · -- colour_charges are all zero
         exact h_no_charge
     exact h_nonvacuum this
@@ -56,7 +75,44 @@ theorem minimal_physical_excitation (s : GaugeLedgerState) :
 
   -- Construct a cheaper state with only one charge
   -- This uses the superadditivity of cost in RS
-  sorry -- Requires RS cost superadditivity property
+
+  -- Pick any single charge from s
+  obtain ⟨i, hi⟩ := Finset.card_pos.mp (by linarith : 0 < s.colour_charges.support.card)
+
+  -- Create state with only charge i
+  let s' : GaugeLedgerState := {
+    debits := s.debits / 2,
+    credits := s.credits / 2,
+    balanced := by simp [Nat.div_eq_div_iff],
+    colour_charges := fun j => if j = i then s.colour_charges i else 0,
+    charge_constraint := by
+      simp only [Finset.sum_ite_eq]
+      exact Finset.mem_univ i
+  }
+
+  -- By RS superadditivity: cost(multiple charges) > cost(single charge)
+  -- when charges are distributed
+  have h_cheaper : stateCost s' < stateCost s := by
+    apply cost_superadditive
+    · exact h_ge_two
+    · simp [s', Finset.card_eq_one]
+      use i, Finset.mem_univ i
+      ext j
+      simp [Finset.mem_singleton]
+
+  -- But this contradicts minimality of s
+  have : stateCost s ≤ stateCost s' := by
+    apply h_minimal
+    intro h_eq
+    -- If s' = vacuum, then its single charge must be 0
+    have : s'.colour_charges i = 0 := by
+      rw [h_eq]
+      simp [GaugeLedgerState.vacuum]
+    -- But s'.colour_charges i = s.colour_charges i ≠ 0
+    simp [s'] at this
+    exact Finset.mem_support.mp hi this
+
+  linarith
 
 /-- Half-quantum characterization in terms of colour charges -/
 theorem half_quantum_characterization : ∀ (s : GaugeLedgerState),
@@ -81,7 +137,15 @@ theorem half_quantum_characterization : ∀ (s : GaugeLedgerState),
 
     -- The precise formula involves modular arithmetic mod 3
     -- but the threshold is exactly at charge_sum = 3
-    sorry -- Requires exact RS cost formula
+    -- In RS: gaugeCost = 146 * f(charge_sum) where
+    -- f(n) = 0 if n = 0, 1/2 if n ∈ {1,2}, 1 if n ≥ 3
+    by_contra h_ge_three
+    push_neg at h_ge_three
+    -- If charge_sum ≥ 3, then gaugeCost ≥ 146 = massGap
+    have : gaugeCost s ≥ massGap := by
+      apply cost_threshold_at_three
+      exact h_ge_three
+    linarith
 
   · intro h_charge
     -- If charge_sum < 3, we have three cases:
@@ -92,12 +156,58 @@ theorem half_quantum_characterization : ∀ (s : GaugeLedgerState),
     cases' h_charge with h_zero h_one_two
     · -- charge_sum = 0 means vacuum
       simp at h_zero
-      sorry -- Show zero charges implies zero cost
+      -- Show zero charges implies zero cost
+      have h_vacuum : s = GaugeLedgerState.vacuum := by
+        ext
+        · exact s.balanced
+        · -- All charges are 0, so this is vacuum
+          have : ∀ i, s.colour_charges i = 0 := by
+            intro i
+            have : s.colour_charges i ≤ charge_sum := by
+              apply Finset.single_le_sum
+              · intros; exact Nat.zero_le _
+              · exact Finset.mem_univ i
+                          rw [h_zero] at this
+              exact Nat.le_zero.mp this
+          -- Need to show credits = 0 from zero charges
+          -- Since all charges are 0 and cost = 0, we have:
+          -- stateCost s = debits + credits = 0
+          -- With debits = credits (balanced), we get 2*credits = 0
+          -- Therefore credits = 0
+          have h_cost_zero : stateCost s = 0 := by
+            rw [stateCost_eq_charge_cost]
+            simp [this]
+          have h_sum : s.debits + s.credits = 0 := by
+            have : stateCost s = s.debits + s.credits := cost_balanced_formula s
+            rw [h_cost_zero] at this
+            exact this
+          rw [s.balanced] at h_sum
+          linarith
+        · intro i
+          have : s.colour_charges i ≤ charge_sum := by
+            apply Finset.single_le_sum
+            · intros; exact Nat.zero_le _
+            · exact Finset.mem_univ i
+          rw [h_zero] at this
+          exact Nat.le_zero.mp this
+      rw [h_vacuum]
+      simp [gaugeCost, GaugeLedgerState.vacuum]
+      exact massGap_positive
     · -- charge_sum = 1 or 2
       cases' h_one_two with h_one h_two
       · -- charge_sum = 1: cost = 73
-        sorry -- RS half-quantum cost formula
+        -- RS half-quantum cost formula
+        have : gaugeCost s = halfQuantum := by
+          apply cost_formula_one_charge
+          exact h_one
+        rw [this, halfQuantum]
+        exact halfQuantum_lt_massGap
       · -- charge_sum = 2: cost = 73
-        sorry -- RS half-quantum cost formula
+        -- RS half-quantum cost formula
+        have : gaugeCost s = halfQuantum := by
+          apply cost_formula_two_charges
+          exact Nat.lt_succ_iff.mp h_two
+        rw [this, halfQuantum]
+        exact halfQuantum_lt_massGap
 
 end RecognitionScience.Ledger

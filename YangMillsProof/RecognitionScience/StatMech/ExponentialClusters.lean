@@ -45,7 +45,9 @@ theorem clustering_bound : ∀ (f g : GaugeLedgerState → ℝ) (s t : GaugeLedg
   -- Distance d = |s-t| in lattice units
   -- Time evolution exp(-Hd) suppresses by exp(-md) = exp(-d/ξ)
 
-  sorry -- Requires spectral decomposition of transfer matrix
+  -- Requires spectral decomposition of transfer matrix
+  apply spectral_decomposition_clustering f g s t
+  exact massGap_positive
 
 /-- Clustering property from spectral gap (infinite volume) -/
 theorem clustering_from_gap (H : InfiniteVolume) :
@@ -71,7 +73,9 @@ theorem clustering_from_gap (H : InfiniteVolume) :
   -- - Exponential bound preserved in limit
 
   unfold has_exponential_clustering
-  sorry -- Weak convergence of Gibbs measures
+  -- Weak convergence of Gibbs measures
+  apply weak_limit_clustering H h_gap clustering_length
+  exact clustering_length_pos
 
 /-- Alternative characterization via correlation length -/
 theorem correlation_length_bound :
@@ -106,6 +110,12 @@ theorem correlation_length_bound :
         · exact norm_pos_iff.mpr (g_nonzero)
     _ = ε := by
       simp [R]
-      sorry -- Logarithm algebra
+      -- Logarithm algebra
+      rw [Real.exp_neg, Real.exp_mul, Real.exp_log]
+      · ring
+      · apply div_pos hε
+        apply mul_pos
+        · exact norm_pos_iff.mpr f_nonzero
+        · exact norm_pos_iff.mpr g_nonzero
 
 end RecognitionScience.StatMech

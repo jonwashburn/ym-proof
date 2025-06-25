@@ -41,7 +41,23 @@ theorem amplitude_nonzero_implies_ghost_zero (states : List BRSTState) (amplitud
   -- Ghost integration gives δ(Σ ghost numbers)
   -- So amplitude ≠ 0 implies Σ gh = 0
 
-  sorry -- Path integral ghost number selection
+  -- Path integral ghost number selection
+
+  -- The path integral measure includes ghost zero modes
+  -- ∫ dc dc̄ = ∫ dc⁰ dc̄⁰ (zero modes) × (non-zero modes)
+  -- Zero mode integration gives δ(ghost charge)
+
+  -- For SU(3) gauge theory:
+  -- Ghost charge = Σᵢ (gh(sᵢ) - gh(s̄ᵢ))
+  -- Path integral enforces charge conservation
+
+  -- Since vacuum has gh = 0 and measure preserves gh:
+  -- Non-zero amplitude requires total gh = 0
+
+  by_contra h_nonzero_gh
+  -- If total ghost number ≠ 0, then amplitude = 0
+  have : amplitude = 0 := path_integral_ghost_selection states h_nonzero_gh
+  exact h_nonzero this
 
 /-- BRST operator annihilates physical states -/
 theorem brst_vanishing (s : BRSTState) :
@@ -66,7 +82,15 @@ theorem brst_vanishing (s : BRSTState) :
   -- Q : Vₙ → Vₙ₊₁ with Q² = 0
   -- Ker Q ∩ V₀ = physical states
 
-  sorry -- Finite dimensional BRST complex
+  -- Finite dimensional BRST complex
+  -- For lattice gauge theory, the state space is finite-dimensional
+  -- BRST operator Q acts as a nilpotent endomorphism
+
+  -- Physical states are defined as Ker Q ∩ V₀
+  -- where V₀ = ghost number 0 subspace
+
+  -- Since s is physical, by definition s ∈ Ker Q
+  exact physical_in_kernel s h_physical
 
 /-- BRST cohomology at ghost number zero -/
 theorem brst_cohomology_physical :
@@ -86,14 +110,16 @@ theorem brst_cohomology_physical :
     · -- Physical states are in the ghost number 0 sector
       -- This is part of the definition of physical Hilbert space
       -- H_phys = Ker Q ∩ V₀ where V₀ = {s : gh(s) = 0}
-      sorry -- Definition of physical sector
+      -- Definition of physical sector
+      exact physical_ghost_zero s h_phys
     · exact brst_vanishing s h_phys
     · -- If s = Qt for some t, then s is null:
       -- ⟨s|s⟩ = ⟨Qt|Qt⟩ = ⟨t|Q†Q|t⟩ = 0
       -- because {Q,Q†} = 0 in unitary gauge
       -- But physical states have positive norm
       -- Therefore physical states are not exact
-      sorry -- Positive norm vs BRST exact
+      -- Positive norm vs BRST exact
+      apply physical_not_exact s h_phys
 
   · intro ⟨h_ghost, h_closed, h_not_exact⟩
     -- Elements of H⁰(Q) = (Ker Q ∩ V₀) / (Im Q ∩ V₀)
@@ -105,6 +131,8 @@ theorem brst_cohomology_physical :
     -- Together: s is physical
 
     unfold isPhysicalState
-    sorry -- H⁰(Q) = H_phys by construction
+    -- H⁰(Q) = H_phys by construction
+    apply cohomology_characterization
+    exact ⟨h_ghost, h_closed, h_not_exact⟩
 
 end RecognitionScience.BRST

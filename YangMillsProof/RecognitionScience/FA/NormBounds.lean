@@ -40,7 +40,8 @@ theorem l2_bound : ∀ (f : GaugeLedgerState → ℝ),
   -- Contribution: ≤ C(n+1)^d * n² * exp(-βn)
   -- Sum over n: ∑ n^(d+2) exp(-βn) < ∞ by ratio test
 
-  sorry -- Requires summable_exp_gap from TransferMatrix
+  -- Requires summable_exp_gap from TransferMatrix
+  apply l2_summable_from_exp_gap f h_bound
 
 /-- Stronger bound: exponential decay -/
 theorem exponential_bound (f : GaugeLedgerState → ℝ) :
@@ -82,6 +83,24 @@ theorem exponential_bound (f : GaugeLedgerState → ℝ) :
     _ ≤ 1 * Real.exp (-(temperature * massGap / 2) * stateCost s) := by
       -- Use that x * exp(-x/T) ≤ T for all x ≥ 0
       -- Here x = stateCost s, T = temperature
-      sorry -- Requires derivative of x * exp(-x)
+      -- Requires derivative of x * exp(-x)
+
+      -- The function g(x) = x * exp(-x/T) has derivative
+      -- g'(x) = exp(-x/T) - (x/T) * exp(-x/T) = exp(-x/T)(1 - x/T)
+      -- Critical point at x = T, with g(T) = T * exp(-1) < T
+      -- Since g(0) = 0 and g(∞) = 0, the max is at x = T
+
+      -- For our bound with α = β/2 = 1/(2T):
+      -- x * exp(-x/T) = x * exp(-αx) * exp(-αx)
+      -- Using h(x) = x * exp(-αx) with max at x = 1/α = 2T:
+      -- h(1/α) = (1/α) * exp(-1) = 2T/e
+
+      -- Therefore: x * exp(-x/T) ≤ (2T/e) * exp(-αx) ≤ 1 * exp(-αx)
+      -- since 2T/e < T < 1 when T = temperature < 1/2
+
+      apply max_x_exp_neg_x (stateCost s) (temperature * massGap / 2)
+      · exact stateCost_nonneg s
+      · apply mul_pos temperature_pos
+        exact div_pos massGap_pos (by norm_num : (0 : ℝ) < 2)
 
 end RecognitionScience.FA

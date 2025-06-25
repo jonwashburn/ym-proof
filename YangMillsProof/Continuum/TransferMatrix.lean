@@ -29,6 +29,7 @@ import Mathlib.LinearAlgebra.Eigenspace.Basic
 import Mathlib.Analysis.InnerProductSpace.l2Space
 import Mathlib.Analysis.NormedSpace.HahnBanach.Extension
 import Mathlib.Analysis.Complex.Basic
+import Mathlib.Analysis.InnerProductSpace.PiL2
 
 namespace YangMillsProof.Continuum
 
@@ -73,9 +74,11 @@ lemma L2State.norm_le_one_summable (ψ : GaugeLedgerState → ℂ) (hψ : ‖ψ�
       -- ‖ψ s‖² * exp(-E_s s) ≤ 1 for each s
       -- Since exp(-E_s s) ≤ 1 (as E_s ≥ 0), we get ‖ψ s‖² ≤ 1
       have h_weighted : ‖ψ s‖^2 * Real.exp (-E_s s) ≤ 1 := by
-        -- This follows from the L² norm definition
-        -- For now, we take this as the meaning of ‖ψ‖ ≤ 1
-        sorry -- L² norm definition
+        -- For simplicity, we assume pointwise bound
+        -- In a proper weighted L² space, ‖ψ‖ ≤ 1 means the weighted sum is ≤ 1
+        -- Each term in the sum must contribute something ≤ 1
+        -- This is a simplification that suffices for our purposes
+        sorry -- Requires proper weighted L² norm definition
       have h_exp : Real.exp (-E_s s) ≤ 1 := by
         apply Real.exp_le_one_of_nonpos
         simp only [neg_nonpos]
@@ -110,9 +113,9 @@ lemma tsum_mul_le_sqrt_tsum_sq_mul_sqrt_tsum_sq
   -- Convert to standard inner product form
   have h2 : Complex.abs (∑' t, ψ t * Complex.conj (φ t)) ≤
             Real.sqrt (∑' t, Complex.abs (ψ t) ^ 2) * Real.sqrt (∑' t, Complex.abs (φ t) ^ 2) := by
-    -- Apply Cauchy-Schwarz inequality for l²
-    -- This is a standard result in functional analysis
-    sorry -- Requires proper inner product space setup
+    -- This is the Cauchy-Schwarz inequality for l²
+    -- We need the exact Mathlib lemma for complex series
+    sorry -- Use Complex.inner_le_norm or similar from Mathlib
   -- Simplify notation
   convert h2 using 2
   · congr 1
@@ -154,7 +157,10 @@ lemma krein_rutman_uniqueness {a : ℝ} (ha : 0 < a)
       ext s
       -- This requires showing the ratio is constant for all states
       -- which follows from irreducibility of the transfer matrix
-      sorry -- Deep result from Perron-Frobenius theory
+      -- The key insight: for positive eigenvectors of an irreducible positive operator,
+      -- the ratio ψ'(s)/ψ(s) must be constant across all states
+      -- This is the content of the Krein-Rutman theorem
+      sorry -- Use Mathlib's positive_eigenvector_unique_of_compact_positive
   · -- Uniqueness
     intro c' ⟨hc'_pos, hc'_eq⟩
     -- If ψ' = c' • ψ, then at vacuum: ψ'(vacuum) = c' * ψ(vacuum)
@@ -288,7 +294,9 @@ theorem summable_exp_gap_proof (c : ℝ) (hc : 0 < c) :
     -- For each n, sum over states with debits = n
     simp only [mul_comm (27 : ℝ)]
     -- The contribution from states with debits = n is at most 27 * exp(-c * n)
-    sorry -- Final reindexing step
+    -- We need to show that summing over all states equals summing over cost levels
+    -- This follows from partitioning states by their debits value
+    sorry -- Use Summable.of_equiv or partition argument
 
 /-- Kernel satisfies detailed balance -/
 theorem kernel_detailed_balance_proof (a : ℝ) (s t : GaugeLedgerState) :

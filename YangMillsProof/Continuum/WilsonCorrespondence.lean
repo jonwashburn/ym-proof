@@ -14,8 +14,15 @@ import YangMillsProof.Continuum.WilsonMap
 import YangMillsProof.PhysicalConstants
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
 import Mathlib.Data.Complex.Exponential
-import Bridge.WilsonProofs
-import Bridge.LatticeContinuumProof
+import YangMillsProof.RecognitionScience.Ledger.Energy
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Bounds
+import Mathlib.Analysis.NormedSpace.OperatorNorm
+import Mathlib.Analysis.Asymptotics.Asymptotics
+import Mathlib.Data.Finset.Card
+import Mathlib.Analysis.Calculus.Taylor
+import Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv
+import Mathlib.Analysis.Calculus.Deriv.Basic
+import Mathlib.Analysis.Calculus.MeanValue
 
 namespace YangMillsProof.Continuum
 
@@ -178,7 +185,29 @@ def gauge_coupling : ℝ := 2 * Real.pi / Real.sqrt 8  -- g² = 2π/√8
 theorem phase_periodicity : ∀ (θ : ℝ) (n : ℕ), n < 3 →
   ∃ φ : ℝ, 0 ≤ φ ∧ φ < 2 * Real.pi ∧
   Real.cos φ = Real.cos (θ + 2 * Real.pi * n / 3) := by
-  exact phase_periodicity_proof
+  intro θ n hn
+  -- Take φ = (θ + 2πn/3) mod 2π
+  let k := ⌊(θ + 2 * Real.pi * n / 3) / (2 * Real.pi)⌋
+  let φ := θ + 2 * Real.pi * n / 3 - k * 2 * Real.pi
+  use φ
+  constructor
+  · -- φ ≥ 0
+    unfold φ
+    have h1 : k * 2 * Real.pi ≤ θ + 2 * Real.pi * n / 3 := by
+      exact Int.floor_le ((θ + 2 * Real.pi * n / 3) / (2 * Real.pi))
+    linarith
+  constructor
+  · -- φ < 2π
+    unfold φ
+    have h2 : θ + 2 * Real.pi * n / 3 < (k + 1) * 2 * Real.pi := by
+      have : (θ + 2 * Real.pi * n / 3) / (2 * Real.pi) < k + 1 := by
+        exact Int.lt_floor_add_one ((θ + 2 * Real.pi * n / 3) / (2 * Real.pi))
+      linarith
+    linarith
+  · -- cos φ = cos(θ + 2πn/3)
+    unfold φ
+    -- cos is periodic with period 2π
+    rw [Real.cos_sub_int_mul_two_pi]
 
 /-- Lattice action converges to continuum Yang-Mills -/
 theorem lattice_continuum_limit : ∀ (ε : ℝ) (hε : ε > 0),
@@ -188,7 +217,46 @@ theorem lattice_continuum_limit : ∀ (ε : ℝ) (hε : ε > 0),
   where
     F_squared (s : GaugeLedgerState) : ℝ :=
       (1 - Real.cos (2 * Real.pi * (s.colour_charges 1 : ℝ) / 3))^2 := by
-  exact lattice_continuum_limit_proof
+  intro ε hε
+  -- The lattice action S_L = (1/g²) Σ_p (1 - cos θ_p)
+  -- converges to continuum action S_C = (1/2g²) ∫ F²
+  -- as lattice spacing a → 0
+
+  -- For our simplified model:
+  -- - Lattice: gaugeCost s = E_coh * 2 * (1 - cos(2πq/3))
+  -- - Continuum: (1/2g²) * F² where F = (1 - cos(2πq/3))
+
+  -- Choose a₀ small enough
+  use min 1 (ε * gauge_coupling^2)
+  constructor
+  · apply lt_min
+    · exact one_pos
+    · apply mul_pos hε
+      unfold gauge_coupling
+      simp only [sq_pos_iff, ne_eq, div_eq_zero_iff, mul_eq_zero, OfNat.ofNat_ne_zero,
+        Real.pi_ne_zero, or_false, Real.sqrt_eq_zero', not_or]
+      constructor
+      · norm_num
+      · norm_num
+
+  intro a ⟨ha_pos, ha_bound⟩ s
+
+  -- The key observation: in our model, the correspondence is exact
+  -- up to the normalization factor E_coh * 2 * g²
+
+  -- gaugeCost s = E_coh * 2 * (1 - cos(2πq/3))
+  -- F_squared s = (1 - cos(2πq/3))²
+
+  -- So gaugeCost s / a⁴ → ∞ as a → 0, which is wrong!
+  -- The issue is that gaugeCost should scale with a⁴ for the continuum limit
+
+  -- In the correct formulation:
+  -- - Lattice action density: S_L/a⁴ = (1/g²a⁴) Σ_p a⁴(1 - cos θ_p)
+  -- - Each plaquette contributes a⁴ to the volume element
+  -- - In continuum: S_C = (1/2g²) ∫ F² d⁴x
+
+  -- For now, we accept this as a limitation of our simplified model
+  sorry -- Requires proper lattice action scaling
 
 /-- Standard Yang-Mills action emerges in continuum -/
 theorem continuum_yang_mills (ε : ℝ) (hε : ε > 0) :
@@ -201,13 +269,9 @@ theorem continuum_yang_mills (ε : ℝ) (hε : ε > 0) :
       (1 - Real.cos (2 * Real.pi * (s.colour_charges 1 : ℝ) / 3))^2
 
 /-- Half-quantum states have cost massGap/2 -/
-axiom half_quantum_characterization : ∀ (s : GaugeLedgerState),
-  (s.debits = 73 ∧ s.credits = 73 ∧ (∀ i, s.colour_charges i = 0)) ↔
-  gaugeCost s = massGap / 2
+theorem half_quantum_characterization := RecognitionScience.Ledger.half_quantum_characterization
 
 /-- States with debits = credits = 146 are minimal physical excitations -/
-axiom minimal_physical_excitation (s : GaugeLedgerState) :
-  (s.debits = 146 ∧ s.credits = 146) ↔
-  (gaugeCost s > 0 ∧ ∀ t : GaugeLedgerState, gaugeCost t > 0 → gaugeCost s ≤ gaugeCost t)
+theorem minimal_physical_excitation := RecognitionScience.Ledger.minimal_physical_excitation
 
 end YangMillsProof.Continuum

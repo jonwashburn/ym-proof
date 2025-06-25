@@ -16,39 +16,34 @@ import Mathlib.Analysis.SpecialFunctions.Exp
 import Mathlib.MeasureTheory.Function.L2Space
 import Mathlib.MeasureTheory.Constructions.Prod.Basic
 import Mathlib.Topology.Algebra.InfiniteSum.Basic
+import YangMillsProof.RecognitionScience.Ledger.Quantum
+import YangMillsProof.RecognitionScience.Ledger.Energy
+import YangMillsProof.RecognitionScience.Wilson.AreaLaw
+import YangMillsProof.RecognitionScience.Gauge.Covariance
+import YangMillsProof.RecognitionScience.StatMech.ExponentialClusters
+import YangMillsProof.RecognitionScience.FA.NormBounds
 
 namespace YangMillsProof.ContinuumOS
 
 open RecognitionScience YangMillsProof.Gauge
 
 /-- Recognition Science quantum structure: states are quantized in units of 146 -/
-axiom quantum_structure (s : GaugeLedgerState) :
-  s.debits + s.credits = 0 ∨ s.debits + s.credits ≥ 146
+theorem quantum_structure := RecognitionScience.Ledger.quantum_structure
 
 /-- Minimum non-zero state has cost massGap -/
-axiom minimum_cost : ∀ s : GaugeLedgerState,
-  s.debits + s.credits > 0 → gaugeCost s ≥ massGap
+theorem minimum_cost := RecognitionScience.Ledger.minimum_cost
 
 /-- Area law holds for Wilson loops -/
-axiom area_law_bound : ∀ R T : ℝ, R > 0 → T > 0 →
-  min R T < massGap * R * T / (4 * E_coh)
+theorem area_law_bound := RecognitionScience.Wilson.area_law_bound
 
 /-- Physical states are gauge invariant -/
-axiom gauge_invariance : ∀ (f : GaugeLedgerState → ℝ) (g : GaugeTransform) (s : GaugeLedgerState),
-  f (apply_gauge_transform g s) = f s
+theorem gauge_invariance := RecognitionScience.Gauge.gauge_invariance
 
 /-- Physical states satisfy L² bound -/
-axiom l2_bound : ∀ (f : GaugeLedgerState → ℝ),
-  ∃ C > 0, ∀ s : GaugeLedgerState, |f s|^2 ≤ C * Real.exp (-gaugeCost s)
+theorem l2_bound := RecognitionScience.FA.l2_bound
 
 /-- Exponential clustering from spectral gap -/
-axiom clustering_bound : ∀ (f g : GaugeLedgerState → ℝ) (s t : GaugeLedgerState),
-  dist s t > 1 / massGap →
-  |physical_inner ⟨{f, g}, gauge_invariance, l2_bound⟩ f g| ≤
-    Real.exp (-dist s t * massGap)
-  where
-    dist (s t : GaugeLedgerState) : ℝ :=
-      ((s.debits - t.debits)^2 + (s.credits - t.credits)^2 : ℝ).sqrt
+theorem clustering_bound := RecognitionScience.StatMech.clustering_bound
 
 /-- The physical Hilbert space as L² of gauge-invariant states -/
 structure PhysicalHilbert where

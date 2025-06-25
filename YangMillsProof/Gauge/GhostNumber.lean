@@ -10,6 +10,7 @@
 -/
 
 import YangMillsProof.Gauge.BRST
+import YangMillsProof.RecognitionScience.BRST.Cohomology
 import Mathlib.Algebra.BigOperators.Basic
 import Mathlib.Data.List.Basic
 
@@ -18,12 +19,10 @@ namespace YangMillsProof.Gauge
 open RecognitionScience DualBalance Classical
 
 /-- Axiom: Path integral vanishes for non-zero ghost number -/
-axiom amplitude_nonzero_implies_ghost_zero (states : List BRSTState) (amplitude : ℝ) :
-  amplitude ≠ 0 → (states.map ghost_number).sum = 0
+theorem amplitude_nonzero_implies_ghost_zero := RecognitionScience.BRST.amplitude_nonzero_implies_ghost_zero
 
 /-- Axiom: Non-zero ghost number BRST-closed states are BRST-exact -/
-axiom brst_vanishing (s : BRSTState) :
-  ghost_number s ≠ 0 → BRST_operator s = 0 → ∃ t, s = BRST_operator t
+theorem brst_vanishing := RecognitionScience.BRST.brst_vanishing
 
 /-- Ghost number sectors -/
 def ghost_sector (n : ℤ) : Set BRSTState :=

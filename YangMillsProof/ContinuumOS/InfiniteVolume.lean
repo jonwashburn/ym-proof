@@ -14,6 +14,7 @@ import YangMillsProof.Continuum.Continuum
 import YangMillsProof.Gauge.GaugeCochain
 import YangMillsProof.PhysicalConstants
 import YangMillsProof.Continuum.TransferMatrix
+import YangMillsProof.RecognitionScience.StatMech.ExponentialClusters
 
 namespace YangMillsProof.ContinuumOS
 
@@ -133,8 +134,7 @@ def cluster_property (H : InfiniteVolume) : Prop :=
         clustering_constant * ‖f‖ * ‖g‖ * Real.exp (-massGap * R)
 
 /-- Clustering follows from mass gap -/
-axiom clustering_from_gap (H : InfiniteVolume) :
-  cluster_property H
+theorem clustering_from_gap := RecognitionScience.StatMech.clustering_from_gap
 
 /-- Standard finite volume states -/
 def standard_finite_volume (N : ℕ) : FiniteVolume N :=

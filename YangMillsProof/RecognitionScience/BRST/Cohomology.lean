@@ -32,7 +32,16 @@ theorem amplitude_nonzero_implies_ghost_zero (states : List BRSTState) (amplitud
   -- 2. BRST nilpotency Q² = 0
   -- 3. Physical state condition
 
-  sorry -- BRST cohomology selection rule
+  -- Ghost number is additive: gh(s₁...sₙ) = Σ gh(sᵢ)
+  -- Physical amplitudes come from path integral over ghost number 0 sector
+  -- Non-zero contribution requires total ghost number = 0
+
+  -- Formal proof:
+  -- Path integral = ∫ [dφ][dc][dc̄] exp(iS) Π states
+  -- Ghost integration gives δ(Σ ghost numbers)
+  -- So amplitude ≠ 0 implies Σ gh = 0
+
+  sorry -- Path integral ghost number selection
 
 /-- BRST operator annihilates physical states -/
 theorem brst_vanishing (s : BRSTState) :
@@ -47,7 +56,17 @@ theorem brst_vanishing (s : BRSTState) :
   -- BRST generates gauge transformations
   -- Therefore Q annihilates physical states
 
-  sorry -- BRST cohomology definition
+  -- By definition: Q = c^a(∂_μ D^μ)^a + ...
+  -- Physical states are gauge singlets
+  -- Q generates infinitesimal gauge transformations
+  -- Gauge singlets are invariant: Q|singlet⟩ = 0
+
+  -- In finite dimensions:
+  -- V = V₀ ⊕ V₁ ⊕ ... (ghost number grading)
+  -- Q : Vₙ → Vₙ₊₁ with Q² = 0
+  -- Ker Q ∩ V₀ = physical states
+
+  sorry -- Finite dimensional BRST complex
 
 /-- BRST cohomology at ghost number zero -/
 theorem brst_cohomology_physical :
@@ -64,11 +83,28 @@ theorem brst_cohomology_physical :
   constructor
   · intro h_phys
     constructor
-    · sorry -- Physical states have ghost number 0
+    · -- Physical states are in the ghost number 0 sector
+      -- This is part of the definition of physical Hilbert space
+      -- H_phys = Ker Q ∩ V₀ where V₀ = {s : gh(s) = 0}
+      sorry -- Definition of physical sector
     · exact brst_vanishing s h_phys
-    · sorry -- Physical states are not BRST-exact
+    · -- If s = Qt for some t, then s is null:
+      -- ⟨s|s⟩ = ⟨Qt|Qt⟩ = ⟨t|Q†Q|t⟩ = 0
+      -- because {Q,Q†} = 0 in unitary gauge
+      -- But physical states have positive norm
+      -- Therefore physical states are not exact
+      sorry -- Positive norm vs BRST exact
 
   · intro ⟨h_ghost, h_closed, h_not_exact⟩
-    sorry -- Cohomology elements are physical
+    -- Elements of H⁰(Q) = (Ker Q ∩ V₀) / (Im Q ∩ V₀)
+    -- are precisely the physical states
+
+    -- s ∈ Ker Q: gauge invariant
+    -- gh(s) = 0: correct statistics
+    -- s ∉ Im Q: positive norm
+    -- Together: s is physical
+
+    unfold isPhysicalState
+    sorry -- H⁰(Q) = H_phys by construction
 
 end RecognitionScience.BRST

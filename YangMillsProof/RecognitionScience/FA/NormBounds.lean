@@ -31,7 +31,16 @@ theorem l2_bound : ∀ (f : GaugeLedgerState → ℝ),
   -- - Polynomial growth: #{s : E_s ≤ E} ~ E^d
   -- - Exponential decay beats polynomial growth
 
-  sorry -- Standard statistical mechanics convergence
+  -- Use Cauchy-Schwarz: ∑ |f|² w ≤ (∑ |f|⁴ w)^(1/2) * (∑ w)^(1/2)
+  -- But simpler: use |f| ≤ E and exponential decay
+
+  -- ∑ f² exp(-βE) ≤ ∑ E² exp(-βE)
+  -- Split by energy shells: E ∈ [n, n+1)
+  -- Each shell has ≤ C(n+1)^d states (polynomial growth)
+  -- Contribution: ≤ C(n+1)^d * n² * exp(-βn)
+  -- Sum over n: ∑ n^(d+2) exp(-βn) < ∞ by ratio test
+
+  sorry -- Requires summable_exp_gap from TransferMatrix
 
 /-- Stronger bound: exponential decay -/
 theorem exponential_bound (f : GaugeLedgerState → ℝ) :
@@ -54,6 +63,25 @@ theorem exponential_bound (f : GaugeLedgerState → ℝ) :
   -- So |f(s)| * gibbs_weight s ≤ E_s * exp(-β E_s)
   -- This is bounded by C * exp(-α E_s) for suitable C, α < β
 
-  sorry -- Calculus exercise
+  -- Function g(x) = x * exp(-βx) has maximum at x = 1/β
+  -- Max value is (1/β) * exp(-1) < 1/β
+
+  -- For our case: E * exp(-βE) ≤ 1/β
+  -- With β = 1/temperature and α = β/2:
+  -- E * exp(-βE) = E * exp(-αE) * exp(-αE)
+  --              ≤ (1/α) * exp(-αE) using max of x*exp(-αx)
+  --              = (2/β) * exp(-αE)
+
+  calc |f s| * gibbs_weight s
+    ≤ stateCost s * gibbs_weight s := by
+      apply mul_le_mul_of_nonneg_right (h_bound s)
+      exact gibbs_weight_nonneg s
+    _ = stateCost s * Real.exp (-temperature⁻¹ * stateCost s) := by
+      unfold gibbs_weight
+      rfl
+    _ ≤ 1 * Real.exp (-(temperature * massGap / 2) * stateCost s) := by
+      -- Use that x * exp(-x/T) ≤ T for all x ≥ 0
+      -- Here x = stateCost s, T = temperature
+      sorry -- Requires derivative of x * exp(-x)
 
 end RecognitionScience.FA

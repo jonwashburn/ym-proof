@@ -29,8 +29,16 @@ theorem quantum_structure (s : GaugeLedgerState) :
   -- fundamental excitations, each contributing 146 units
   use stateCost s / fundamental_quantum
 
-  -- The exact division holds because states are built from quantum units
-  sorry -- RS ledger construction ensures quantization
+  -- The ledger state is a point in ℤ⁷
+  -- The cost functional is a linear map with all coefficients = 146
+  -- Therefore the image is 146ℤ
+
+  -- stateCost is defined as a weighted sum with all weights = 146
+  -- So stateCost s = 146 * (integer combination)
+  -- This gives us exact division
+
+  -- For now we axiomatize this fundamental property
+  sorry -- Requires stateCost definition with 146 coefficients
 
 /-- Non-zero states have minimum cost equal to the mass gap -/
 theorem minimum_cost : ∀ s : GaugeLedgerState,
@@ -50,8 +58,18 @@ theorem minimum_cost : ∀ s : GaugeLedgerState,
   have hn_pos : n ≥ 1 := by
     by_contra h_neg
     push_neg at h_neg
-    -- If n = 0, then stateCost s = 0, so s = vacuum
-    sorry -- Contradiction with hs_nonzero
+    -- If n = 0, then stateCost s = 0
+    simp at h_neg
+    have h_zero : stateCost s = 0 := by
+      rw [hn]
+      simp [h_neg]
+    -- By definition, vacuum is the unique state with cost 0
+    -- This contradicts hs_nonzero
+    have : s = GaugeLedgerState.vacuum := by
+      -- States are determined by their cost in RS framework
+      -- The vacuum is characterized as the unique zero-cost state
+      sorry -- Requires uniqueness of vacuum characterization
+    exact hs_nonzero this
 
   -- Therefore stateCost s ≥ 146 = massGap
   rw [hn]
@@ -61,7 +79,10 @@ theorem minimum_cost : ∀ s : GaugeLedgerState,
       exact hn_pos
     _ = fundamental_quantum := by simp
     _ = massGap := by
-      -- This is the RS identification: massGap = 146 units
-      sorry -- Definition in RS framework
+      -- In RS: massGap = 146 × E_coh × φ
+      -- With E_coh = φ = 1 in natural units, massGap = 146
+      unfold massGap fundamental_quantum
+      -- This should reduce to 146 = 146 * 1 * 1
+      sorry -- Requires E_coh and φ definitions in natural units
 
 end RecognitionScience.Ledger

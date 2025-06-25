@@ -34,6 +34,22 @@ theorem area_law_bound : ∀ R T : ℝ, R > 0 → T > 0 →
   -- The constant σ = 0.073 = 73/1000 is half the fundamental quantum
   -- This reflects that virtual excitations cost half-quanta
 
-  sorry -- RS confinement mechanism via discrete ledger
+  -- Strong coupling expansion at finite lattice spacing a:
+  -- W(C) = ⟨Tr U_C⟩ = Σ_surfaces exp(-β·Area(S))
+  -- Dominant contribution from minimal surface with area R·T
+
+  -- In the continuum limit a→0 with physical area A = R·T fixed:
+  -- - Number of plaquettes ~ A/a²
+  -- - Each plaquette contributes ~ exp(-β/g²)
+  -- - Total: W ~ exp(-σA) with σ = lim_{a→0} β/(g²a²)
+
+  -- For RS with discrete structure:
+  -- - Minimal excitation creates flux tube of half-quanta
+  -- - Cost per unit area = 73 = fundamental_quantum/2
+  -- - Leading to σ = 0.073 in natural units
+
+  -- This is the only result requiring strong-coupling QCD methods
+  -- Full proof needs Polyakov's confinement mechanism
+  sorry -- Strong coupling expansion not in mathlib
 
 end RecognitionScience.Wilson

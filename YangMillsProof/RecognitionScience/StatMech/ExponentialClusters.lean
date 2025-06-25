@@ -36,7 +36,16 @@ theorem clustering_bound : ∀ (f g : GaugeLedgerState → ℝ) (s t : GaugeLedg
   -- Key insight: virtual excitations mediating correlations
   -- have energy ≥ massGap, leading to exponential suppression
 
-  sorry -- Standard QFT result: gap implies clustering
+  -- Spectral decomposition: write H = m|1⟩⟨1| + H' with gap m
+  -- Correlator = ⟨0|f(s) exp(-Ht) g(t)|0⟩
+  -- Insert complete set of states: Σ_n |n⟩⟨n|
+  -- Ground state |0⟩ gives ⟨f⟩⟨g⟩
+  -- Excited states |n⟩ with E_n ≥ m give exp(-mt) decay
+
+  -- Distance d = |s-t| in lattice units
+  -- Time evolution exp(-Hd) suppresses by exp(-md) = exp(-d/ξ)
+
+  sorry -- Requires spectral decomposition of transfer matrix
 
 /-- Clustering property from spectral gap (infinite volume) -/
 theorem clustering_from_gap (H : InfiniteVolume) :
@@ -53,7 +62,16 @@ theorem clustering_from_gap (H : InfiniteVolume) :
   -- The clustering length ξ = 1/massGap ≈ 6.8 units
   -- matches the confinement scale in Yang-Mills
 
-  sorry -- Thermodynamic limit preserves clustering
+  -- Finite volume clustering with periodic BC:
+  -- |⟨f⊗g⟩_L - ⟨f⟩_L⟨g⟩_L| ≤ C exp(-d/ξ)
+
+  -- Take L → ∞ with d fixed:
+  -- - Correlators ⟨f⊗g⟩_L → ⟨f⊗g⟩_∞ by weak convergence
+  -- - Expectations ⟨f⟩_L → ⟨f⟩_∞ by ergodicity
+  -- - Exponential bound preserved in limit
+
+  unfold has_exponential_clustering
+  sorry -- Weak convergence of Gibbs measures
 
 /-- Alternative characterization via correlation length -/
 theorem correlation_length_bound :
@@ -70,6 +88,24 @@ theorem correlation_length_bound :
   intro s t h_dist
 
   have h_bound := clustering_bound f g s t
-  sorry -- Apply exponential bound with chosen R
+  -- From h_bound: |corr| ≤ ‖f‖ * ‖g‖ * exp(-d/ξ)
+  -- With d > R = -ξ * log(ε/(‖f‖*‖g‖)):
+  -- exp(-d/ξ) < exp(-R/ξ) = ε/(‖f‖*‖g‖)
+  -- So |corr| < ‖f‖ * ‖g‖ * ε/(‖f‖*‖g‖) = ε
+
+  calc |⟨f ⊗ g⟩ - ⟨f⟩ * ⟨g⟩|
+    ≤ ‖f‖ * ‖g‖ * Real.exp (-distance s t / clustering_length) := h_bound
+    _ < ‖f‖ * ‖g‖ * Real.exp (-R / clustering_length) := by
+      apply mul_lt_mul_of_pos_left
+      · apply Real.exp_lt_exp.mpr
+        apply div_lt_div_of_neg_left h_dist
+        · exact neg_lt_zero.mpr clustering_length_pos
+        · exact clustering_length_pos
+      · apply mul_pos
+        · exact norm_pos_iff.mpr (f_nonzero)
+        · exact norm_pos_iff.mpr (g_nonzero)
+    _ = ε := by
+      simp [R]
+      sorry -- Logarithm algebra
 
 end RecognitionScience.StatMech

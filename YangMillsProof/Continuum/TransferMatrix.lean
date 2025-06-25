@@ -25,6 +25,7 @@ import Mathlib.Analysis.InnerProductSpace.PiL2
 import Mathlib.Analysis.InnerProductSpace.Adjoint
 import Mathlib.Analysis.LocallyConvex.Bounded
 import Mathlib.Analysis.InnerProductSpace.Projection
+import YangMillsProof.L2State
 
 namespace YangMillsProof.Continuum
 
@@ -39,6 +40,35 @@ def stateCountExponent : ℝ := 3  -- 3D space
 
 /-- Volume constant for polynomial bounds -/
 def vol_constant : ℝ := 12000  -- Adjusted for lattice site counting
+
+/-- Un-normalised Euclidean partition function -/
+noncomputable def Z (β : ℝ) : ℝ :=
+  ∑' t, Real.exp (-β * gaugeCost t)
+
+/-- The vacuum state with zero cost -/
+def vacuum : GaugeLedgerState :=
+  { debits := 0, credits := 0, colour_charges := fun _ => 0 }
+
+/-- Vacuum has zero gauge cost -/
+lemma gaugeCost_vacuum : gaugeCost vacuum = 0 := by
+  unfold vacuum gaugeCost
+  simp only [Finset.sum_eq_zero_iff]
+  intro i _
+  rfl
+
+lemma Z_ge_one {β : ℝ} (hβ : 0 < β) : 1 ≤ Z β := by
+  -- vacuum term is 1
+  have hv : Real.exp (-β * gaugeCost vacuum) = 1 := by
+    simp [gaugeCost_vacuum]
+  have h_nonneg : ∀ t, 0 ≤ Real.exp (-β * gaugeCost t) := fun t => Real.exp_nonneg _
+  have h_summable := summable_exp_gap β hβ
+  rw [← h_summable.hasSum.tsum_eq] at hv ⊢
+  exact le_trans (le_of_eq hv.symm) (le_tsum h_summable vacuum h_nonneg)
+
+lemma Z_finite {β : ℝ} (hβ : 0 < β) : Z β < ⊤ := by
+  -- summable_exp_gap gives us summability
+  have h := summable_exp_gap β hβ
+  exact ENNReal.ofReal_lt_top
 
 /-- Number of states with diameter ≤ R -/
 noncomputable def N_states (R : ℝ) : ℕ :=
@@ -138,23 +168,14 @@ noncomputable def T_lattice (a : ℝ) : TransferOperator a :=
           congr 1
           ring
         rw [this]
-        -- Since a > 0, we have 1 + a > 1, so the sum converges faster
-        -- ∑_t exp(-(1+a)E_t) ≤ ∑_t exp(-E_t) = 1 (normalized)
-        apply mul_le_of_le_one_right (Real.exp_nonneg _)
-        -- The partition function at inverse temperature 1+a is ≤ 1
-        -- This follows from the gap: smallest E_t = 0, next is massGap
-        -- Z(β) = 1 + exp(-β*massGap) + ... ≤ 1 + 1/(1-exp(-β*massGap))
-        -- For β = 1+a > 1, this is bounded by 1
-        -- Partition function bound
-        -- Z(β) = ∑_s exp(-β * E_s) where E_0 = 0 (vacuum), E_1 = massGap, ...
-        -- For β > 1: Z(β) = 1 + exp(-β*massGap) + exp(-β*E_2) + ...
-        --                 ≤ 1 + exp(-massGap) + exp(-2*massGap) + ...
-        --                 = 1 + exp(-massGap)/(1 - exp(-massGap))
-        -- Since massGap > 0, this geometric series converges
-        -- For our purpose, we just need Z(1+a) ≤ 1 which holds for large massGap
-        -- Directly apply the geometric-series lemma from Mathlib (axiom above)
-        have hZ := partition_function_le_one a (by positivity : 0 < a)
-        simpa using hZ
+        -- The partition function Z(1+a) is finite but not necessarily ≤ 1
+        -- Instead, we work with normalized operators
+        -- For boundedness, we need: exp(-aE_s) * Z(1+a) ≤ C for some C
+        -- This is true since both factors are finite
+        have hZ_finite : Z (1 + a) < ⊤ := Z_finite (by linarith : 0 < 1 + a)
+        -- For the operator bound, we accept that ‖T_a‖ might be > 1
+        -- The key is that it's finite and the spectral radius < 1
+        sorry -- Operator norm bound requires different approach
     positive := by
       intro ψ h_pos s
       -- Sum of positive terms
@@ -198,8 +219,13 @@ noncomputable def T_lattice (a : ℝ) : TransferOperator a :=
           -- The first factor is bounded by our kernel estimate
           -- The second factor is ‖ψ‖_L² < ∞ by assumption
           -- Therefore the series converges absolutely (axiom above)
-          have hSumm := kernel_mul_psi_summable (ψ := ψ) a (by positivity : 0 < a) s
-            hilbert_space_l2
+          -- Assume ψ is square-summable (this should be enforced by types)
+          have hψ_l2 : Summable fun t => Complex.abs (ψ t)^2 := by
+            -- In a proper formalization, functions would be in ℓ² by construction
+            sorry -- Type system should enforce this
+          -- Now use the subtype
+          let ψ_l2 : ℓ² := ⟨ψ, hψ_l2⟩
+          have hSumm := kernel_mul_psi_summable (ψ := ψ_l2) a (by positivity : 0 < a) s
           simpa using hSumm
       exact this }
 
@@ -432,15 +458,12 @@ theorem transfer_matrix_complete :
     · intro ψ' h'
       exact h_uniq ψ' h'
 
-/-- The partition function is finite (and we normalize it to be ≤ 1) -/
-theorem partition_function_le_one (a : ℝ) (ha : 0 < a) :
-    ∑' t : GaugeLedgerState, Real.exp (-(1 + a) * gaugeCost t) ≤ 1 := by
-  exact partition_function_le_one_proof a ha
+
 
 /-- The kernel times a square-integrable function is summable. This uses
 Cauchy-Schwarz: ∑|K(s,t)ψ(t)| ≤ (∑|K(s,t)|²)^{1/2} · ‖ψ‖_{L²} -/
-lemma kernel_mul_psi_summable {ψ : GaugeLedgerState → ℂ} (a : ℝ) (ha : 0 < a)
-    (s : GaugeLedgerState) (hψ : Summable fun t => Complex.abs (ψ t)^2) :
+lemma kernel_mul_psi_summable {ψ : ℓ²} (a : ℝ) (ha : 0 < a)
+    (s : GaugeLedgerState) :
     Summable fun t => Complex.abs (Complex.exp (-a * (gaugeCost s + gaugeCost t) / 2) * ψ t) := by
   -- Apply Cauchy-Schwarz in ℓ²
   -- ∑|K(s,t)·ψ(t)| ≤ √(∑|K(s,t)|²) · √(∑|ψ(t)|²)
@@ -461,7 +484,7 @@ lemma kernel_mul_psi_summable {ψ : GaugeLedgerState → ℂ} (a : ℝ) (ha : 0 
       · norm_num
 
   -- Use that bounded * summable = summable
-  apply Summable.of_norm_bounded _ hψ
+  apply Summable.of_norm_bounded _ ψ.summable
   intro t
   simp only [Complex.norm_eq_abs]
   calc Complex.abs (Complex.exp (-a * (gaugeCost s + gaugeCost t) / 2) * ψ t)
@@ -603,14 +626,10 @@ theorem krein_rutman_uniqueness {a : ℝ} (ha : 0 < a)
     ψ = ψ' := by
   exact krein_rutman_uniqueness_proof ha ψ ψ' h_pos h_pos' h_eigen h_eigen' h_norm h_norm'
 
-/-- L² membership is a defining property of our Hilbert space -/
-axiom l2_membership (ψ : GaugeLedgerState → ℂ) :
-    Summable fun t => Complex.abs (ψ t)^2
+open L2State
 
-/-- Functions in our Hilbert space are L² summable -/
-theorem hilbert_space_l2 {ψ : GaugeLedgerState → ℂ} :
-    Summable fun t => Complex.abs (ψ t)^2 := by
-  exact hilbert_space_l2_proof
+/-- Alias for backward compatibility -/
+alias L2State.summable ← hilbert_space_l2
 
 /-
   Proof Implementations
@@ -977,103 +996,7 @@ theorem summable_exp_gap_proof (c : ℝ) (hc : 0 < c) :
       exact hn this
     · rfl
 
-/-- Path integral normalization convention -/
-axiom path_integral_normalized (a : ℝ) (ha : 0 < a) :
-  ∑' t : GaugeLedgerState, Real.exp (-(1 + a) * gaugeCost t) ≤ 1
 
-/-- Proof that partition function is bounded by 1 -/
-theorem partition_function_le_one_proof (a : ℝ) (ha : 0 < a) :
-  ∑' t : GaugeLedgerState, Real.exp (-(1 + a) * gaugeCost t) ≤ 1 := by
-  -- Z = Σ exp(-a·E_s) where E_s ≥ 0
-  -- Largest term is s = vacuum with E_s = 0
-  -- So exp(-a·0) = 1
-  -- All other terms have E_s > 0, so exp(-a·E_s) < 1
-
-  -- The vacuum state
-  let vacuum : GaugeLedgerState :=
-    { debits := 0, credits := 0, colour_charges := fun _ => 0 }
-
-  have h_vacuum : gaugeCost vacuum = 0 := by
-    -- The vacuum has debits = credits = 0 and all colour_charges = 0
-    -- By definition of gaugeCost as sum of gauge link deviations:
-    -- gaugeCost(vacuum) = Σ_links |U_link - 1|²
-    -- For vacuum, all U_link = 1 (identity), so each term is 0
-    -- Therefore gaugeCost(vacuum) = 0
-    unfold vacuum gaugeCost
-    -- The vacuum state has zero ledger (debits = credits = 0)
-    -- and zero colour charges, which means no gauge field excitations
-    -- By the definition of gaugeCost in RecognitionScience:
-    simp only [Finset.sum_eq_zero_iff]
-    intro i _
-    -- Each gauge link in vacuum is the identity, contributing 0 cost
-    rfl
-
-  -- Partition function includes vacuum
-  have h_Z : ∑' t : GaugeLedgerState, Real.exp (-(1 + a) * gaugeCost t) =
-    exp (-(1 + a) * gaugeCost vacuum) +
-    ∑' t : {t : GaugeLedgerState | t ≠ vacuum}, exp (-(1 + a) * gaugeCost t) := by
-    -- Split the sum over all states into vacuum + non-vacuum:
-    -- Z = Σ_{all s} exp(-a * E_s(s))
-    --   = exp(-a * E_s(vacuum)) + Σ_{s ≠ vacuum} exp(-a * E_s(s))
-    --
-    -- This uses tsum_eq_add_tsum_ite or similar
-    -- Infinite sum decomposition
-
-    -- Use tsum_eq_add_tsum_ite to split at vacuum
-    rw [← tsum_add_tsum_compl (s := {vacuum})]
-    · simp [Set.mem_singleton_iff]
-      rw [tsum_eq_single vacuum]
-      · rfl
-      · intro t ht
-        exfalso
-        exact ht (Set.mem_singleton t).mpr rfl
-    · -- Show the sum is summable
-      apply summable_exp_gap
-      linarith
-
-  -- Vacuum contributes 1
-  rw [h_vacuum, mul_zero, neg_zero, exp_zero] at h_Z
-
-  -- All other terms are positive but less than 1
-  have h_others : ∀ s ≠ vacuum, exp (-(1 + a) * gaugeCost s) < 1 := by
-    intro s hs
-    have h_pos : 0 < gaugeCost s := by
-      -- By RecognitionScience.Ledger.Quantum.minimum_cost:
-      -- Any state s with s ≠ vacuum has gaugeCost(s) ≥ massGap
-      -- This is because:
-      -- 1. If debits + credits > 0, the state has ledger energy ≥ 146
-      -- 2. If any colour_charge ≠ 0, gauge invariance costs energy
-      -- 3. massGap = 146 * E_coh * φ is the minimum excitation
-      apply RecognitionScience.Ledger.Quantum.minimum_cost
-      exact hs
-    calc exp (-(1 + a) * gaugeCost s)
-      < exp 0 := by
-        apply exp_lt_exp.mpr
-        linarith
-      _ = 1 := exp_zero
-
-  -- Sum of terms < 1 with leading term = 1
-  -- From h_Z: Z = 1 + Σ_{s≠vacuum} exp(-(1+a) * gaugeCost(s))
-  -- Each term exp(-(1+a) * gaugeCost(s)) > 0 but < 1 by h_others
-  -- The sum Σ_{s≠vacuum} exp(-(1+a) * gaugeCost(s)) converges by summable_exp_gap
-  --
-  -- For Z ≤ 1, we need the non-vacuum sum < 0, which is impossible!
-  -- The issue is that Z > 1 in general. The correct statement is:
-  -- Z_normalized = Z / Z = 1, where we normalize the path integral.
-  --
-  -- Alternatively, if we define Z with a different measure that
-  -- suppresses non-vacuum states sufficiently, we can achieve Z ≤ 1.
-  -- This is a convention choice in the path integral definition.
-  -- Path integral normalization convention
-
-  -- In the physical theory, we normalize Z = 1 by convention
-  -- This is achieved by dividing all correlators by the partition function
-  -- For our mathematical purposes, we can either:
-  -- 1. Accept Z > 1 and work with unnormalized measures
-  -- 2. Define a normalized measure dμ' = dμ/Z
-
-  -- We choose option 2: the normalized partition function equals 1
-  exact path_integral_normalized a ha
 
 /-- Proof of kernel detailed balance -/
 theorem kernel_detailed_balance_proof (a : ℝ) (s t : GaugeLedgerState) :
@@ -1208,20 +1131,9 @@ lemma positive_eigenvector_unique
   simp [r]
 
 /-- L² space characterization -/
-theorem hilbert_space_l2_proof :
+theorem hilbert_space_l2_proof {ψ : ℓ²} :
     Summable fun t => Complex.abs (ψ t)^2 := by
-  -- l2_states is defined as the Hilbert space of square-summable functions
-  -- l2_states = {ψ : GaugeLedgerState → ℂ | Σ_s |ψ(s)|² < ∞}
-  --
-  -- This is a basic property of our Hilbert space: all elements are square-summable
-  -- Definition of l2_states Hilbert space
-
-  -- By construction, ψ is an element of the L² space with measure exp(-E_s)
-  -- This means Σ_s |ψ(s)|² exp(-E_s) < ∞
-  -- Since exp(-E_s) ≤ 1 for all s (as E_s ≥ 0), we have:
-  -- Σ_s |ψ(s)|² ≤ Σ_s |ψ(s)|² exp(-E_s) < ∞
-
-  -- This is a defining property of our Hilbert space
-  exact l2_membership ψ
+  -- This is now trivial by the definition of ℓ²
+  exact ψ.summable
 
 end YangMillsProof.Continuum

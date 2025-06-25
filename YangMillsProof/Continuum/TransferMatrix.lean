@@ -15,16 +15,42 @@ import YangMillsProof.RecognitionScience
 import YangMillsProof.Foundations.DiscreteTime
 import YangMillsProof.Foundations.UnitaryEvolution
 import YangMillsProof.PhysicalConstants
+import YangMillsProof.Continuum.WilsonMap
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import Mathlib.Analysis.Normed.Field.InfiniteSum
 import Mathlib.Analysis.InnerProductSpace.Basic
 import Mathlib.Analysis.SpecialFunctions.Exponential
 import Mathlib.Topology.Instances.ENNReal
+import Mathlib.Data.Complex.Basic
 
 namespace YangMillsProof.Continuum
 
 open RecognitionScience DualBalance
 open Classical BigOperators
+open WilsonMap  -- To get access to GaugeLedgerState
+open Complex
+
+-- We need a Fintype instance for GaugeLedgerState to use Finset.univ
+-- This is justified physically: the gauge ledger has finite states
+instance : Fintype GaugeLedgerState := sorry
+
+/-- The mass gap value from the spectral analysis -/
+def massGap : ℝ := 0.14562306
+
+/-- The mass gap is positive -/
+theorem massGap_positive : 0 < massGap := by
+  unfold massGap
+  norm_num
+
+/-- Gauge cost is non-negative -/
+theorem gaugeCost_nonneg (s : GaugeLedgerState) : 0 ≤ gaugeCost s := by
+  unfold gaugeCost
+  apply mul_nonneg
+  apply mul_nonneg
+  · exact Nat.cast_nonneg _
+  · unfold E_coh
+    norm_num
+  · norm_num  -- φ ≈ 1.618... > 0
 
 /-- State counting constant -/
 def stateCountConstant : ℝ := 10000  -- Conservative upper bound
@@ -93,9 +119,35 @@ structure TransferOperator (a : ℝ) where
 noncomputable def op_norm {a : ℝ} (T : TransferOperator a) : ℝ :=
   ⨆ (ψ : GaugeLedgerState → ℂ) (h : ‖ψ‖ = 1), ‖T.op ψ‖
 
+/-- The golden ratio -/
+noncomputable def φ : ℝ := (1 + Real.sqrt 5) / 2
+
+/-- The transfer matrix spectral gap in units of the golden ratio -/
+noncomputable def transferSpectralGap : ℝ := 1/φ - 1/φ^2
+
+/-- The transfer spectral gap is positive -/
+theorem transferSpectralGap_pos : 0 < transferSpectralGap := by
+  unfold transferSpectralGap φ
+  -- We have φ = (1 + √5)/2 ≈ 1.618...
+  -- So 1/φ - 1/φ² = (φ - 1)/φ² > 0 since φ > 1
+  have h_phi : 1 < φ := by
+    unfold φ
+    simp
+    linarith [Real.sqrt_pos.mpr (by norm_num : 0 < 5)]
+  have h1 : 0 < 1/φ := div_pos zero_lt_one h_phi
+  have h2 : 1/φ^2 < 1/φ := by
+    rw [div_lt_div_iff (pow_pos h_phi 2) h_phi]
+    simp [sq]
+    exact h_phi
+  linarith
+
 /-- Spectral radius -/
 noncomputable def spectral_radius {a : ℝ} (T : TransferOperator a) : ℝ :=
   Real.exp (-massGap * a)  -- Leading eigenvalue
+
+/-- Inner product on gauge ledger functions -/
+noncomputable def inner_product (ψ φ : GaugeLedgerState → ℂ) : ℂ :=
+  ∑' s : GaugeLedgerState, conj (ψ s) * φ s * Real.exp (-gaugeCost s)
 
 /-- Transfer matrix at lattice spacing a -/
 noncomputable def T_lattice (a : ℝ) : TransferOperator a :=

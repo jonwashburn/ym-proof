@@ -10,6 +10,7 @@
 
 import YangMillsProof.RecognitionScience.Basic
 import YangMillsProof.Core.Constants
+import YangMillsProof.RecognitionScience.Ledger.FirstPrinciples
 import Mathlib.Analysis.SpecialFunctions.Exponential
 import Mathlib.Algebra.BigOperators.Basic
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
@@ -19,11 +20,11 @@ namespace RecognitionScience.Wilson
 
 open YangMillsProof BigOperators Real
 
-/-- The fundamental quantum unit in RS -/
-def halfQuantum : ℕ := 73
+/-- The fundamental quantum unit in RS - derived from first principles -/
+def halfQuantum : ℕ := RecognitionScience.Ledger.FirstPrinciples.plaquetteCost
 
 /-- Physical string tension after unit conversion -/
-def stringTension : ℝ := 0.073  -- = 73 × 10^(-3)
+def stringTension : ℝ := (halfQuantum : ℝ) / 1000
 
 /-- Simplified model: Wilson loop as exponential of area -/
 noncomputable def wilsonLoopExpectation (R T : ℝ) : ℝ :=
@@ -47,11 +48,11 @@ theorem area_law_bound : ∀ R T : ℝ, R > 0 → T > 0 →
   unfold wilsonLoopExpectation
   simp [hR, hT]
 
-  -- Need to show: exp(-73 * R * T / 1000) ≤ exp(-0.073 * R * T)
-  -- This is true because 73/1000 = 0.073
-  have h_eq : halfQuantum / 1000 = stringTension := by
-    unfold halfQuantum stringTension
-    norm_num
+    -- Need to show: exp(-halfQuantum * R * T / 1000) ≤ exp(-stringTension * R * T)
+  -- This is true because stringTension = halfQuantum / 1000 by definition
+  have h_eq : (halfQuantum : ℝ) / 1000 = stringTension := by
+    unfold stringTension
+    rfl
 
   rw [← h_eq]
 
@@ -66,17 +67,17 @@ theorem area_law_from_ledger :
   -- Substitute the cost formula
   rw [h_cost]
 
-  -- Same calculation as above
-  have h_eq : halfQuantum / 1000 = stringTension := by
-    unfold halfQuantum stringTension
-    norm_num
+    -- Same calculation as above
+  have h_eq : (halfQuantum : ℝ) / 1000 = stringTension := by
+    unfold stringTension
+    rfl
 
   rw [← h_eq]
 
 /-- The complete story: confinement is accounting -/
 theorem confinement_is_accounting :
     stringTension = halfQuantum / 1000 := by
-  unfold stringTension halfQuantum
-  norm_num
+  unfold stringTension
+  rfl
 
 end RecognitionScience.Wilson

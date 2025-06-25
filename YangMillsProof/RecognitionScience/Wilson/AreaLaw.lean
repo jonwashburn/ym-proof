@@ -11,6 +11,7 @@
 import YangMillsProof.RecognitionScience.Basic
 import YangMillsProof.Core.Constants
 import YangMillsProof.RecognitionScience.Wilson.AreaLawComplete
+import YangMillsProof.RecognitionScience.Ledger.FirstPrinciples
 
 namespace RecognitionScience.Wilson
 

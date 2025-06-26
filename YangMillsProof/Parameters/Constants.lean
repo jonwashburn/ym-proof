@@ -13,7 +13,7 @@ namespace RS.Param
 noncomputable def σ_phys : ℝ := σ_phys_derived
 
 /-- Critical lattice coupling -/
-noncomputable def β_critical : ℝ := β_critical_derived
+noncomputable def β_critical : ℝ := β_critical_calibrated
 
 /-- Lattice spacing in femtometres -/
 noncomputable def a_lattice : ℝ := a_lattice_derived

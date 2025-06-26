@@ -27,4 +27,10 @@ lemma E_coh_pos : 0 < E_coh := by
 lemma q73_eq_73 : (q73 : ℤ) = 73 := by
   simp [q73]
 
+-- Recognition length is positive (follows from definition as sqrt of positive)
+lemma λ_rec_pos : 0 < λ_rec := by
+  unfold λ_rec RecognitionScience.Core.λ_rec_formula
+  -- λ_rec = sqrt(ℏG/(πc³)) where all terms are positive
+  sorry -- Requires showing ℏ, G, c are positive in the RSJ framework
+
 end RS.Param

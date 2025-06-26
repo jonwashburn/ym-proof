@@ -8,6 +8,7 @@
 
 import YangMillsProof.Parameters.Constants
 import YangMillsProof.Parameters.DerivedConstants
+import Mathlib.Data.Real.Sqrt
 
 namespace RS.Param
 
@@ -15,9 +16,15 @@ open Real
 
 /-- Golden ratio is greater than 1 -/
 theorem φ_gt_one : 1 < φ := by
-  -- φ = (1 + √5)/2 > (1 + 0)/2 = 1/2 < 1? No, that's wrong
-  -- φ = (1 + √5)/2 > (1 + 2)/2 = 3/2 > 1
-  sorry -- Numerical: (1 + √5)/2 ≈ 1.618 > 1
+  -- φ = (1 + √5)/2
+  have h1 : φ = (1 + sqrt 5) / 2 := by rfl
+  rw [h1]
+  -- Need to show (1 + √5)/2 > 1, i.e., 1 + √5 > 2, i.e., √5 > 1
+  have h2 : 1 < sqrt 5 := by
+    rw [one_lt_sqrt_iff_sq_lt_self]
+    norm_num
+    norm_num
+  linarith
 
 /-- Golden ratio satisfies its defining equation -/
 theorem φ_eq : φ * φ = φ + 1 := by
@@ -36,26 +43,53 @@ theorem q73_eq : (q73 : ℤ) = 73 := by
 
 /-- Recognition length is positive -/
 theorem λ_rec_pos : 0 < λ_rec := by
-  -- λ_rec = √(ℏG/πc³) > 0
-  sorry -- Follows from positive arguments
+  -- λ_rec is defined in FromRS as a positive constant
+  -- This should be proven there
+  sorry -- TODO: Add to FromRS
 
 /-- Physical string tension is positive -/
 theorem σ_phys_pos : 0 < σ_phys := by
-  -- σ_phys = (q73/1000) * 2.466 > 0
   unfold σ_phys σ_phys_derived
-  sorry -- Numerical: 73/1000 * 2.466 > 0
+  -- σ = (q73/1000) * 2.466
+  have h1 : (0 : ℝ) < q73 := by
+    have : (q73 : ℤ) = 73 := q73_eq
+    norm_cast at *
+    linarith
+  have h2 : (0 : ℝ) < 2.466 := by norm_num
+  have h3 : (0 : ℝ) < 1000 := by norm_num
+  field_simp
+  apply mul_pos
+  · exact h1
+  · exact h2
 
 /-- Critical coupling is positive -/
 theorem β_critical_pos : 0 < β_critical := by
-  -- β_critical = π²/(6*E_coh*φ) > 0
-  unfold β_critical β_critical_derived
-  sorry -- All terms positive
+  unfold β_critical β_critical_calibrated β_critical_derived
+  -- β = π²/(6*E_coh*φ) * calibration_factor
+  have h1 : 0 < π := pi_pos
+  have h2 : 0 < E_coh := E_coh_pos
+  have h3 : 0 < φ := φ_pos
+  have h4 : 0 < calibration_factor := by
+    unfold calibration_factor
+    norm_num
+  field_simp
+  apply mul_pos
+  · apply mul_pos
+    · exact sq_pos_of_ne_zero _ (ne_of_gt h1)
+    · exact h4
+  · apply mul_pos
+    · norm_num
+    · apply mul_pos h2 h3
 
 /-- Lattice spacing is positive -/
 theorem a_lattice_pos : 0 < a_lattice := by
-  -- a_lattice = 1/(E_coh*φ*10) > 0
   unfold a_lattice a_lattice_derived
-  sorry -- Reciprocal of positive
+  -- a = GeV_to_fm / (E_coh * φ)
+  have h1 : 0 < GeV_to_fm := by
+    unfold GeV_to_fm
+    norm_num
+  have h2 : 0 < E_coh * φ := mul_pos E_coh_pos φ_pos
+  exact div_pos h1 h2
 
 /-- Step-scaling constant is positive -/
 theorem c₆_pos : 0 < c₆ := by

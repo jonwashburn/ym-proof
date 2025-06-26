@@ -2,6 +2,7 @@ import external.RSJ.Core.GoldenRatioDerivation
 import external.RSJ.Core.CoherenceQuantumDerivation
 import external.RSJ.Core.TopologicalCharge
 import external.RSJ.Core.RecognitionLengthDerivation
+import external.RSJ.Physics.Axioms
 
 namespace RS.Param
 
@@ -30,7 +31,18 @@ lemma q73_eq_73 : (q73 : ℤ) = 73 := by
 -- Recognition length is positive (follows from definition as sqrt of positive)
 lemma λ_rec_pos : 0 < λ_rec := by
   unfold λ_rec RecognitionScience.Core.λ_rec_formula
-  -- λ_rec = sqrt(ℏG/(πc³)) where all terms are positive
-  sorry -- Requires showing ℏ, G, c are positive in the RSJ framework
+  -- λ_rec = sqrt (Physics.ℏ * Physics.G / (Real.pi * Physics.c ^ 3))
+  have h_num : 0 < (Physics.ℏ * Physics.G) :=
+    mul_pos Physics.ℏ_pos Physics.G_pos
+  have h_den : 0 < (Real.pi * Physics.c ^ 3) := by
+    have hpi : (0:ℝ) < Real.pi := Real.pi_pos
+    have hc : (0:ℝ) < Physics.c := Physics.c_pos
+    have hc3 : (0:ℝ) < Physics.c ^ 3 := by
+      have : (0:ℝ) < Physics.c ^ 3 := pow_pos hc 3
+      exact this
+    exact mul_pos hpi hc3
+  have h_frac : 0 < Physics.ℏ * Physics.G / (Real.pi * Physics.c ^ 3) :=
+    div_pos h_num h_den
+  simpa using Real.sqrt_pos.mpr h_frac
 
 end RS.Param

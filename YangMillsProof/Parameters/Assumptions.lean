@@ -43,9 +43,8 @@ theorem q73_eq : (q73 : ℤ) = 73 := by
 
 /-- Recognition length is positive -/
 theorem λ_rec_pos : 0 < λ_rec := by
-  -- λ_rec is defined in FromRS as a positive constant
-  -- This should be proven there
-  sorry -- TODO: Add to FromRS
+  -- Proven in FromRS
+  exact RS.Param.λ_rec_pos
 
 /-- Physical string tension is positive -/
 theorem σ_phys_pos : 0 < σ_phys := by

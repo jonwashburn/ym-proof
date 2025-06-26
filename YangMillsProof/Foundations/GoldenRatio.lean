@@ -174,14 +174,8 @@ structure LogarithmicSpiral where
   golden_growth : growth_factor = fib_ratio 10
 
 /-- Golden ratio minimizes energy in packing problems -/
--- theorem optimal_packing :
---   ∀ (n : Nat), n > 10 →
---   -- Simplified: fib ratio approaches optimal value
---   fib (n + 1) * fib (n + 1) > fib n * fib (n + 2) := by
---   intro n hn
---   -- TODO(RecognitionScience): Requires discrete optimisation theory and
---   -- asymptotic analysis.  Omitted for now.
---   sorry
+-- Note: A formal proof of optimal packing would require discrete optimization theory
+-- and asymptotic analysis. This is left for future work.
 
 /-- Golden ratio appears in quantum mechanics -/
 structure QuantumGolden where
@@ -223,14 +217,9 @@ def golden_continued_fraction (n : Nat) : QuadExt :=
     1
 
 /-- Most irrational number (hardest to approximate) -/
--- theorem golden_most_irrational :
---   ∀ (n : Nat) (p q : Nat), q > 0 →
---   -- Simplified: golden ratio has slow rational approximation
---   fib (n + 2) * q > p * fib (n + 1) ∨ p * fib (n + 1) > fib (n + 2) * q := by
---   intro n p q hq
---   -- TODO(RecognitionScience): Needs Diophantine approximation (Hurwitz theorem).
---   -- Omitted for now.
---   sorry
+-- Note: The golden ratio is the "most irrational" number in the sense of having
+-- the slowest rational approximations. A formal proof would use Diophantine
+-- approximation theory (Hurwitz's theorem).
 
 /-- Aesthetic proportion in art and nature -/
 def golden_rectangle (width height : Nat) : Bool :=

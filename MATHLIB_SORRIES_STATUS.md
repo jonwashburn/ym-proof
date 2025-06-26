@@ -56,7 +56,7 @@ The remaining sorries are either:
 - Constraints that follow from how we set up the main theorem (ha_small, plaquette constraint)
 - Standard operator theory that needs better formalization (triangle inequality, norm bound)
 
-The proof structure is sound and the sorries could be eliminated with more time to navigate mathlib's library or by slightly restructuring the proof.
+The proof structure is sound and the sorries could be eliminated with more time to navigate mathlib's library or by slightly restructuring the proof. 
 
 # Mathlib Integration for Remaining Sorries
 

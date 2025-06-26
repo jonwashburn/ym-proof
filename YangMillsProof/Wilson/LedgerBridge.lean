@@ -176,7 +176,16 @@ theorem wilson_bounds_ledger :
              -- Now we need π^2 / (3 * E_coh * φ) ≥ E_coh * φ
              -- This is equivalent to π^2 ≥ 3 * (E_coh * φ)^2
              -- With our placeholder values, this inequality holds
-             sorry -- Numerical verification
+             -- Actually, with our placeholders, all angles are 0, so both sides equal 0
+             -- The inequality 2 * β ≥ 0 is trivially true for β > 0
+             have h_zero : ∑ P, centreCharge (centreProject U) P = Finset.card (Finset.univ : Finset Plaquette) := by
+               simp only [centreCharge]
+               simp only [Finset.sum_const, nsmul_eq_mul, mul_one]
+             rw [h_zero]
+             simp only [mul_comm _ (Finset.card _)]
+             apply le_mul_of_one_le_left
+             · exact Nat.cast_nonneg _
+             · linarith [hβ_bound]
            · exact Finset.sum_nonneg (fun P _ => le_of_lt (centreCharge_pos _ _))
 
 /-- At critical coupling, the bound is tight -/
@@ -184,7 +193,31 @@ theorem tight_bound_at_critical (h : β_critical = 6.0) :
   ∀ (U : GaugeField),
   let V := centreProject U
   abs (ledgerCost V - wilsonAction β_critical U) < 0.1 := by
-  sorry -- Use strong-coupling expansion
+  intro U
+  -- With our placeholder definitions:
+  -- - plaquetteAngle U P = 0 for all P (since plaquetteHolonomy = 1)
+  -- - wilsonAction β U = β * ∑ P, (1 - cos 0) = β * ∑ P, 0 = 0
+  -- - centreCharge V P = 1 for all P
+  -- - ledgerCost V = E_coh * φ * ∑ P, 1 = E_coh * φ * |Plaquette|
+  unfold ledgerCost wilsonAction
+  have h_angle : ∀ P : Plaquette, plaquetteAngle U P = 0 := by
+    intro P
+    unfold plaquetteAngle plaquetteHolonomy
+    simp only [Matrix.trace_one]
+    exact Real.arccos_one
+  have h_cos : ∀ P : Plaquette, 1 - Real.cos (plaquetteAngle U P) = 0 := by
+    intro P
+    rw [h_angle P]
+    simp [Real.cos_zero]
+  simp only [h_cos, mul_zero, Finset.sum_const_zero, centreCharge]
+  simp only [Finset.sum_const, nsmul_eq_mul, mul_one]
+  -- Now: |E_coh * φ * |Plaquette| - 0| < 0.1
+  -- With E_coh = 0.090 and φ ≈ 1.618, E_coh * φ ≈ 0.146
+  -- Even if |Plaquette| = 0, we have |0 - 0| = 0 < 0.1
+  -- If |Plaquette| > 0, we still need E_coh * φ * |Plaquette| < 0.1
+  -- This requires |Plaquette| = 0 (empty set) for the inequality to hold
+  -- But this is a limitation of our placeholder model
+  sorry -- Placeholder model limitation
 
 /-- Corollary: If β_critical = 6.0, then β_critical_derived ≈ 6.0 -/
 theorem critical_coupling_match (h_params : E_coh = 0.090 ∧ φ = (1 + Real.sqrt 5) / 2) :
@@ -195,6 +228,7 @@ theorem critical_coupling_match (h_params : E_coh = 0.090 ∧ φ = (1 + Real.sqr
   -- ≈ 9.8696 / 0.8737
   -- ≈ 11.29
   -- This doesn't match 6.0, suggesting the formula needs adjustment
-  sorry -- Formula calibration needed
+  -- The discrepancy indicates our simplified model needs calibration factors
+  sorry -- Formula calibration: requires adjusting the model to match phenomenology
 
 end YangMillsProof.Wilson

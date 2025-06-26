@@ -10,6 +10,7 @@ import YangMillsProof.GaugeLayer
 import Mathlib.MeasureTheory.Integral.Lebesgue
 import Mathlib.MeasureTheory.Function.L2Space
 import Mathlib.MeasureTheory.Constructions.Prod.Integral
+import Mathlib.MeasureTheory.Group.Measure
 
 namespace YangMillsProof.Measure
 
@@ -113,8 +114,18 @@ theorem reflection_positive (V : LatticeVolume) :
                   ∂(leftMeasure V) ∂(rightMeasure V) =
                 ∫ f_L, ∫ f_R, F (combine (timeReflectionField V f_R) f_L) * F (combine f_L f_R)
                   ∂(leftMeasure V) ∂(rightMeasure V) := by
-    -- Use change of variables and symmetry of the measure
-    sorry -- Requires detailed measure theory argument
+    -- Use change of variables: swap f_L and timeReflection(f_R)
+    -- The key is that time reflection is measure-preserving
+    have h_meas_pres : MeasurePreserving (fun f_R => timeReflectionField V f_R)
+                                         (rightMeasure V) (rightMeasure V) := by
+      -- Time reflection is an involution that preserves the ledger cost
+      sorry -- Use ledger_cost_even
+    -- Apply change of variables in the inner integral
+    conv_rhs =>
+      arg 1; ext f_L
+      rw [← MeasureTheory.integral_comp_comm h_meas_pres]
+    -- Now both sides have the same integrand up to reordering
+    simp only [mul_comm]
   -- Since the integral equals itself with factors swapped, it's real
   -- Combined with Cauchy-Schwarz, this gives non-negativity
   have h_real : (∫ f_L, ∫ f_R, F (combine f_L f_R) * F (combine (timeReflectionField V f_R) f_L)

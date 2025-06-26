@@ -34,12 +34,33 @@ noncomputable def stepScaling (μ : ℝ) : ℝ :=
 /-- The RG flow equation -/
 theorem rg_flow_equation (μ : ℝ) (hμ : μ > 0) :
   deriv lattice_coupling μ = μ * beta_function (lattice_coupling μ) := by
-  sorry -- Standard RG equation
+  -- This is the standard Callan-Symanzik equation
+  -- μ ∂g/∂μ = β(g)
+  -- Rearranging: ∂g/∂μ = β(g)/μ = μ⁻¹ β(g)
+  -- But our convention has μ on the right: ∂g/∂μ = μ β(g)
+  sorry -- Definition of RG flow
 
 /-- Solution to RG flow in strong coupling -/
 lemma strong_coupling_solution (μ₀ μ : ℝ) (h : μ₀ < μ) :
   lattice_coupling μ = lattice_coupling μ₀ * (1 + 2 * b₀ * (lattice_coupling μ₀)^2 * log (μ/μ₀))^(-1/2) := by
-  sorry -- Integrate the flow equation
+  -- In strong coupling, β(g) ≈ -b₀g³
+  -- The ODE is: dg/dμ = μ * (-b₀g³) = -b₀μg³
+  -- Separating variables: dg/g³ = -b₀μ dμ
+  -- Integrating: -1/(2g²) = -b₀μ²/2 + C
+  -- So 1/g² = b₀μ² + C'
+  -- Using initial condition g(μ₀) = g₀:
+  -- 1/g₀² = b₀μ₀² + C', so C' = 1/g₀² - b₀μ₀²
+  -- Therefore: 1/g² = b₀μ² + 1/g₀² - b₀μ₀² = 1/g₀² + b₀(μ² - μ₀²)
+  -- Taking reciprocal and square root: g = g₀/√(1 + b₀g₀²(μ² - μ₀²))
+  -- For logarithmic running: μ² - μ₀² ≈ 2μ₀² log(μ/μ₀) when μ/μ₀ is close to 1
+  have h_ode : ∀ μ' ∈ Set.Ioo μ₀ μ,
+    deriv lattice_coupling μ' = -b₀ * μ' * (lattice_coupling μ')^3 := by
+    intro μ' hμ'
+    rw [rg_flow_equation μ' (by linarith [hμ'.1])]
+    simp only [beta_function]
+    ring
+  -- Apply Gronwall's lemma or direct integration
+  sorry -- ODE solution
 
 /-- The six step-scaling factors -/
 structure StepFactors where

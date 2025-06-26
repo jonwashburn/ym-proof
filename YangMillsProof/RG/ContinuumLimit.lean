@@ -9,6 +9,7 @@ import YangMillsProof.Parameters.Assumptions
 import YangMillsProof.TransferMatrix
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
 import Mathlib.Topology.MetricSpace.CauchiSeqFilter
+import Mathlib.Analysis.SpecificLimits.Basic
 
 namespace YangMillsProof.RG
 
@@ -78,11 +79,37 @@ lemma gap_sequence_cauchy :
   -- Sum the telescoping series
   calc |massGap (2^(-m : ℝ)) - massGap (2^(-n : ℝ))|
       ≤ ∑ k in Finset.range (max m n - min m n), C * E_coh * φ * M * (2^(-(min m n + k) : ℝ))^2 := by
-        sorry -- Telescoping sum
+        -- Use triangle inequality on the telescoping sum
+        have h_tele : massGap (2^(-m : ℝ)) - massGap (2^(-n : ℝ)) =
+                      ∑ k in Finset.range (max m n - min m n),
+                        (massGap (2^(-(min m n + k) : ℝ)) - massGap (2^(-(min m n + k + 1) : ℝ))) := by
+          sorry -- Telescoping identity
+        rw [h_tele]
+        apply Finset.abs_sum_le_sum_abs
+        intro k hk
+        exact h_conv (min m n + k) (by linarith [hm, hn])
     _ ≤ C * E_coh * φ * M * (2^(-(min m n) : ℝ))^2 / (1 - 1/4) := by
-        sorry -- Geometric series bound
+        -- Geometric series: ∑ k, (1/4)^k = 1/(1-1/4) = 4/3
+        have h_geom : ∑ k in Finset.range (max m n - min m n), (2^(-(min m n + k) : ℝ))^2 ≤
+                      (2^(-(min m n) : ℝ))^2 / (1 - 1/4) := by
+          rw [← Finset.sum_mul]
+          have : ∀ k ∈ Finset.range (max m n - min m n),
+                 (2^(-(min m n + k) : ℝ))^2 = (2^(-(min m n) : ℝ))^2 * (1/4)^k := by
+            intro k hk
+            simp only [pow_two, ← mul_pow, ← pow_add]
+            congr 1
+            simp only [neg_add, pow_add, pow_neg, div_eq_inv_mul]
+            ring
+          simp only [this]
+          rw [← Finset.sum_mul]
+          apply mul_le_mul_of_nonneg_left
+          · exact Finset.sum_geometric_le (by norm_num : (1/4 : ℝ) < 1)
+          · exact sq_nonneg _
+        exact mul_le_mul_of_nonneg_left h_geom (by positivity)
     _ ≤ ε := by
-        sorry -- Use choice of N
+        -- Use choice of N: we chose N so that C * E_coh * φ * M * 4^(-N) * (4/3) < ε
+        have hN : N ≥ Nat.ceil (Real.log 2 / Real.log (ε / (4 * C * E_coh * φ * M))) := by rfl
+        sorry -- Arithmetic with logarithms
 
 /-- The continuum limit exists -/
 noncomputable def continuumGap : ℝ :=

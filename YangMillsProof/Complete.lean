@@ -54,11 +54,30 @@ theorem yang_mills_mass_gap_numerical
   constructor
   · -- Numerical approximation
     rw [h_ecoh_val, h_phi_val]
-    -- 0.090 * (1 + √5)/2 ≈ 0.090 * 1.618 ≈ 0.1456
-    -- This requires showing |0.090 * (1 + √5)/2 - 0.1456| < 0.0001
-    -- √5 ≈ 2.236, so (1 + √5)/2 ≈ 1.618
-    -- 0.090 * 1.618 ≈ 0.14562
-    sorry -- Requires numerical bounds on Real.sqrt 5
+    -- We need to show |0.090 * (1 + √5)/2 - 0.1456| < 0.0001
+    -- First, we bound √5: 2.236 < √5 < 2.237
+    have h_sqrt5_lo : 2.236 < Real.sqrt 5 := by
+      rw [Real.sqrt_lt' (by norm_num : 0 < 5)]
+      norm_num
+    have h_sqrt5_hi : Real.sqrt 5 < 2.237 := by
+      rw [Real.sqrt_lt' (by norm_num : 0 < 5)]
+      norm_num
+    -- So (1 + √5)/2 is between 1.618 and 1.6185
+    have h_phi_lo : 1.618 < (1 + Real.sqrt 5) / 2 := by
+      linarith [h_sqrt5_lo]
+    have h_phi_hi : (1 + Real.sqrt 5) / 2 < 1.6185 := by
+      linarith [h_sqrt5_hi]
+    -- Therefore 0.090 * φ is between 0.14562 and 0.14567
+    have h_prod_lo : 0.14562 < 0.090 * ((1 + Real.sqrt 5) / 2) := by
+      linarith [h_phi_lo]
+    have h_prod_hi : 0.090 * ((1 + Real.sqrt 5) / 2) < 0.14567 := by
+      linarith [h_phi_hi]
+    -- So |0.090 * φ - 0.1456| < 0.0001
+    simp only [abs_sub_comm]
+    rw [abs_sub_lt_iff]
+    constructor
+    · linarith [h_prod_lo]
+    · linarith [h_prod_hi]
   · -- Is mass gap
     exact yang_mills_mass_gap φ_eq E_coh_pos h_q73_val λ_rec_pos
 

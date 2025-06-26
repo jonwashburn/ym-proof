@@ -183,9 +183,42 @@ theorem reflection_positive (V : LatticeVolume) :
             ext l
             simp [timeReflectionField]
             -- The reflection of reflection brings us back
-            sorry -- Involution property
-          rw [← this]
-          exact h
+            -- For any coordinate x, (L-1-(L-1-x)) = x
+            have h_inv : ∀ (x : Fin V.L), V.L - 1 - (V.L - 1 - x) = x := by
+              intro x
+              -- Use Fin arithmetic
+              simp only [Fin.sub_def]
+              -- Convert to natural numbers
+              have hx : x.val < V.L := x.prop
+              have h1 : (V.L - 1 - x).val = V.L - 1 - x.val := by
+                rw [Fin.sub_def, Fin.sub_def]
+                simp only [Fin.coe_ofNat_eq_mod, Fin.val_mk]
+                have : 1 < V.L := by omega
+                have : x.val < V.L - 1 ∨ x.val = V.L - 1 := by omega
+                cases this with
+                | inl h =>
+                  simp [Nat.mod_eq_of_lt (by omega : V.L - 1 - x.val < V.L)]
+                | inr h =>
+                  simp [h]
+                  rw [Nat.sub_self]
+                  simp [Nat.zero_mod]
+              rw [h1]
+              have : V.L - 1 - (V.L - 1 - x.val) = x.val := by
+                have : x.val ≤ V.L - 1 := by omega
+                omega
+              simp [this, Fin.ext_iff]
+            -- Apply to the specific link
+            congr 1
+            · -- source reflection
+              ext i
+              split_ifs with h
+              · exact h_inv _
+              · rfl
+            · -- target reflection
+              ext i
+              split_ifs with h
+              · exact h_inv _
+              · rfl
         · intro h
           exact h
     -- Apply change of variables in the inner integral

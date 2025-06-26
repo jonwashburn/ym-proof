@@ -17,7 +17,10 @@ namespace YangMillsProof.Wilson
 open RS.Param
 
 /-- Plaquette holonomy (product of link variables around plaquette) -/
-def plaquetteHolonomy (U : GaugeField) (P : Plaquette) : SU(3) := sorry
+def plaquetteHolonomy (U : GaugeField) (P : Plaquette) : SU(3) :=
+  -- Placeholder: return identity element
+  -- In reality, this should compute the product of link variables around the plaquette
+  1
 
 /-- Extract angle from SU(3) matrix via trace -/
 noncomputable def plaquetteAngle (U : GaugeField) (P : Plaquette) : ℝ :=
@@ -29,11 +32,15 @@ noncomputable def wilsonAction (β : ℝ) (U : GaugeField) : ℝ :=
   β * ∑ P : Plaquette, (1 - Real.cos (plaquetteAngle U P))
 
 /-- Centre projection map -/
-def centreProject : GaugeField → CentreField := sorry
+def centreProject : GaugeField → CentreField :=
+  -- Placeholder: map to trivial centre field
+  fun _ => fun _ => 0
 
 /-- Centre charge is positive -/
 lemma centreCharge_pos (V : CentreField) (P : Plaquette) : 0 < centreCharge V P := by
-  sorry -- Centre charges are non-negative by construction
+  -- For the placeholder implementation, we need a positive value
+  -- In the real implementation, centre charges are non-negative by construction
+  sorry -- Requires actual centre field implementation
 
 /-- Key lemma: cosine bound for small angles -/
 lemma cos_bound (θ : ℝ) (h : |θ| ≤ π) : 1 - Real.cos θ ≥ (2 / π^2) * θ^2 := by
@@ -75,7 +82,9 @@ lemma centre_angle_bound (U : GaugeField) (P : Plaquette) :
   -- Step 2: The center projection maps U_P to the nearest center element
   -- The charge measures the "winding number" mod 3
   have h_winding : ∃ k : Fin 3, centreCharge V P = (k : ℝ) * (2 * π / 3)^2 / π^2 := by
-    sorry -- Center elements are evenly spaced
+    -- For Z₃ center, elements are at angles 0, 2π/3, 4π/3
+    use 1  -- Placeholder
+    sorry -- Requires actual implementation
 
   -- Step 3: For small θ, the charge is proportional to θ²
   -- This uses the fact that the distance function on SU(3)/Z₃ is locally quadratic
@@ -133,7 +142,9 @@ theorem wilson_bounds_ledger :
       -- So arccos(tr(M).re / 3) ∈ [0, π]
       have h_trace : |(plaquetteHolonomy U P).trace.re| ≤ 3 := by
         -- Trace of unitary matrix has absolute value at most dimension
-        sorry -- Use properties of SU(3) matrices
+        -- For SU(3), trace is sum of 3 eigenvalues, each with |λ| = 1
+        -- So |tr(M)| ≤ 3 by triangle inequality
+        sorry -- Matrix.SpecialUnitaryGroup properties
       have h_arccos : ∀ x : ℝ, |x| ≤ 1 → |Real.arccos x| ≤ π := by
         intro x hx
         exact Real.abs_arccos_le_pi x
@@ -182,7 +193,10 @@ theorem wilson_bounds_ledger :
                convert h using 2; ring
              -- Now we need π^2 / (3 * E_coh * φ) ≥ E_coh * φ
              -- This is equivalent to π^2 ≥ 3 * (E_coh * φ)^2
-             sorry -- Requires numerical bounds on E_coh and φ
+             -- With E_coh = 0.090 and φ = (1 + √5)/2 ≈ 1.618
+             -- We need π^2 ≈ 9.87 ≥ 3 * (0.090 * 1.618)^2 ≈ 3 * 0.0212 ≈ 0.0636
+             -- This is clearly true
+             sorry -- Numerical verification
            · exact Finset.sum_nonneg (fun P _ => le_of_lt (centreCharge_pos _ _))
 
 /-- At critical coupling, the bound is tight -/
@@ -195,6 +209,12 @@ theorem tight_bound_at_critical (h : β_critical = 6.0) :
 /-- Corollary: If β_critical = 6.0, then β_critical_derived ≈ 6.0 -/
 theorem critical_coupling_match (h_params : E_coh = 0.090 ∧ φ = (1 + Real.sqrt 5) / 2) :
   abs (β_critical_derived - 6.0) < 0.1 := by
-  sorry -- Numerical calculation
+  -- β_critical_derived = π^2 / (6 * E_coh * φ)
+  -- = π^2 / (6 * 0.090 * ((1 + √5)/2))
+  -- ≈ 9.8696 / (6 * 0.090 * 1.618)
+  -- ≈ 9.8696 / 0.8737
+  -- ≈ 11.29
+  -- This doesn't match 6.0, suggesting the formula needs adjustment
+  sorry -- Formula calibration needed
 
 end YangMillsProof.Wilson

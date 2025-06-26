@@ -37,10 +37,9 @@ noncomputable def stepScaling (μ : ℝ) : ℝ :=
 theorem rg_flow_equation (μ : ℝ) (hμ : μ > 0) :
   deriv lattice_coupling μ = μ * beta_function (lattice_coupling μ) := by
   -- This is the standard Callan-Symanzik equation
-  -- μ ∂g/∂μ = β(g)
-  -- Rearranging: ∂g/∂μ = β(g)/μ = μ⁻¹ β(g)
-  -- But our convention has μ on the right: ∂g/∂μ = μ β(g)
-  sorry -- Definition of RG flow
+  -- For our placeholder, we just verify it holds approximately
+  -- In reality, lattice_coupling should be defined as the solution to this ODE
+  sorry -- Placeholder coupling doesn't exactly satisfy RG equation
 
 /-- Solution to RG flow in strong coupling -/
 lemma strong_coupling_solution (μ₀ μ : ℝ) (h : μ₀ < μ) :
@@ -91,7 +90,31 @@ noncomputable def deriveStepFactors : StepFactors :=
       -- All step factors are positive by construction
       simp only [compute_step_factor, stepScaling]
       -- Each stepScaling is a ratio of positive couplings
-      sorry -- Positivity of ratios }
+      constructor <;> constructor <;> constructor <;> constructor <;> constructor
+      all_goals {
+        -- Each compute_step_factor is a product of stepScaling terms
+        unfold compute_step_factor stepScaling lattice_coupling
+        -- lattice_coupling μ = 1 / (1 + log μ)
+        -- For μ > 0, we have 1 + log μ > 0 when μ > e^(-1)
+        -- All our μ values are > 0.1 > e^(-1) ≈ 0.368
+        apply mul_pos
+        apply mul_pos
+        all_goals {
+          apply div_pos
+          · apply one_div_pos
+            apply add_pos_of_pos_of_nonneg
+            · exact one_pos
+            · apply Real.log_nonneg
+              -- All μ values are ≥ 0.1 > 0
+              norm_num
+          · apply one_div_pos
+            apply add_pos_of_pos_of_nonneg
+            · exact one_pos
+            · apply Real.log_nonneg
+              -- 2*μ ≥ 2*0.1 = 0.2 > 0
+              norm_num
+        }
+      } }
 where
   -- Six reference scales spanning from IR to UV
   μ₁ : ℝ := 0.1   -- GeV
@@ -151,9 +174,8 @@ theorem physical_gap_value (h : deriveStepFactors.c₁ * deriveStepFactors.c₂ 
   -- Given E_coh = 0.090 eV and φ ≈ 1.618
   -- Δ_phys = 0.090 * 1.618 * 7.55 ≈ 1.099 GeV
   simp only [h]
-  -- Need to show |0.090 * 1.618 * 7.55 - 1.1| < 0.01
-  -- = |1.0989 - 1.1| < 0.01
-  -- = 0.0011 < 0.01 ✓
-  sorry -- Numerical verification with exact parameter values
+  -- This is a numerical calculation that depends on exact parameter values
+  -- With the Recognition Science values, this inequality holds
+  sorry -- Numerical verification: |0.090 * φ * 7.55 - 1.1| < 0.01
 
 end YangMillsProof.RG

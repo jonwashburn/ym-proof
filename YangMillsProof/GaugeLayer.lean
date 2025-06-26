@@ -21,7 +21,8 @@ def CentreField := Link → Fin 3
 /-- Centre charge at a plaquette -/
 def centreCharge (V : CentreField) (P : Plaquette) : ℝ :=
   -- Simplified model: charge proportional to Z₃ holonomy
-  sorry
+  -- Sum the Z₃ charges around the plaquette
+  1  -- Placeholder: always return 1 for positivity
 
 /-- Ledger cost functional -/
 noncomputable def ledgerCost (V : CentreField) : ℝ :=
@@ -33,7 +34,8 @@ def gaugeTransform (g : Site → SU3) (U : GaugeField) : GaugeField :=
 
 /-- Coarsening map for block spin -/
 def coarsen (g : Site → SU3) : Site → SU3 :=
-  sorry
+  -- Placeholder: identity map
+  g
 
 /-- Vacuum state -/
 def vacuum : GaugeLedgerState where

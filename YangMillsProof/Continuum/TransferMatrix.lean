@@ -11,6 +11,7 @@
   Recognition Science Institute
 -/
 
+import YangMillsProof.Parameters.Assumptions
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import Mathlib.Analysis.Normed.Field.InfiniteSum
 import Mathlib.Analysis.InnerProductSpace.Basic
@@ -51,8 +52,9 @@ lemma gaugeCost_nonneg (s : GaugeLedgerState) : 0 ≤ gaugeCost s := by
   exact Nat.cast_nonneg _
 
 -- Physical constants
-def massGap : ℝ := 1.5
-lemma massGap_positive : 0 < massGap := by norm_num [massGap]
+open RS.Param
+-- massGap is now imported from Parameters.Assumptions
+lemma massGap_positive : 0 < massGap := massGap_pos
 
 -- Energy function
 def E_s (s : GaugeLedgerState) : ℝ := gaugeCost s
@@ -302,3 +304,5 @@ theorem kernel_detailed_balance_proof (a : ℝ) (s t : GaugeLedgerState) :
   -- This follows from commutativity of addition
   have h_sym : gaugeCost s + gaugeCost t = gaugeCost t + gaugeCost s := by ring
   simp only [h_sym]
+
+-- Parameters are now imported from YangMillsProof.Parameters

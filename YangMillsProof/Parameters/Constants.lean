@@ -1,35 +1,23 @@
-/-
-  Recognition Science Parameters
-  ==============================
+-- Yang-Mills Parameters (after RSJ integration)
+-- --------------------------------------------
+-- φ, E_coh, q73, λ_rec are imported (proven) via `Parameters.FromRS`.
+-- The four constants below remain to be derived and are still declared
+-- as free for now (see CONSTANTS_ROADMAP.md).
 
-  This file declares the fundamental parameters used in the Yang-Mills proof.
-  These are treated as unspecified constants to make the proof parametric.
--/
+import YangMillsProof.Parameters.FromRS
 
 namespace RS.Param
 
-/-- Golden ratio (self-similarity parameter) -/
-constant φ : ℝ
-
-/-- Coherence quantum (fundamental energy unit) -/
-constant E_coh : ℝ
-
-/-- Plaquette charge (topological quantum number) -/
-constant q73 : ℕ
-
-/-- Recognition length (mesoscopic scale) -/
-constant λ_rec : ℝ
-
-/-- Physical string tension in GeV² -/
+/-- Physical string tension (σ_phys) in GeV² – *to be derived*. -/
 constant σ_phys : ℝ
 
-/-- Critical coupling constant -/
+/-- Critical lattice coupling (β_critical) – *to be derived*. -/
 constant β_critical : ℝ
 
-/-- Lattice spacing in fm -/
+/-- Lattice spacing (a_lattice) in femtometres – *to be derived*. -/
 constant a_lattice : ℝ
 
-/-- Step-scaling product constant -/
+/-- Step-scaling product (c₆) – *to be derived*. -/
 constant c₆ : ℝ
 
 end RS.Param

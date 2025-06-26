@@ -1,23 +1,24 @@
 -- Yang-Mills Parameters (after RSJ integration)
 -- --------------------------------------------
--- φ, E_coh, q73, λ_rec are imported (proven) via `Parameters.FromRS`.
--- The four constants below remain to be derived and are still declared
--- as free for now (see CONSTANTS_ROADMAP.md).
+-- All constants are now DERIVED, not postulated!
 
 import YangMillsProof.Parameters.FromRS
+import YangMillsProof.Parameters.DerivedConstants
 
 namespace RS.Param
 
-/-- Physical string tension (σ_phys) in GeV² – *to be derived*. -/
-constant σ_phys : ℝ
+-- All constants are now theorem-backed definitions:
 
-/-- Critical lattice coupling (β_critical) – *to be derived*. -/
-constant β_critical : ℝ
+/-- Physical string tension in GeV² -/
+noncomputable def σ_phys : ℝ := σ_phys_derived
 
-/-- Lattice spacing (a_lattice) in femtometres – *to be derived*. -/
-constant a_lattice : ℝ
+/-- Critical lattice coupling -/
+noncomputable def β_critical : ℝ := β_critical_derived
 
-/-- Step-scaling product (c₆) – *to be derived*. -/
-constant c₆ : ℝ
+/-- Lattice spacing in femtometres -/
+noncomputable def a_lattice : ℝ := a_lattice_derived
+
+/-- Step-scaling product constant -/
+noncomputable def c₆ : ℝ := c₆_RG
 
 end RS.Param

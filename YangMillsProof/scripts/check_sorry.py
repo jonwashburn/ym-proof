@@ -11,6 +11,7 @@ import re
 # Core proof files that must be sorry-free
 CORE_FILES = [
     "Parameters/Constants.lean",
+    "Parameters/DerivedConstants.lean",
     "Parameters/Assumptions.lean", 
     "Wilson/LedgerBridge.lean",
     "Measure/ReflectionPositivity.lean",

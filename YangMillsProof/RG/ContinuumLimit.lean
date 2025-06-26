@@ -51,7 +51,38 @@ lemma gap_scaling_bounded : ∃ (M : ℝ), M > 0 ∧ ∀ (a : ℝ), 0 < a → ga
 lemma gap_sequence_cauchy :
   ∀ (ε : ℝ), ε > 0 → ∃ (N : ℕ), ∀ (m n : ℕ), m ≥ N → n ≥ N →
   |massGap (2^(-m : ℝ)) - massGap (2^(-n : ℝ))| < ε := by
-  sorry -- Use block_spin_gap_bound iteratively
+  intro ε hε
+  -- From block_spin_gap_bound, gaps at successive scales differ by O(a²)
+  -- For the sequence aₙ = 2^(-n), we have a geometric decay
+  -- The key is that the correction factor (1 + C * a²) → 1 as a → 0
+
+  -- Get the universal constant C from block_spin_gap_bound
+  obtain ⟨C, hC⟩ : ∃ C : ℝ, ∀ L B a, 0 < a → massGap (a * L) ≤ massGap a * (1 + C * a^2) := by
+    sorry -- Extract from block_spin_gap_bound
+
+  -- Choose N large enough that 2^(-N) < min(1, sqrt(ε/(2*C*E_coh*φ)))
+  have h_bound := gap_scaling_bounded
+  obtain ⟨M, hM_pos, hM_bound⟩ := h_bound
+
+  -- For m, n ≥ N, the difference is controlled by the sum of corrections
+  use Nat.ceil (Real.log 2 / Real.log (ε / (4 * C * E_coh * φ * M)))
+  intro m n hm hn
+
+  -- Use triangle inequality and the fact that corrections form a convergent series
+  have h_conv : ∀ k ≥ N, massGap (2^(-k : ℝ)) - massGap (2^(-(k+1) : ℝ)) ≤
+                         C * E_coh * φ * M * (2^(-k : ℝ))^2 := by
+    intro k hk
+    -- Apply block_spin_gap_bound with L = 2
+    sorry -- Detailed calculation
+
+  -- Sum the telescoping series
+  calc |massGap (2^(-m : ℝ)) - massGap (2^(-n : ℝ))|
+      ≤ ∑ k in Finset.range (max m n - min m n), C * E_coh * φ * M * (2^(-(min m n + k) : ℝ))^2 := by
+        sorry -- Telescoping sum
+    _ ≤ C * E_coh * φ * M * (2^(-(min m n) : ℝ))^2 / (1 - 1/4) := by
+        sorry -- Geometric series bound
+    _ ≤ ε := by
+        sorry -- Use choice of N
 
 /-- The continuum limit exists -/
 noncomputable def continuumGap : ℝ :=

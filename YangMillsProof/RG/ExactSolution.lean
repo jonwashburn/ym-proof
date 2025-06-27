@@ -7,6 +7,7 @@
 -/
 
 import YangMillsProof.Parameters.Assumptions
+import YangMillsProof.Numerical.Constants
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import Mathlib.Analysis.Calculus.Deriv.Basic
@@ -14,58 +15,20 @@ import Mathlib.Analysis.Calculus.Deriv.Basic
 namespace YangMillsProof.RG
 
 open Real RS.Param
+open YangMillsProof.Numerical.Constants
 
-/-- Leading beta function coefficient for SU(3) -/
-def b₀ : ℝ := 11 / (3 * 16 * π^2)
+/-- Use b₀ from Numerical.Constants -/
+noncomputable def b₀ := YangMillsProof.Numerical.Constants.b₀
 
 /-- Next-to-leading coefficient -/
 def b₁ : ℝ := 34 / (3 * (16 * π^2)^2)
 
-/-- Numerical bound on b₀ -/
-lemma b₀_bound : (0.073 : ℝ) < b₀ ∧ b₀ < (0.074 : ℝ) := by
-  unfold b₀
-  constructor
-  · -- Lower bound: 11/(3*16*π²) > 0.073
-    -- First establish a lower bound on π²
-    have h_pi_sq : (9.869 : ℝ) < π^2 := by
-      -- π > 3.14159, so π² > 9.869
-      have h_pi : (3.14159 : ℝ) < π := by
-        -- Use Mathlib's three_lt_pi : 3 < π
-        calc (3.14159 : ℝ) < 3.14160 := by norm_num
-          _ < 22/7 := by norm_num
-          _ < π := Real.pi_gt_22_div_7
-      calc (9.869 : ℝ) < 3.14159^2 := by norm_num
-        _ < π^2 := sq_lt_sq' (by norm_num) h_pi
-    -- Now compute the bound
-    calc (0.073 : ℝ) = 11 / 150.58 := by norm_num
-      _ < 11 / (3 * 16 * 9.869) := by
-        apply div_lt_div_of_lt_left
-        · norm_num
-        · norm_num
-        · norm_num
-      _ < 11 / (3 * 16 * π^2) := by
-        apply div_lt_div_of_lt_left
-        · norm_num
-        · apply mul_pos; apply mul_pos; norm_num; norm_num; exact sq_pos_of_ne_zero _ pi_ne_zero
-        · apply mul_lt_mul_of_pos_left; apply mul_lt_mul_of_pos_left h_pi_sq; norm_num; norm_num
-  · -- Upper bound: 11/(3*16*π²) < 0.074
-    -- Use upper bound on π²
-    have h_pi_sq : π^2 < (9.870 : ℝ) := by
-      -- π < 3.14160, so π² < 9.870
-      have h_pi : π < (3.14160 : ℝ) := by
-        -- Use Mathlib's pi_lt_22_div_7 : π < 22/7
-        calc π < 22/7 := Real.pi_lt_22_div_7
-          _ < 3.14160 := by norm_num
-      calc π^2 < 3.14160^2 := sq_lt_sq' (by linarith) h_pi
-        _ < 9.870 := by norm_num
-    -- Now compute the bound
-    calc 11 / (3 * 16 * π^2) < 11 / (3 * 16 * 9.869) := by
-        apply div_lt_div_of_lt_left
-        · norm_num
-        · apply mul_pos; apply mul_pos; norm_num; norm_num; norm_num
-        · apply mul_lt_mul_of_pos_left; apply mul_lt_mul_of_pos_left h_pi_sq; norm_num; norm_num
-      _ = 11 / 473.712 := by norm_num
-      _ < 0.074 := by norm_num
+/-- b₀ is positive (re-export) -/
+lemma b₀_pos : 0 < b₀ := YangMillsProof.Numerical.Constants.b₀_pos
+
+/-- Numerical bound on b₀ (re-export) -/
+lemma b₀_bound : (0.0232 : ℝ) < b₀ ∧ b₀ < (0.0234 : ℝ) :=
+  ⟨b₀_lower, b₀_upper⟩
 
 /-- Exact one-loop solution to RG equation -/
 noncomputable def g_exact (μ₀ g₀ μ : ℝ) : ℝ :=
@@ -83,31 +46,37 @@ lemma g_exact_pos (μ₀ g₀ μ : ℝ) (h₀ : 0 < μ₀) (hg : 0 < g₀) (hμ 
   · exact mul_nonneg (by norm_num : (0 : ℝ) ≤ 2) (le_of_lt b₀_pos)
   · exact sq_nonneg _
   · exact log_nonneg (div_one_le_iff h₀).mpr (le_mul_of_one_le_left h₀ (one_le_div_iff_le h₀).mpr hμ)
-where
-  b₀_pos : 0 < b₀ := by
-    unfold b₀
-    apply div_pos
-    · norm_num
-    · apply mul_pos
-      · norm_num
-      · exact sq_pos_of_ne_zero _ pi_ne_zero
 
-/-- The exact solution satisfies the RG flow equation -/
-theorem g_exact_satisfies_rg (μ₀ g₀ μ : ℝ) (h₀ : 0 < μ₀) (hg : 0 < g₀) (hμ : μ₀ < μ) :
-  deriv (g_exact μ₀ g₀) μ = -b₀ / μ * (g_exact μ₀ g₀ μ)^3 := by
-  -- Direct calculation using chain rule
-  -- d/dμ [g₀/√(1 + 2b₀g₀²log(μ/μ₀))] = -g₀ · (1/2) · (1 + ...)^(-3/2) · 2b₀g₀² · (1/μ)
-  -- = -b₀g₀³/μ · (1 + ...)^(-3/2) = -b₀/μ · [g₀/(1 + ...)^(1/2)]³
-  unfold g_exact
-
-  -- Set notation for the inner function
-  set f := fun μ => 1 + 2 * b₀ * g₀^2 * log (μ / μ₀) with hf
-
-  -- The derivative of log(μ/μ₀) with respect to μ
+/-- Helper: derivative of inverse square root of log term -/
+lemma deriv_inv_sqrt_log {a μ₀ : ℝ} (hμ : μ ≠ 0) (hden : 0 < 1 + a * log (μ / μ₀)) :
+    deriv (fun μ => (1 + a * log (μ / μ₀))^(-(1:ℝ)/2)) μ
+    = (- a) / (2 * μ) * (1 + a * log (μ / μ₀))^(-(3:ℝ)/2) := by
+  -- Use chain rule: d/dμ f(μ)^(-1/2) = (-1/2) * f(μ)^(-3/2) * f'(μ)
   have h_deriv_log : deriv (fun μ => log (μ / μ₀)) μ = 1 / μ := by
-    rw [deriv_log (div_pos (by linarith : 0 < μ) h₀)]
-    simp [div_ne_zero (ne_of_gt (by linarith : 0 < μ)) (ne_of_gt h₀)]
+    rw [deriv_log (ne_of_gt (by linarith : 0 < μ))]
+    simp [div_ne_zero hμ (ne_of_gt (by linarith : 0 < μ₀))]
     field_simp
+
+  -- Rewrite as rpow for easier differentiation
+  conv => rhs; rw [← rpow_neg hden, ← rpow_neg hden]
+
+  -- Apply chain rule
+  rw [deriv_rpow_const (Or.inl hden)]
+  simp only [deriv_add_const, deriv_const_mul, h_deriv_log]
+  ring_nf
+  rw [← rpow_neg hden, ← rpow_add hden]
+  norm_num
+
+/-- Helper: g_exact formula explicitly -/
+lemma g_exact_formula (μ₀ g₀ μ : ℝ) :
+    g_exact μ₀ g₀ μ = g₀ / sqrt (1 + 2 * b₀ * g₀^2 * log (μ / μ₀)) := by
+  rfl
+
+/-- Helper: derivative of g_exact -/
+lemma deriv_g_exact (μ₀ g₀ μ : ℝ) (h₀ : 0 < μ₀) (hg : 0 < g₀) (hμ : μ₀ < μ) :
+    deriv (g_exact μ₀ g₀) μ = (- b₀ * (g_exact μ₀ g₀ μ)^3) / μ := by
+  -- Set up notation
+  set f := fun μ => 1 + 2 * b₀ * g₀^2 * log (μ / μ₀) with hf
 
   -- f(μ) > 0 for our range
   have hf_pos : 0 < f μ := by
@@ -119,52 +88,29 @@ theorem g_exact_satisfies_rg (μ₀ g₀ μ : ℝ) (h₀ : 0 < μ₀) (hg : 0 < 
     · exact sq_nonneg _
     · exact log_nonneg (div_one_le_iff h₀).mpr (le_mul_of_one_le_left h₀ (one_le_div_iff_le h₀).mpr (le_of_lt hμ))
 
-  -- The derivative of f
-  have h_deriv_f : deriv f μ = 2 * b₀ * g₀^2 / μ := by
-    rw [← hf]
-    simp only [deriv_add_const, deriv_const_mul]
-    rw [h_deriv_log]
-    ring
-
-  -- Now use chain rule for g₀ / sqrt(f(μ))
-  -- d/dμ [g₀ / sqrt(f)] = g₀ * d/dμ [1/sqrt(f)] = g₀ * (-1/2) * f^(-3/2) * f'
-  have h_main : deriv (fun μ => g₀ / sqrt (f μ)) μ =
-    -g₀ / 2 * (f μ)^(-(3:ℝ)/2) * (2 * b₀ * g₀^2 / μ) := by
-    -- Use deriv_div_const and deriv_sqrt
-    rw [div_eq_mul_inv, deriv_const_mul]
-    have h_sqrt : deriv (fun μ => sqrt (f μ)) μ = 1 / (2 * sqrt (f μ)) * deriv f μ := by
-      apply deriv_sqrt hf_pos
-    have h_inv_sqrt : deriv (fun μ => (sqrt (f μ))⁻¹) μ =
-      -(sqrt (f μ))⁻¹^2 * deriv (fun μ => sqrt (f μ)) μ := by
-      apply deriv_inv (sqrt_ne_zero'.mpr hf_pos)
-    rw [h_inv_sqrt, h_sqrt, h_deriv_f]
-    -- Simplify: -(sqrt f)^(-2) * (1/(2*sqrt f)) * (2*b₀*g₀²/μ)
-    field_simp
-    ring_nf
-    -- This should give -b₀*g₀³/(μ * f^(3/2))
-    -- Expand: -(sqrt f)^(-2) * (1/(2*sqrt f)) * (2*b₀*g₀²/μ)
-    have h_sqrt_inv_sq : (sqrt (f μ))⁻¹ ^ 2 = (f μ)⁻¹ := by
-      rw [← sqrt_sq hf_pos, inv_pow, sq_sqrt hf_pos]
-    rw [h_sqrt_inv_sq]
-    -- Now: -(f μ)⁻¹ * 1/(2*sqrt(f μ)) * 2*b₀*g₀²/μ
-    ring_nf
-    -- = -b₀*g₀²/(μ * sqrt(f μ))
-    rw [← pow_three, ← sqrt_sq hf_pos]
-    ring_nf
-    -- Rewrite as power: sqrt(f)³ = f^(3/2)
-    rw [← rpow_natCast (f μ) 3, ← rpow_div hf_pos, div_self (by norm_num : (2 : ℝ) ≠ 0)]
-    simp only [rpow_one]
-
-  rw [h_main]
-  -- Simplify and show it equals -b₀/μ * (g_exact μ₀ g₀ μ)³
-  simp only [mul_div_assoc', neg_mul, neg_div]
-  -- -g₀/2 * f^(-3/2) * 2*b₀*g₀²/μ = -b₀*g₀³/μ * f^(-3/2)
-  ring_nf
-  -- And [g₀/√f]³ = g₀³/f^(3/2) = g₀³ * f^(-3/2)
-  rw [pow_three, ← hf]
+  -- Use the helper lemma
   unfold g_exact
-  simp only [div_pow, pow_div']
-  ring_nf
+  rw [deriv_const_mul]
+
+  -- Apply deriv_inv_sqrt_log with a = 2*b₀*g₀²
+  have h := deriv_inv_sqrt_log (ne_of_gt (by linarith : 0 < μ)) hf_pos
+  simp only [← hf] at h
+  rw [← sqrt_eq_rpow', ← sqrt_eq_rpow'] at h
+  convert h using 1
+  · ext x
+    rw [← sqrt_eq_rpow']
+  · ring_nf
+    rw [div_eq_iff (ne_of_gt (by linarith : 0 < μ))]
+    ring_nf
+    -- Now show: -b₀*g₀³/f^(3/2) = -b₀*(g₀/√f)³
+    rw [← pow_three, div_pow, ← sqrt_eq_rpow']
+    ring_nf
+
+/-- The exact solution satisfies the RG flow equation -/
+theorem g_exact_satisfies_rg (μ₀ g₀ μ : ℝ) (h₀ : 0 < μ₀) (hg : 0 < g₀) (hμ : μ₀ < μ) :
+  deriv (g_exact μ₀ g₀) μ = -b₀ / μ * (g_exact μ₀ g₀ μ)^3 := by
+  rw [deriv_g_exact μ₀ g₀ μ h₀ hg hμ]
+  ring
 
 /-- Upper bound on coupling in our range -/
 lemma g_exact_bound (μ₀ g₀ μ : ℝ) (h₀ : 0 < μ₀) (hg : g₀ ≤ 1.5) (hμ : μ₀ ≤ μ) :
@@ -457,39 +403,35 @@ lemma g_exact_bounds_at_i (i : Fin 6) :
       unfold g_exact μ_ref μ₀ g₀
       simp only
       -- log(0.8/0.1) = log 8 ∈ (2.0793, 2.0796)
-      have h_log := YangMillsProof.Numerical.log_eight_bounds
-      have h_b0 := YangMillsProof.Numerical.b_zero_value
-      obtain ⟨b₀', rfl, hb0_lower, hb0_upper⟩ := h_b0
+      have h_log := log_eight_bounds
+      have hb0_lower := b₀_lower
+      have hb0_upper := b₀_upper
       constructor
       · -- Lower bound: use upper bounds on denominator
         calc 1.095 < 1.2 / sqrt 1.145 := by norm_num
-          _ < 1.2 / sqrt (1 + 2 * b₀' * (1.2)^2 * log (0.8 / 0.1)) := by
+          _ < 1.2 / sqrt (1 + 2 * b₀ * (1.2)^2 * log (0.8 / 0.1)) := by
             apply div_lt_div_of_lt_left (by norm_num : (0:ℝ) < 1.2)
             · apply sqrt_pos; linarith
             · apply sqrt_lt_sqrt
-              calc 1 + 2 * b₀' * (1.2)^2 * log (0.8 / 0.1)
-                  = 1 + 2 * b₀' * 1.44 * log 8 := by norm_num
+              calc 1 + 2 * b₀ * (1.2)^2 * log (0.8 / 0.1)
+                  = 1 + 2 * b₀ * 1.44 * log 8 := by norm_num
                 _ < 1 + 2 * 0.0234 * 1.44 * 2.0796 := by
                   linarith [hb0_upper, h_log.2]
                 _ < 1.145 := by norm_num
       · -- Upper bound: use lower bounds on denominator
-        calc 1.2 / sqrt (1 + 2 * b₀' * (1.2)^2 * log (0.8 / 0.1))
+        calc 1.2 / sqrt (1 + 2 * b₀ * (1.2)^2 * log (0.8 / 0.1))
             < 1.2 / sqrt 1.144 := by
               apply div_lt_div_of_lt_left (by norm_num : (0:ℝ) < 1.2)
-              · apply sqrt_pos
-                calc 1.144 < 1 + 2 * 0.0232 * 1.44 * 2.0793 := by norm_num
-                  _ < 1 + 2 * b₀' * 1.44 * log 8 := by
-                    linarith [hb0_lower, h_log.1]
-                  _ = 1 + 2 * b₀' * (1.2)^2 * log (0.8 / 0.1) := by norm_num
+              · apply sqrt_pos; linarith
               · apply sqrt_lt_sqrt; linarith
           _ < 1.096 := by norm_num
     · -- i = 2: μ = 6.4
       unfold g_exact μ_ref μ₀ g₀
       simp only
       -- log(6.4/0.1) = log 64 = 6 * log 2 ∈ (4.1586, 4.1592)
-      have h_log2 := YangMillsProof.Numerical.log_two_bounds
-      have h_b0 := YangMillsProof.Numerical.b_zero_value
-      obtain ⟨b₀', rfl, hb0_lower, hb0_upper⟩ := h_b0
+      have h_log2 := log_two_bounds
+      have hb0_lower := b₀_lower
+      have hb0_upper := b₀_upper
       have h_log : 4.1586 < log (6.4 / 0.1) ∧ log (6.4 / 0.1) < 4.1592 := by
         have : log (6.4 / 0.1) = log 64 := by norm_num
         rw [this, ← log_pow (by norm_num : (0:ℝ) < 2)]
@@ -500,30 +442,30 @@ lemma g_exact_bounds_at_i (i : Fin 6) :
             _ = 4.1592 := by norm_num
       constructor
       · calc 0.999 < 1.2 / sqrt 1.290 := by norm_num
-          _ < 1.2 / sqrt (1 + 2 * b₀' * (1.2)^2 * log (6.4 / 0.1)) := by
+          _ < 1.2 / sqrt (1 + 2 * b₀ * (1.2)^2 * log (6.4 / 0.1)) := by
             apply div_lt_div_of_lt_left (by norm_num : (0:ℝ) < 1.2)
             · apply sqrt_pos; linarith
             · apply sqrt_lt_sqrt
-              calc 1 + 2 * b₀' * 1.44 * log (6.4 / 0.1)
+              calc 1 + 2 * b₀ * 1.44 * log (6.4 / 0.1)
                   < 1 + 2 * 0.0234 * 1.44 * 4.1592 := by
                     linarith [hb0_upper, h_log.2]
                 _ < 1.290 := by norm_num
-      · calc 1.2 / sqrt (1 + 2 * b₀' * (1.2)^2 * log (6.4 / 0.1))
+      · calc 1.2 / sqrt (1 + 2 * b₀ * (1.2)^2 * log (6.4 / 0.1))
             < 1.2 / sqrt 1.289 := by
               apply div_lt_div_of_lt_left (by norm_num : (0:ℝ) < 1.2)
               · apply sqrt_pos; linarith
               · apply sqrt_lt_sqrt
                 calc 1.289 < 1 + 2 * 0.0232 * 1.44 * 4.1586 := by norm_num
-                  _ < 1 + 2 * b₀' * 1.44 * log (6.4 / 0.1) := by
+                  _ < 1 + 2 * b₀ * 1.44 * log (6.4 / 0.1) := by
                     linarith [hb0_lower, h_log.1]
           _ < 1.000 := by norm_num
     · -- i = 3: μ = 51.2
       unfold g_exact μ_ref μ₀ g₀
       simp only
       -- log(51.2/0.1) = log 512 = 9 * log 2 ∈ (6.2379, 6.2388)
-      have h_log2 := YangMillsProof.Numerical.log_two_bounds
-      have h_b0 := YangMillsProof.Numerical.b_zero_value
-      obtain ⟨b₀', rfl, hb0_lower, hb0_upper⟩ := h_b0
+      have h_log2 := log_two_bounds
+      have hb0_lower := b₀_lower
+      have hb0_upper := b₀_upper
       have h_log : 6.2379 < log (51.2 / 0.1) ∧ log (51.2 / 0.1) < 6.2388 := by
         have : log (51.2 / 0.1) = log 512 := by norm_num
         rw [this, ← log_pow (by norm_num : (0:ℝ) < 2)]
@@ -808,7 +750,7 @@ lemma c_i_approx (i : Fin 6) :
 /-- Product of six octave factors -/
 noncomputable def c_product : ℝ := c_i 0 * c_i 1 * c_i 2 * c_i 3 * c_i 4 * c_i 5
 
-/-- Main result: Product is approximately 7.55 -/
+/-- Main result: Product lies in the interval (7.42, 7.68) -/
 theorem c_product_value : 7.42 < c_product ∧ c_product < 7.68 := by
   unfold c_product
   -- Use specific bounds for each c_i
@@ -835,7 +777,7 @@ theorem c_product_value : 7.42 < c_product ∧ c_product < 7.68 := by
             · apply mul_pos; apply mul_pos; apply mul_pos; linarith; linarith; linarith; linarith
           · exact h4.1
           · linarith
-          · apply mul_pos; apply mul_pos; apply mul_pos; apply mul_pos; linarith; linarith; linarith; linarith; linarith
+          · apply mul_pos; apply mul_pos; apply mul_pos; apply mul_pos; linarith; linarith; linarith; linarith
         · exact h5.1
         · linarith
         · apply mul_pos; apply mul_pos; apply mul_pos; apply mul_pos; apply mul_pos
@@ -866,7 +808,7 @@ theorem c_product_value : 7.42 < c_product ∧ c_product < 7.68 := by
 /-- Physical gap with exact RG -/
 noncomputable def Δ_phys_exact : ℝ := E_coh * φ * c_product
 
-/-- Gap is approximately 1.1 GeV -/
+/-- Gap is within 0.01 GeV of 1.1 GeV -/
 theorem gap_value_exact : abs (Δ_phys_exact - 1.1) < 0.01 := by
   unfold Δ_phys_exact
   -- With E_coh = 0.090, φ ≈ 1.618, c_product ≈ 7.55

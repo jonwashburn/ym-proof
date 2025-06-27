@@ -69,3 +69,7 @@ Progress tracking:
 [ ] D-1  [ ] D-2
 ```
 Pull requests should reference the IDs (e.g. `Closes M-1, M-2`). 
+
+lemma deriv_g_exact (hμ : μ ≠ 0)
+  : deriv (g_exact μ₀ g₀) μ
+    = (- b₀ * (g_exact μ₀ g₀ μ)^3) / μ

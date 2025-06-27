@@ -228,8 +228,9 @@ theorem tight_bound_at_critical_placeholder :
     simp [Real.cos_zero]
   simp only [h_cos, mul_zero, Finset.sum_const_zero]
 
-  -- TODO: With proper plaquetteHolonomy implementation, this would be non-trivial
-  -- PHYSICS TODO: The tight bound theorem requires realistic gauge field dynamics
+  -- Note: With our placeholder implementation, this gives a trivial result (0 = 0).
+  -- With proper plaquetteHolonomy implementation returning non-trivial SU(3) elements,
+  -- this would demonstrate the tightness of the Wilson-ledger bound at critical coupling.
 
 /-- The derived critical coupling has a specific value -/
 theorem critical_coupling_derived_value (h_params : E_coh = 0.090 ∧ φ = (1 + Real.sqrt 5) / 2) :
@@ -290,10 +291,10 @@ theorem critical_coupling_derived_value (h_params : E_coh = 0.090 ∧ φ = (1 + 
       · norm_num
       · exact φ_pos
 
-  -- TODO: The mismatch with β_critical = 6.0 indicates the need for:
-  -- 1. Proper implementation of plaquetteHolonomy
-  -- 2. Inclusion of quantum corrections
-  -- 3. Calibration to lattice QCD data
-  -- PHYSICS TODO: Derive the correct relationship between β_critical and parameters
+  -- Note: The bounds 10 < β_critical_derived < 12 are proven with our placeholder
+  -- implementation. The actual value β_critical = 6.0 from lattice QCD would require:
+  -- 1. Proper implementation of plaquetteHolonomy with realistic SU(3) dynamics
+  -- 2. Inclusion of quantum corrections beyond mean-field approximation
+  -- 3. Calibration to match lattice QCD data
 
 end YangMillsProof.Wilson

@@ -21,7 +21,10 @@ noncomputable def lattice_coupling (μ : ℝ) : ℝ :=
   -- Use exact one-loop solution
   g_exact μ₀ g₀ μ
 
-/-- Beta function for the running coupling -/
+/-- One-loop beta function for SU(3) Yang-Mills -/
+def beta_one_loop (g : ℝ) : ℝ := -b₀ * g^3
+
+/-- Full beta function including two-loop terms (for future use) -/
 noncomputable def beta_function (g : ℝ) : ℝ :=
   -- In strong coupling: β(g) = -b₀ g³ + higher orders
   -b₀ * g^3 + b₁ * g^5
@@ -31,45 +34,24 @@ noncomputable def stepScaling (μ : ℝ) : ℝ :=
   -- Ratio of couplings at scales μ and 2μ
   lattice_coupling (2 * μ) / lattice_coupling μ
 
-/-- The RG flow equation -/
-theorem rg_flow_equation (μ : ℝ) (hμ : μ > 0) :
-  μ * deriv lattice_coupling μ = beta_function (lattice_coupling μ) := by
-  -- This is the standard Callan-Symanzik equation
-  -- Our exact solution satisfies it by construction
-  unfold lattice_coupling beta_function
+/-- The RG flow equation (one-loop) -/
+theorem rg_flow_equation_one_loop (μ : ℝ) (hμ : μ > 0) :
+  μ * deriv lattice_coupling μ = beta_one_loop (lattice_coupling μ) := by
+  -- This is the standard Callan-Symanzik equation at one-loop
+  unfold lattice_coupling beta_one_loop
   have h : μ₀ < μ := by
     unfold μ₀
     linarith
   have h_exact := g_exact_satisfies_rg μ₀ g₀ μ (by unfold μ₀; norm_num) (by unfold g₀; norm_num) h
   -- The exact solution gives: d/dμ g = -b₀/μ * g³
   -- So: μ * d/dμ g = -b₀ * g³
-  -- The beta function at one-loop is: β(g) = -b₀ * g³ + b₁ * g⁵
   rw [← h_exact]
   simp only [mul_div_assoc', mul_comm μ]
-  -- Need to show: -b₀ * g³ = -b₀ * g³ + b₁ * g⁵
-  -- At one-loop order, we're working with β(g) = -b₀g³ only
-  -- The exact solution g_exact was derived specifically for this one-loop equation
-  -- So the equation μ * dg/dμ = -b₀g³ holds exactly for g_exact
-  -- The full beta function β(g) = -b₀g³ + b₁g⁵ is used for completeness,
-  -- but g_exact doesn't satisfy the full equation, only the one-loop part
 
-    -- To complete the proof, we show the equality holds up to higher-order terms
-  -- The key insight: g_exact solves μ * dg/dμ = -b₀g³ exactly
-  -- So the left side equals -b₀ * (g_exact μ₀ g₀ μ)³
-  -- The right side is -b₀ * (g_exact μ₀ g₀ μ)³ + b₁ * (g_exact μ₀ g₀ μ)⁵
-
-  -- We need to show these are equal, which means b₁ * g⁵ must be 0
-  -- In the one-loop approximation, we work with the truncated beta function
-  -- The mathematical resolution: redefine beta_function to match what g_exact satisfies
-
-  -- For now, we note that this is a limitation of mixing exact one-loop solutions
-  -- with multi-loop beta functions. The proper approach would be to either:
-  -- 1. Use only the one-loop beta function β(g) = -b₀g³, or
-  -- 2. Use a multi-loop solution that satisfies the full beta function
-
-  -- Since we're proving the one-loop result, we assert the equality
-  simp only [mul_comm b₁]
-  ring
+/-- Note: The full RG flow equation with two-loop terms -/
+-- This would require a two-loop solution, not implemented here
+-- theorem rg_flow_equation_full (μ : ℝ) (hμ : μ > 0) :
+--   μ * deriv lattice_coupling μ = beta_function (lattice_coupling μ) := sorry
 
 /-- Solution to RG flow in strong coupling -/
 lemma strong_coupling_solution (μ₀' μ : ℝ) (h : μ₀' < μ) :
@@ -213,7 +195,7 @@ noncomputable def deriveStepFactors : StepFactors :=
           apply g_exact_pos; unfold μ₀ g₀ μ_ref; norm_num
       } }
 
-/-- Each step factor is approximately φ^(1/3) -/
+/-- Each step factor is within 0.01 of φ^(1/3) -/
 lemma step_factor_estimate (i : Fin 6) :
   let c := match i with
     | 0 => deriveStepFactors.c₁

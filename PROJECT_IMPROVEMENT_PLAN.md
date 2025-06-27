@@ -62,8 +62,8 @@ The proof will be considered _solid and complete_ when **all High-priority (H) i
 
 Progress tracking:
 ```
-[ ] M-1  [ ] M-2  [ ] M-3  [ ] M-4  [ ] M-5  [ ] M-6  [ ] M-7
-[ ] P-1  [ ] P-2  [ ] P-3  [ ] P-4  [ ] P-5
+[ ] M-1  [x] M-2  [x] M-3  [ ] M-4  [ ] M-5  [ ] M-6  [ ] M-7
+[x] P-1  [x] P-2  [x] P-3  [x] P-4  [ ] P-5
 [ ] N-1  [ ] N-2  [ ] N-3
 [ ] C-1  [ ] C-2  [ ] C-3
 [ ] D-1  [ ] D-2

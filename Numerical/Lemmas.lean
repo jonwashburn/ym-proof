@@ -242,6 +242,25 @@ lemma sqrt_term_8_bounds (g : ℝ) (hg : 0.97 ≤ g ∧ g ≤ 1.2) :
         linarith [h.2]
       _ < 1.140 := by norm_num
 
+/-! ## Specific bounds for different g values -/
+
+-- For g ∈ [1.095, 1.096]
+lemma sqrt_term_2_bounds_1095 :
+  1.040 < sqrt (1 + 2 * (11 / (3 * 16 * π^2)) * (1.095)^2 * log 2) ∧
+  sqrt (1 + 2 * (11 / (3 * 16 * π^2)) * (1.096)^2 * log 2) < 1.043 := by
+  have hb0 := b_zero_value
+  obtain ⟨b₀, rfl, hb0_lower, hb0_upper⟩ := hb0
+  have hl2 := log_two_bounds
+  constructor
+  · calc 1.040 < sqrt (1 + 2 * 0.0232 * (1.095)^2 * 0.6931) := by norm_num
+      _ < sqrt (1 + 2 * b₀ * (1.095)^2 * log 2) := by
+        apply sqrt_lt_sqrt
+        linarith [hb0_lower, hl2.1]
+  · calc sqrt (1 + 2 * b₀ * (1.096)^2 * log 2) < sqrt (1 + 2 * 0.0234 * (1.096)^2 * 0.6932) := by
+        apply sqrt_lt_sqrt
+        linarith [hb0_upper, hl2.2]
+      _ < 1.043 := by norm_num
+
 lemma six_E_coh_phi_bounds (E_coh : ℝ) (φ : ℝ)
     (hE : E_coh = 0.090) (hφ : φ = (1 + sqrt 5) / 2) :
     (0.87 : ℝ) < 6 * E_coh * φ ∧ 6 * E_coh * φ < (0.88 : ℝ) := by

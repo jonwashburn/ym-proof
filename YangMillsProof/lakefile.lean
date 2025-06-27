@@ -3,9 +3,9 @@ open Lake DSL
 
 package «recognition-science» where
   -- Basic settings
-  leanOptions := #[
-    ⟨`autoImplicit, false⟩,
-    ⟨`relaxedAutoImplicit, false⟩
+  moreLeanArgs := #[
+    "-DautoImplicit=false",
+    "-DrelaxedAutoImplicit=false"
   ]
 
 require mathlib from git
@@ -32,3 +32,7 @@ lean_lib «Foundations» where
 lean_lib «RecognitionScience» where
   -- Main library combining everything
   roots := #[`RecognitionScience]
+
+lean_exe «numerical_tests» where
+  -- Numerical verification executable
+  root := `Tests.NumericalTests

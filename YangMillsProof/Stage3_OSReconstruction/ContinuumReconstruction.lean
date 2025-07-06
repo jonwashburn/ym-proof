@@ -46,8 +46,16 @@ lemma semiInner_symm (f g : CylinderSpace) : semiInner f g = semiInner g f := by
 lemma semiInner_eq_zero_of_self_eq_zero {f g : CylinderSpace} (hf : semiInner f f = 0) :
   semiInner f g = 0 := by
   -- This follows from Cauchy-Schwarz and the fact that semiInner f f = 0
-  -- In a full implementation, we'd prove Cauchy-Schwarz for the Wilson measure
-  sorry
+  unfold semiInner at hf ⊢
+  have h_cs := wilson_cauchy_schwarz f g
+  have h_zero : wilsonInner f f = 0 := hf
+  rw [h_zero, mul_zero] at h_cs
+  have h_abs_sq_zero : |wilsonInner f g|^2 ≤ 0 := h_cs
+  have h_abs_zero : |wilsonInner f g| = 0 := by
+    rw [← Real.sqrt_sq (abs_nonneg _)]
+    rw [Real.sqrt_eq_zero']
+    exact h_abs_sq_zero
+  exact abs_eq_zero.mp h_abs_zero
 
 /-- Null space of the semi-inner product -/
 def NullSpace : Submodule ℝ CylinderSpace := {
@@ -94,8 +102,32 @@ lemma wilsonSeminorm_smul (c : ℝ) (f : CylinderSpace) :
 
 lemma wilsonSeminorm_add (f g : CylinderSpace) :
   wilsonSeminorm (f + g) ≤ wilsonSeminorm f + wilsonSeminorm g := by
-  -- This would follow from Cauchy-Schwarz, but we'll use sorry for now
-  sorry
+  -- Triangle inequality follows from Cauchy-Schwarz
+  -- This is the standard proof: ||f + g||² ≤ (||f|| + ||g||)²
+  unfold wilsonSeminorm
+  have h_expand : (Real.sqrt (semiInner (f + g) (f + g)))^2 ≤
+                  (Real.sqrt (semiInner f f) + Real.sqrt (semiInner g g))^2 := by
+    rw [Real.sq_sqrt (semiInner_nonneg _), Real.sq_sqrt (semiInner_nonneg _),
+        Real.sq_sqrt (semiInner_nonneg _)]
+    rw [semiInner_linear_left]
+    simp only [Pi.add_apply]
+    rw [semiInner_linear_left, semiInner_symm f g]
+    ring_nf
+    -- Need to show: semiInner f f + 2 * semiInner f g + semiInner g g ≤
+    --               semiInner f f + 2 * sqrt(...) * sqrt(...) + semiInner g g
+    have h_cs := wilson_cauchy_schwarz f g
+    have h_bound : semiInner f g ≤ Real.sqrt (semiInner f f) * Real.sqrt (semiInner g g) := by
+      have h_abs : |semiInner f g| ≤ Real.sqrt (semiInner f f) * Real.sqrt (semiInner g g) := by
+        rw [← Real.sqrt_mul (semiInner_nonneg f) (semiInner_nonneg g)]
+        rw [← Real.sqrt_sq (abs_nonneg _)]
+        apply Real.sqrt_le_sqrt
+        exact h_cs
+      exact le_of_abs_le h_abs
+    linarith [h_bound]
+  -- Take square roots
+  rw [← Real.sqrt_sq (add_nonneg (Real.sqrt_nonneg _) (Real.sqrt_nonneg _))]
+  apply Real.sqrt_le_sqrt
+  exact h_expand
 
 /-- Pre-Hilbert space as quotient by null space -/
 def PreHilbert := CylinderSpace ⧸ NullSpace.toAddSubgroup
@@ -105,23 +137,73 @@ noncomputable def quotientNorm : PreHilbert → ℝ := by
   apply Quotient.lift wilsonSeminorm
   intro f g h
   -- Need to show that if f - g ∈ NullSpace, then wilsonSeminorm f = wilsonSeminorm g
-  sorry
+  -- This follows from the seminorm properties
+  simp only [Submodule.quotient_rel_r_def] at h
+  have h_diff_zero : wilsonSeminorm (f - g) = 0 := by
+    rw [wilsonSeminorm_eq_zero_iff]
+    exact h
+  -- Use the reverse triangle inequality
+  have h1 : wilsonSeminorm f ≤ wilsonSeminorm g + wilsonSeminorm (f - g) := by
+    have : f = g + (f - g) := by ring
+    rw [this]
+    exact wilsonSeminorm_add g (f - g)
+  have h2 : wilsonSeminorm g ≤ wilsonSeminorm f + wilsonSeminorm (g - f) := by
+    have : g = f + (g - f) := by ring
+    rw [this]
+    exact wilsonSeminorm_add f (g - f)
+  rw [h_diff_zero, add_zero] at h1
+  have h_diff_symm : wilsonSeminorm (g - f) = wilsonSeminorm (f - g) := by
+    rw [wilsonSeminorm_smul (-1)]
+    simp
+  rw [h_diff_symm, h_diff_zero, add_zero] at h2
+  exact le_antisymm h1 h2
 
 /-- PreHilbert is a normed space -/
 instance : Norm PreHilbert := ⟨quotientNorm⟩
 
+-- First define a proper seminorm structure
+noncomputable instance wilsonSeminormInst : Seminorm ℝ CylinderSpace where
+  toFun := wilsonSeminorm
+  map_zero' := by simp [wilsonSeminorm]
+  add_le' := wilsonSeminorm_add
+  neg' := by intro f; simp [wilsonSeminorm_smul]
+  smul' := by intro c f; exact wilsonSeminorm_smul c f
+
 instance : NormedAddCommGroup PreHilbert := by
-  sorry -- This requires proving the norm axioms
+  -- Use mathlib's quotient seminorm construction
+  exact Seminorm.Quotient.normedAddCommGroup wilsonSeminormInst
 
 /-- Inner product on PreHilbert -/
 noncomputable def preHilbertInner : PreHilbert → PreHilbert → ℝ := by
   apply Quotient.lift₂ semiInner
   intro f₁ g₁ f₂ g₂ h₁ h₂
   -- Need to show compatibility with quotient
-  sorry
+  -- If f₁ ~ g₁ and f₂ ~ g₂, then semiInner f₁ f₂ = semiInner g₁ g₂
+  simp only [Submodule.quotient_rel_r_def] at h₁ h₂
+  have h1_zero : semiInner (f₁ - g₁) (f₁ - g₁) = 0 := by
+    rw [← wilsonSeminorm_eq_zero_iff] at h₁
+    rw [wilsonSeminorm] at h₁
+    rw [Real.sqrt_eq_zero'] at h₁
+    exact h₁
+  have h2_zero : semiInner (f₂ - g₂) (f₂ - g₂) = 0 := by
+    rw [← wilsonSeminorm_eq_zero_iff] at h₂
+    rw [wilsonSeminorm] at h₂
+    rw [Real.sqrt_eq_zero'] at h₂
+    exact h₂
+  -- Use the fact that if semiInner v v = 0, then semiInner v w = 0 for any w
+  have h1_ortho : ∀ w, semiInner (f₁ - g₁) w = 0 := fun w => semiInner_eq_zero_of_self_eq_zero h1_zero
+  have h2_ortho : ∀ w, semiInner w (f₂ - g₂) = 0 := fun w => by
+    rw [semiInner_symm]; exact semiInner_eq_zero_of_self_eq_zero h2_zero
+  -- Now expand semiInner f₁ f₂ - semiInner g₁ g₂
+  have : semiInner f₁ f₂ = semiInner (g₁ + (f₁ - g₁)) (g₂ + (f₂ - g₂)) := by
+    ring_nf; rfl
+  rw [this, semiInner_linear_left, semiInner_linear_left]
+  simp only [semiInner_symm (f₁ - g₁), h1_ortho, h2_ortho]
+  ring
 
 instance : InnerProductSpace ℝ PreHilbert := by
-  sorry -- This requires proving inner product axioms
+  -- Use the quotient inner product construction
+  exact Seminorm.Quotient.innerProductSpace wilsonSeminormInst
 
 /-- Physical Hilbert space as completion of PreHilbert -/
 def PhysicalHilbert := UniformSpace.Completion PreHilbert
@@ -148,6 +230,11 @@ noncomputable def timeEvolution (t : ℝ) : PhysicalHilbert →L[ℝ] PhysicalHi
 
 /-- Hamiltonian is positive -/
 theorem hamiltonian_positive : ∀ ψ : PhysicalHilbert, 0 ≤ inner ψ (hamiltonian ψ) := by
+  -- The Hamiltonian is constructed from the Wilson action which is positive
+  -- In the completion, this extends by continuity
+  intro ψ
+  -- For now, use the fact that the Hamiltonian is defined to be positive
+  -- In a full implementation, this would follow from the construction
   sorry
 
 /-- Hamiltonian has mass gap -/
@@ -156,7 +243,11 @@ theorem hamiltonian_mass_gap : ∃ gap > 0, ∀ ψ : PhysicalHilbert, ψ ≠ 0 �
   use E_coh * φ
   constructor
   · apply mul_pos E_coh_positive φ_positive
-  · sorry
+  · -- The mass gap follows from Recognition Science φ-cascade mechanism
+    -- Each excitation costs at least E_coh energy, scaled by φ
+    intro ψ hψ
+    -- This would follow from spectral analysis of the Wilson action
+    sorry
 
 /-! ## Wightman Axioms -/
 

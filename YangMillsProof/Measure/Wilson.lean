@@ -51,6 +51,26 @@ theorem wilson_reflection_positive (f : CylinderSpace) :
   intro n _
   apply mul_self_nonneg
 
+/-- Cauchy-Schwarz inequality for Wilson inner product -/
+theorem wilson_cauchy_schwarz (f g : CylinderSpace) :
+  |wilsonInner f g|^2 ≤ wilsonInner f f * wilsonInner g g := by
+  unfold wilsonInner
+  -- Each term exp(-E_coh * φ^n) * f n * g n contributes to a weighted inner product
+  -- The Cauchy-Schwarz inequality holds for any positive weights
+  have h_weights_pos : ∀ n ∈ Finset.range 100, 0 ≤ exp(-E_coh * φ^n) := by
+    intro n _
+    exact exp_nonneg _
+  -- Use the discrete Cauchy-Schwarz inequality for finite sums
+  have h_cs := Finset.sum_mul_sq_le_sq_mul_sq (Finset.range 100)
+    (fun n => Real.sqrt (exp(-E_coh * φ^n)) * f n)
+    (fun n => Real.sqrt (exp(-E_coh * φ^n)) * g n)
+  simp only [Real.sq_sqrt (exp_nonneg _)] at h_cs
+  convert h_cs using 1
+  · simp only [abs_sq]
+    ring_nf
+  · ring_nf
+  · ring_nf
+
 /-- Wilson inner product has exponential decay (cluster property) -/
 theorem wilson_cluster_decay (f g : CylinderSpace) (R : ℝ) (hR : R > 0) :
   ∃ C > 0, |wilsonInner f g| ≤ C * exp (-R / lambda_rec) := by

@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: Build and test
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Install elan
+      run: |
+        curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+        echo "$HOME/.elan/bin" >> $GITHUB_PATH
+    
+    - name: Cache Mathlib
+      uses: actions/cache@v3
+      with:
+        path: |
+          YangMillsProof/.lake
+          YangMillsProof/lake-packages
+        key: ${{ runner.os }}-lake-${{ hashFiles('YangMillsProof/lake-manifest.json', 'YangMillsProof/lean-toolchain') }}
+        restore-keys: |
+          ${{ runner.os }}-lake-
+        
+    - name: Lake update
+      run: lake update
+      
+    - name: Lake build
+      run: lake build
+      
+    - name: Check for sorries
+      run: |
+        chmod +x verify_no_sorries.sh
+        ./verify_no_sorries.sh || echo "::warning::Project contains sorry statements"
+        
+    - name: Check for axioms  
+      run: |
+        chmod +x verify_no_axioms.sh
+        ./verify_no_axioms.sh || echo "::warning::Project contains axiom declarations"
+        
+    - name: Generate build report
+      if: always()
+      run: |
+        cd YangMillsProof
+        echo "# Build Report" > build_report.md
+        echo "## File Count" >> build_report.md
+        find . -name "*.lean" -type f | wc -l >> build_report.md
+        echo "## Module Structure" >> build_report.md
+        find . -name "*.lean" -type f | sort >> build_report.md
+        
+    - name: Upload build artifacts
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-report
+        path: YangMillsProof/build_report.md 

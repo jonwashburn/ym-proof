@@ -1,0 +1,3 @@
+[submodule "external/RSJ"]
+	path = external/RSJ
+	url = https://github.com/jonwashburn/Recognition-Science-Journal.git

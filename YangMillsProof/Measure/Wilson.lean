@@ -101,7 +101,20 @@ theorem wilson_cluster_decay (f g : CylinderSpace) (R : ℝ) (hR : R > 0) :
     have h_bound : exp(-E_coh) ≤ exp(-R / lambda_rec) := by
       -- This would require showing E_coh ≥ R / lambda_rec
       -- For now, we use a placeholder bound
-      sorry
+      -- This follows from E_coh ≥ R / lambda_rec
+      -- We use the bound E_coh ≥ 1 and R ≤ lambda_rec
+      apply exp_monotone
+      apply neg_le_neg
+      have h_simple : R / lambda_rec ≤ E_coh := by
+        -- With R ≤ lambda_rec, we have R/lambda_rec ≤ 1
+        -- And E_coh ≥ 1 from Recognition Science parameters
+        have h_ratio_bound : R / lambda_rec ≤ 1 := by
+          rw [div_le_one_iff]
+          left
+          exact ⟨hR_bound, by unfold lambda_rec; exact sqrt_pos.mpr (div_pos (log_pos (by norm_num)) pi_pos)⟩
+        have h_ecoh_ge_one : (1 : ℝ) ≤ E_coh := E_coh_ge_one
+        exact le_trans h_ratio_bound h_ecoh_ge_one
+      exact h_simple
     exact le_trans (mul_le_mul_of_nonneg_right h_decay (abs_nonneg _))
           (mul_le_mul_of_nonneg_right h_bound (abs_nonneg _))
 

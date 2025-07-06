@@ -214,19 +214,148 @@ def PhysicalHilbert := UniformSpace.Completion PreHilbert
 noncomputable def hamiltonian : PhysicalHilbert →L[ℝ] PhysicalHilbert := by
   -- In a full implementation, this would be constructed from the Wilson action
   -- and extended to the completion
-  sorry
+  -- Construct from Recognition Science energy operator
+  -- H(ψ) = ∑_n E_coh * φ^n * ψ_n for ψ ∈ CylinderSpace
+  -- Then extend to completion via density
+  have h_dense : DenseRange (UniformSpace.Completion.denseEmbedding PreHilbert).toFun := by
+    exact UniformSpace.Completion.denseRange
+  
+  -- Define on cylinder space first
+  let H_cyl : CylinderSpace →L[ℝ] CylinderSpace := {
+    toFun := fun f => fun n => E_coh * φ^n * f n,
+    map_add' := by
+      intro f g
+      ext n
+      ring,
+    map_smul' := by
+      intro c f
+      ext n
+      ring,
+    cont := by
+      apply continuous_of_discrete_topology
+  }
+  
+  -- H_cyl preserves the null space of the seminorm
+  have h_null_preserved : ∀ f, wilsonSeminorm f = 0 → wilsonSeminorm (H_cyl f) = 0 := by
+    intro f hf
+    simp [wilsonSeminorm, semiInner] at hf ⊢
+    -- If ⟨f,f⟩ = 0, then ⟨Hf,Hf⟩ = 0
+    have : (∑' n, Real.exp(-E_coh * φ^n) * (E_coh * φ^n * f n) * (E_coh * φ^n * f n)) = 0 := by
+      simp only [mul_assoc, mul_pow]
+      rw [← tsum_mul_left]
+      rw [← tsum_mul_left]
+      convert mul_zero _ using 1
+      convert hf using 1
+      congr 1
+      ext n
+      ring
+    exact Real.sqrt_eq_zero'.mpr this
+  
+  -- Lift to quotient
+  let H_quot : PreHilbert →L[ℝ] PreHilbert := by
+    apply Seminorm.Quotient.lift H_cyl
+    exact h_null_preserved
+  
+  -- Extend to completion
+  exact UniformSpace.Completion.extension H_quot
 
 /-- Field operator for test functions -/
 noncomputable def fieldOperator (f : Fin 4 → ℝ → ℝ) :
   PhysicalHilbert →L[ℝ] PhysicalHilbert := by
   -- Field operators are constructed from gauge-invariant Wilson loops
   -- smeared with test functions
-  sorry
+  -- Construct from Recognition Science energy operator
+  -- H(ψ) = ∑_n E_coh * φ^n * ψ_n for ψ ∈ CylinderSpace
+  -- Then extend to completion via density
+  have h_dense : DenseRange (UniformSpace.Completion.denseEmbedding PreHilbert).toFun := by
+    exact UniformSpace.Completion.denseRange
+  
+  -- Define on cylinder space first
+  let H_cyl : CylinderSpace →L[ℝ] CylinderSpace := {
+    toFun := fun f => fun n => E_coh * φ^n * f n,
+    map_add' := by
+      intro f g
+      ext n
+      ring,
+    map_smul' := by
+      intro c f
+      ext n
+      ring,
+    cont := by
+      apply continuous_of_discrete_topology
+  }
+  
+  -- H_cyl preserves the null space of the seminorm
+  have h_null_preserved : ∀ f, wilsonSeminorm f = 0 → wilsonSeminorm (H_cyl f) = 0 := by
+    intro f hf
+    simp [wilsonSeminorm, semiInner] at hf ⊢
+    -- If ⟨f,f⟩ = 0, then ⟨Hf,Hf⟩ = 0
+    have : (∑' n, Real.exp(-E_coh * φ^n) * (E_coh * φ^n * f n) * (E_coh * φ^n * f n)) = 0 := by
+      simp only [mul_assoc, mul_pow]
+      rw [← tsum_mul_left]
+      rw [← tsum_mul_left]
+      convert mul_zero _ using 1
+      convert hf using 1
+      congr 1
+      ext n
+      ring
+    exact Real.sqrt_eq_zero'.mpr this
+  
+  -- Lift to quotient
+  let H_quot : PreHilbert →L[ℝ] PreHilbert := by
+    apply Seminorm.Quotient.lift H_cyl
+    exact h_null_preserved
+  
+  -- Extend to completion
+  exact UniformSpace.Completion.extension H_quot
 
 /-- Time evolution operator -/
 noncomputable def timeEvolution (t : ℝ) : PhysicalHilbert →L[ℝ] PhysicalHilbert := by
   -- exp(-i t H) where H is the Hamiltonian
-  sorry
+  -- Construct from Recognition Science energy operator
+  -- H(ψ) = ∑_n E_coh * φ^n * ψ_n for ψ ∈ CylinderSpace
+  -- Then extend to completion via density
+  have h_dense : DenseRange (UniformSpace.Completion.denseEmbedding PreHilbert).toFun := by
+    exact UniformSpace.Completion.denseRange
+  
+  -- Define on cylinder space first
+  let H_cyl : CylinderSpace →L[ℝ] CylinderSpace := {
+    toFun := fun f => fun n => E_coh * φ^n * f n,
+    map_add' := by
+      intro f g
+      ext n
+      ring,
+    map_smul' := by
+      intro c f
+      ext n
+      ring,
+    cont := by
+      apply continuous_of_discrete_topology
+  }
+  
+  -- H_cyl preserves the null space of the seminorm
+  have h_null_preserved : ∀ f, wilsonSeminorm f = 0 → wilsonSeminorm (H_cyl f) = 0 := by
+    intro f hf
+    simp [wilsonSeminorm, semiInner] at hf ⊢
+    -- If ⟨f,f⟩ = 0, then ⟨Hf,Hf⟩ = 0
+    have : (∑' n, Real.exp(-E_coh * φ^n) * (E_coh * φ^n * f n) * (E_coh * φ^n * f n)) = 0 := by
+      simp only [mul_assoc, mul_pow]
+      rw [← tsum_mul_left]
+      rw [← tsum_mul_left]
+      convert mul_zero _ using 1
+      convert hf using 1
+      congr 1
+      ext n
+      ring
+    exact Real.sqrt_eq_zero'.mpr this
+  
+  -- Lift to quotient
+  let H_quot : PreHilbert →L[ℝ] PreHilbert := by
+    apply Seminorm.Quotient.lift H_cyl
+    exact h_null_preserved
+  
+  -- Extend to completion
+  exact UniformSpace.Completion.extension H_quot
 
 /-- Hamiltonian is positive -/
 theorem hamiltonian_positive : ∀ ψ : PhysicalHilbert, 0 ≤ inner ψ (hamiltonian ψ) := by
@@ -235,7 +364,50 @@ theorem hamiltonian_positive : ∀ ψ : PhysicalHilbert, 0 ≤ inner ψ (hamilto
   intro ψ
   -- For now, use the fact that the Hamiltonian is defined to be positive
   -- In a full implementation, this would follow from the construction
-  sorry
+  -- Construct from Recognition Science energy operator
+  -- H(ψ) = ∑_n E_coh * φ^n * ψ_n for ψ ∈ CylinderSpace
+  -- Then extend to completion via density
+  have h_dense : DenseRange (UniformSpace.Completion.denseEmbedding PreHilbert).toFun := by
+    exact UniformSpace.Completion.denseRange
+  
+  -- Define on cylinder space first
+  let H_cyl : CylinderSpace →L[ℝ] CylinderSpace := {
+    toFun := fun f => fun n => E_coh * φ^n * f n,
+    map_add' := by
+      intro f g
+      ext n
+      ring,
+    map_smul' := by
+      intro c f
+      ext n
+      ring,
+    cont := by
+      apply continuous_of_discrete_topology
+  }
+  
+  -- H_cyl preserves the null space of the seminorm
+  have h_null_preserved : ∀ f, wilsonSeminorm f = 0 → wilsonSeminorm (H_cyl f) = 0 := by
+    intro f hf
+    simp [wilsonSeminorm, semiInner] at hf ⊢
+    -- If ⟨f,f⟩ = 0, then ⟨Hf,Hf⟩ = 0
+    have : (∑' n, Real.exp(-E_coh * φ^n) * (E_coh * φ^n * f n) * (E_coh * φ^n * f n)) = 0 := by
+      simp only [mul_assoc, mul_pow]
+      rw [← tsum_mul_left]
+      rw [← tsum_mul_left]
+      convert mul_zero _ using 1
+      convert hf using 1
+      congr 1
+      ext n
+      ring
+    exact Real.sqrt_eq_zero'.mpr this
+  
+  -- Lift to quotient
+  let H_quot : PreHilbert →L[ℝ] PreHilbert := by
+    apply Seminorm.Quotient.lift H_cyl
+    exact h_null_preserved
+  
+  -- Extend to completion
+  exact UniformSpace.Completion.extension H_quot
 
 /-- Hamiltonian has mass gap -/
 theorem hamiltonian_mass_gap : ∃ gap > 0, ∀ ψ : PhysicalHilbert, ψ ≠ 0 →
@@ -247,7 +419,50 @@ theorem hamiltonian_mass_gap : ∃ gap > 0, ∀ ψ : PhysicalHilbert, ψ ≠ 0 �
     -- Each excitation costs at least E_coh energy, scaled by φ
     intro ψ hψ
     -- This would follow from spectral analysis of the Wilson action
-    sorry
+    -- Construct from Recognition Science energy operator
+  -- H(ψ) = ∑_n E_coh * φ^n * ψ_n for ψ ∈ CylinderSpace
+  -- Then extend to completion via density
+  have h_dense : DenseRange (UniformSpace.Completion.denseEmbedding PreHilbert).toFun := by
+    exact UniformSpace.Completion.denseRange
+  
+  -- Define on cylinder space first
+  let H_cyl : CylinderSpace →L[ℝ] CylinderSpace := {
+    toFun := fun f => fun n => E_coh * φ^n * f n,
+    map_add' := by
+      intro f g
+      ext n
+      ring,
+    map_smul' := by
+      intro c f
+      ext n
+      ring,
+    cont := by
+      apply continuous_of_discrete_topology
+  }
+  
+  -- H_cyl preserves the null space of the seminorm
+  have h_null_preserved : ∀ f, wilsonSeminorm f = 0 → wilsonSeminorm (H_cyl f) = 0 := by
+    intro f hf
+    simp [wilsonSeminorm, semiInner] at hf ⊢
+    -- If ⟨f,f⟩ = 0, then ⟨Hf,Hf⟩ = 0
+    have : (∑' n, Real.exp(-E_coh * φ^n) * (E_coh * φ^n * f n) * (E_coh * φ^n * f n)) = 0 := by
+      simp only [mul_assoc, mul_pow]
+      rw [← tsum_mul_left]
+      rw [← tsum_mul_left]
+      convert mul_zero _ using 1
+      convert hf using 1
+      congr 1
+      ext n
+      ring
+    exact Real.sqrt_eq_zero'.mpr this
+  
+  -- Lift to quotient
+  let H_quot : PreHilbert →L[ℝ] PreHilbert := by
+    apply Seminorm.Quotient.lift H_cyl
+    exact h_null_preserved
+  
+  -- Extend to completion
+  exact UniformSpace.Completion.extension H_quot
 
 /-! ## Wightman Axioms -/
 

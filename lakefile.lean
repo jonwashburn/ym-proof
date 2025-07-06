@@ -36,4 +36,4 @@ lean_lib «RecognitionScience» where
 lean_lib «YangMillsProof» where
   -- Yang-Mills proof components
   srcDir := "YangMillsProof"
-  roots := #[`Stage3_OSReconstruction.ContinuumReconstruction, `Stage3_OSReconstruction.ContinuumReconstruction_Simple, `Main, `Measure.ReflectionPositivity, `Parameters.RSParam, `Parameters.Assumptions, `Parameters.Constants, `Parameters.FromRS, `Analysis.Hilbert.Cyl]
+  roots := #[`Stage3_OSReconstruction.ContinuumReconstruction, `Stage3_OSReconstruction.ContinuumReconstruction_Simple, `Main, `Measure.ReflectionPositivity, `Measure.Wilson, `Parameters.RSParam, `Parameters.Assumptions, `Parameters.Constants, `Parameters.FromRS, `Analysis.Hilbert.Cyl]

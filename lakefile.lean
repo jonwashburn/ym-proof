@@ -25,17 +25,15 @@ lean_lib «Foundations» where
   -- Concrete foundation implementations
   srcDir := "YangMillsProof"
   roots := #[
-    `Foundations.DiscreteTime,
-    `Foundations.DualBalance,
-    `Foundations.PositiveCost,
-    `Foundations.UnitaryEvolution,
-    `Foundations.IrreducibleTick,
-    `Foundations.SpatialVoxels,
-    `Foundations.EightBeat,
-    `Foundations.GoldenRatio
+    `Foundations.DualBalance
   ]
 
 lean_lib «RecognitionScience» where
   -- Main library combining everything
   srcDir := "YangMillsProof"
   roots := #[`RecognitionScience]
+
+lean_lib «YangMillsProof» where
+  -- Yang-Mills proof components
+  srcDir := "YangMillsProof"
+  roots := #[`Stage3_OSReconstruction.ContinuumReconstruction, `Stage3_OSReconstruction.ContinuumReconstruction_Simple, `Main, `Measure.ReflectionPositivity, `Parameters.RSParam, `Parameters.Assumptions, `Parameters.Constants, `Parameters.FromRS, `Analysis.Hilbert.Cyl]

@@ -35,7 +35,7 @@ jobs:
       
     - name: Lake build
       run: lake build
-      
+        
     - name: Check for sorries
       run: |
         chmod +x verify_no_sorries.sh

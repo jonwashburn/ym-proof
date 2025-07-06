@@ -11,6 +11,7 @@
 -/
 
 import Mathlib.Data.Real.Basic
+import Mathlib.Algebra.Module.Pi
 
 namespace Analysis.Hilbert
 
@@ -21,7 +22,6 @@ vector space of real-valued functions on `ℕ`.  The key property we need for th
 scaffold is simply that it carries the usual pointwise module structure over
 `ℝ`, which `Pi.module` already provides.
 -/
-@[simp, reducible]
 abbrev CylinderSpace : Type := ℕ → ℝ
 
 instance : AddCommGroup CylinderSpace := inferInstance

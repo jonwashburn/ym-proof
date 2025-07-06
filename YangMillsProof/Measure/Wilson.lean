@@ -3,6 +3,7 @@
 
 import Mathlib.Data.Real.Basic
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Mathlib.Data.Finset.Basic
 import Parameters.RSParam
 import Analysis.Hilbert.Cyl
 
@@ -71,13 +72,37 @@ theorem wilson_cauchy_schwarz (f g : CylinderSpace) :
   · ring_nf
   · ring_nf
 
+/-- Wilson inner product satisfies exponential bounds -/
+theorem wilson_exponential_bound (f g : CylinderSpace) :
+  |wilsonInner f g| ≤ (Finset.range 100).sum (fun n => exp(-E_coh * φ^n) * |f n * g n|) := by
+  unfold wilsonInner
+  exact Finset.abs_sum_le_sum_abs _ _
+
 /-- Wilson inner product has exponential decay (cluster property) -/
 theorem wilson_cluster_decay (f g : CylinderSpace) (R : ℝ) (hR : R > 0) :
   ∃ C > 0, |wilsonInner f g| ≤ C * exp (-R / lambda_rec) := by
-  -- This follows from the mass gap in the Wilson action
-  use E_coh
+  -- This follows from the exponential weights in the Wilson action
+  use (Finset.range 100).sum (fun n => |f n * g n|)
   constructor
-  · exact E_coh_positive
-  · sorry -- Detailed proof requires correlation function analysis
+  · -- Positivity of the bound
+    apply Finset.sum_nonneg
+    intro n _
+    exact abs_nonneg _
+  · -- The exponential decay bound
+    rw [wilson_exponential_bound]
+    apply Finset.sum_le_sum
+    intro n _
+    have h_decay : exp(-E_coh * φ^n) ≤ exp(-E_coh) := by
+      apply exp_monotone
+      apply neg_le_neg
+      apply mul_le_mul_of_nonneg_left
+      · exact one_le_pow_of_one_le φ_positive.le n
+      · exact E_coh_positive.le
+    have h_bound : exp(-E_coh) ≤ exp(-R / lambda_rec) := by
+      -- This would require showing E_coh ≥ R / lambda_rec
+      -- For now, we use a placeholder bound
+      sorry
+    exact le_trans (mul_le_mul_of_nonneg_right h_decay (abs_nonneg _))
+          (mul_le_mul_of_nonneg_right h_bound (abs_nonneg _))
 
 end YangMillsProof.Measure

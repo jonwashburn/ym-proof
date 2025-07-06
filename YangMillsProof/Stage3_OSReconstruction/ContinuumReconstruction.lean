@@ -254,7 +254,8 @@ theorem hamiltonian_mass_gap : ∃ gap > 0, ∀ ψ : PhysicalHilbert, ψ ≠ 0 �
 /-- W0: Hilbert space structure -/
 theorem W0_hilbert : Nonempty (InnerProductSpace ℝ PhysicalHilbert) := by
   -- PhysicalHilbert is the completion of PreHilbert, which has an inner product
-  sorry
+  -- The completion of an inner product space is an inner product space
+  exact ⟨inferInstance⟩
 
 /-- W1: Poincaré invariance -/
 theorem W1_poincare : True := trivial -- Placeholder for Poincaré group action

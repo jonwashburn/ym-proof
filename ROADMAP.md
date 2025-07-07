@@ -1,5 +1,7 @@
 # Yang–Mills–Lean  —  Essential Completion Road-map
 
+**UPDATE:** Major milestone achieved - repository is now **sorry-free** with CI protection!
+
 This document lists **only the tasks that must still be done** for the
 repository to provide a *complete* formal proof that matches the narrative
 manuscript.  Anything already fully proved in Lean is omitted.
@@ -15,7 +17,7 @@ Legend
 
 | Task | Status |
 |------|--------|
-| ☐  CI script scans **all** `.lean` files and fails on any<br>  `axiom` or `sorry`. |
+| ✅  CI script scans **all** `.lean` files and fails on any<br>  `axiom` or `sorry`. | **COMPLETED** - GitHub Actions CI implemented |
 | ☐  Script verifies that every LaTeX `\label{thm:…}` appearing in the manuscript has a Lean constant of the same name. |
 
 Once these two scripts exist, their green status becomes the permanent

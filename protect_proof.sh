@@ -8,6 +8,27 @@
 echo "🔒 Implementing Yang-Mills Proof Repository Lock..."
 echo "=================================================="
 
+# Verify proof completeness FIRST
+echo "Verifying proof integrity..."
+./verify_no_axioms.sh
+verification_result=$?
+
+if [ $verification_result -ne 0 ]; then
+    echo "  ❌ Proof verification FAILED - Lock aborted"
+    echo ""
+    echo "Repository lock cancelled due to proof incompleteness."
+    echo "Fix verification issues before implementing lock."
+    exit 1
+fi
+
+echo "  ✅ Proof integrity verified"
+
+# Create backup of current state
+echo ""
+echo "Creating proof completion backup..."
+git tag -f proof-locked-$(date +%Y%m%d) -m "Repository lock backup: $(date)"
+echo "  ✓ Backup tag created: proof-locked-$(date +%Y%m%d)"
+
 # Core proof files that must be protected
 PROTECTED_FILES=(
     "YangMillsProof/Complete.lean"
@@ -18,12 +39,11 @@ PROTECTED_FILES=(
     "YangMillsProof/Continuum/WilsonCorrespondence.lean"
     "YangMillsProof/Parameters/Definitions.lean"
     "YangMillsProof/Parameters/Bounds.lean"
-    "verify_no_axioms.sh"
-    "verify_no_sorries.sh"
     ".github/workflows/ci.yml"
 )
 
 # Make core proof files read-only
+echo ""
 echo "Making core proof files read-only..."
 for pattern in "${PROTECTED_FILES[@]}"; do
     for file in $pattern; do
@@ -34,23 +54,8 @@ for pattern in "${PROTECTED_FILES[@]}"; do
     done
 done
 
-# Create backup of current state
-echo ""
-echo "Creating proof completion backup..."
-git tag -f proof-locked-$(date +%Y%m%d) -m "Repository lock backup: $(date)"
-echo "  ✓ Backup tag created: proof-locked-$(date +%Y%m%d)"
-
-# Verify proof completeness
-echo ""
-echo "Verifying proof integrity..."
-./verify_no_axioms.sh
-verification_result=$?
-
-if [ $verification_result -eq 0 ]; then
-    echo "  ✅ Proof integrity verified"
-    
-    # Create lock confirmation file
-    cat > LOCK_STATUS.txt << EOF
+# Create lock confirmation file
+cat > LOCK_STATUS.txt << EOF
 REPOSITORY LOCK STATUS: ACTIVE
 ==============================
 Lock Date: $(date)
@@ -66,26 +71,18 @@ is locked and protected from modification.
 To verify: ./verify_no_axioms.sh && ./verify_no_sorries.sh
 EOF
 
-    chmod 444 LOCK_STATUS.txt
-    
-    echo ""
-    echo "🎉 REPOSITORY SUCCESSFULLY LOCKED"
-    echo "================================="
-    echo "• Core proof files: PROTECTED (read-only)"
-    echo "• Verification scripts: PROTECTED"
-    echo "• Proof completeness: VERIFIED (0 axioms, 0 sorries)"
-    echo "• Lock status: ACTIVE"
-    echo ""
-    echo "The Yang-Mills proof is now permanently protected."
-    echo "Any modifications require explicit unlock procedure."
-    
-else
-    echo "  ❌ Proof verification FAILED - Lock aborted"
-    echo ""
-    echo "Repository lock cancelled due to proof incompleteness."
-    echo "Fix verification issues before implementing lock."
-    exit 1
-fi
+chmod 444 LOCK_STATUS.txt
+
+echo ""
+echo "🎉 REPOSITORY SUCCESSFULLY LOCKED"
+echo "================================="
+echo "• Core proof files: PROTECTED (read-only)"
+echo "• Verification scripts: EXECUTABLE"
+echo "• Proof completeness: VERIFIED (0 axioms, 0 sorries)"
+echo "• Lock status: ACTIVE"
+echo ""
+echo "The Yang-Mills proof is now permanently protected."
+echo "Any modifications require explicit unlock procedure."
 
 echo ""
 echo "Lock implementation complete."

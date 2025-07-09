@@ -1,4 +1,4 @@
-name: CI
+name: Yang-Mills Proof CI
 
 on:
   push:
@@ -7,58 +7,76 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
-    name: Build and test
+  build-and-verify:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout code
+    - name: Checkout repository
       uses: actions/checkout@v4
-      
-    - name: Install elan
+      with:
+        submodules: recursive
+        
+    - name: Install elan (Lean version manager)
       run: |
         curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
         echo "$HOME/.elan/bin" >> $GITHUB_PATH
-    
-    - name: Cache Mathlib
-      uses: actions/cache@v3
-      with:
-        path: |
-          YangMillsProof/.lake
-          YangMillsProof/lake-packages
-        key: ${{ runner.os }}-lake-${{ hashFiles('YangMillsProof/lake-manifest.json', 'YangMillsProof/lean-toolchain') }}
-        restore-keys: |
-          ${{ runner.os }}-lake-
         
-    - name: Lake update
-      run: lake update
+    - name: Get Lean dependencies
+      run: |
+        export PATH="$HOME/.elan/bin:$PATH"
+        lake update
       
-    - name: Lake build
-      run: lake build
-        
-    - name: Check for sorries
+    - name: Build Yang-Mills proof
       run: |
-        chmod +x verify_no_sorries.sh
-        ./verify_no_sorries.sh || echo "::warning::Project contains sorry statements"
+        export PATH="$HOME/.elan/bin:$PATH"
+        echo "🔨 Building Yang-Mills proof..."
+        lake build
+        echo "✅ Build completed successfully!"
         
-    - name: Check for axioms  
+    - name: Verify axiom-free status
       run: |
-        chmod +x verify_no_axioms.sh
-        ./verify_no_axioms.sh || echo "::warning::Project contains axiom declarations"
+        echo "🔍 Verifying axiom-free status..."
+        bash verify_no_axioms.sh
+        echo "✅ Axiom verification passed!"
         
-    - name: Generate build report
-      if: always()
+    - name: Verify sorry-free status  
       run: |
-        cd YangMillsProof
-        echo "# Build Report" > build_report.md
-        echo "## File Count" >> build_report.md
-        find . -name "*.lean" -type f | wc -l >> build_report.md
-        echo "## Module Structure" >> build_report.md
-        find . -name "*.lean" -type f | sort >> build_report.md
+        echo "🔍 Verifying sorry-free status..."
+        bash verify_no_sorries.sh
+        echo "✅ Sorry verification passed!"
         
-    - name: Upload build artifacts
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: build-report
-        path: YangMillsProof/build_report.md 
+    - name: Generate verification summary
+      run: |
+        echo "📊 Yang-Mills Proof Verification Summary"
+        echo "========================================"
+        echo "✅ Build: SUCCESS"
+        echo "✅ Axiom-free: VERIFIED"
+        echo "✅ Sorry-free: VERIFIED"
+        echo ""
+        echo "🎯 The proof is complete and formally verified!"
+        
+    - name: Create build artifacts
+      if: success()
+      run: |
+        echo "BUILD_SUCCESS=true" >> $GITHUB_ENV
+        echo "AXIOM_FREE=true" >> $GITHUB_ENV
+        echo "SORRY_FREE=true" >> $GITHUB_ENV
+        
+  verification-status:
+    runs-on: ubuntu-latest
+    needs: build-and-verify
+    if: always()
+    
+    steps:
+    - name: Set verification badges
+      run: |
+        if [ "${{ needs.build-and-verify.result }}" == "success" ]; then
+          echo "🟢 YANG-MILLS PROOF STATUS: VERIFIED"
+          echo "✅ Build: SUCCESS"
+          echo "✅ Axiom-free: CONFIRMED" 
+          echo "✅ Sorry-free: CONFIRMED"
+          echo "📜 Formal verification complete!"
+        else
+          echo "🔴 YANG-MILLS PROOF STATUS: FAILED"
+          echo "❌ Verification failed - check logs"
+        fi 

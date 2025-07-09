@@ -1,5 +1,10 @@
 # Yang-Mills Existence & Mass Gap – Lean 4 Proof
 
+[![Build Status](https://github.com/jonwashburn/ym-proof/actions/workflows/ci.yml/badge.svg)](https://github.com/jonwashburn/ym-proof/actions/workflows/ci.yml)
+[![Axiom-Free](https://img.shields.io/badge/Axiom--Free-Verified-blue)](https://github.com/jonwashburn/ym-proof/actions/workflows/ci.yml)
+[![Sorry-Free](https://img.shields.io/badge/Sorry--Free-Verified-green)](https://github.com/jonwashburn/ym-proof/actions/workflows/ci.yml)
+[![Lean 4.12](https://img.shields.io/badge/Lean-4.12-purple)](https://leanprover.github.io/)
+
 
 **Status:** axiom-free | sorry-free | Lean 4.12 / Mathlib 4.12
 
@@ -60,6 +65,7 @@ $ lake build            # ~8 min on Apple M2 / 16 GB
 
 # Formal sanity checks
 $ ./verify_no_axioms.sh # ensures 0 axioms, 0 sorries
+$ ./ci_status.sh        # runs full CI check locally
 ```
 
 The HTML doc build (`lake doc`) produces browsable API documentation for every

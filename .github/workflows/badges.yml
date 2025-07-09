@@ -1,0 +1,47 @@
+name: Generate Status Badges
+
+on:
+  push:
+    branches: [ main ]
+  workflow_run:
+    workflows: ["Yang-Mills Proof CI"]
+    types:
+      - completed
+
+jobs:
+  generate-badges:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Generate Build Badge
+      uses: schneegans/dynamic-badges-action@v1.7.0
+      with:
+        auth: ${{ secrets.GITHUB_TOKEN }}
+        gistID: yangmills-badges
+        filename: build-badge.json
+        label: Build
+        message: ${{ github.event.workflow_run.conclusion == 'success' && 'Passing' || 'Failed' }}
+        color: ${{ github.event.workflow_run.conclusion == 'success' && 'brightgreen' || 'red' }}
+        
+    - name: Generate Axiom-Free Badge
+      uses: schneegans/dynamic-badges-action@v1.7.0
+      with:
+        auth: ${{ secrets.GITHUB_TOKEN }}
+        gistID: yangmills-badges
+        filename: axiom-badge.json
+        label: Axiom-Free
+        message: ${{ github.event.workflow_run.conclusion == 'success' && 'Verified' || 'Unknown' }}
+        color: ${{ github.event.workflow_run.conclusion == 'success' && 'blue' || 'orange' }}
+        
+    - name: Generate Sorry-Free Badge
+      uses: schneegans/dynamic-badges-action@v1.7.0
+      with:
+        auth: ${{ secrets.GITHUB_TOKEN }}
+        gistID: yangmills-badges
+        filename: sorry-badge.json
+        label: Sorry-Free
+        message: ${{ github.event.workflow_run.conclusion == 'success' && 'Verified' || 'Unknown' }}
+        color: ${{ github.event.workflow_run.conclusion == 'success' && 'green' || 'orange' }} 

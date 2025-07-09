@@ -68,6 +68,7 @@ $ lake build            # ~8 min on Apple M2 / 16 GB
 # Formal sanity checks
 $ ./verify_no_axioms.sh # ensures 0 axioms, 0 sorries
 $ ./ci_status.sh        # runs full CI check locally
+$ ./lock_status.sh      # displays repository lock status
 ```
 
 The HTML doc build (`lake doc`) produces browsable API documentation for every

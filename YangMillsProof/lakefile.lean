@@ -12,6 +12,12 @@ require mathlib from git
 -- require proofwidgets from git
 --   "https://github.com/leanprover-community/ProofWidgets4.git" @ "v0.0.42"
 
+-- Clean foundation from ledger-foundation
+lean_lib foundation_clean where
+  roots := #[`foundation_clean.RecognitionScience, `foundation_clean.MinimalFoundation,
+            `foundation_clean.Core, `foundation_clean.Foundations, `foundation_clean.Parameters,
+            `foundation_clean.Fintype.Basic]
+
 -- Core modules
 lean_lib Core where
   roots := #[`Core.Finite, `Core.MetaPrinciple, `Core.MetaPrincipleMinimal,

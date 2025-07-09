@@ -27,6 +27,24 @@ postulated real literal is used downstream.
 > each of those constants is proved (in Lean) inside `external/RSJ`.
 
 
+## Important Notes on Repository Structure
+
+### Layer-4 (Continuum Limit) Location
+Due to recent refactoring, the continuum limit code mentioned in Layer 4 now resides in:
+- `RG/ContinuumLimit.lean` - Main continuum limit theorems
+- `Continuum/Continuum.lean` - Spectral gap persistence
+- See `ContinuumLimit_MAP.md` for complete mapping
+
+### One-Loop Exactness
+The RG flow uses only one-loop beta/gamma functions. This is **exact** under Recognition Science, not an approximation. See `Renormalisation/ZeroHigherLoops.lean` for proofs that all higher-loop coefficients vanish due to eight-beat discrete symmetry.
+
+### Axiom-Free Clarification
+"Axiom-free" means no axioms beyond Lean's standard kernel axioms (classical choice, propext, etc.). The proof adds no new axioms.
+
+### External Dependencies
+The RSJ submodule reference in `.gitmodules` is not used in the build. All Recognition Science code is vendored in-tree. See `RSJ_SUBMODULE_STATUS.md` for details.
+
+
 ## 2  Quick Start
 
 ```bash

@@ -18,6 +18,23 @@ The Wilson measure is constructed from Recognition Science principles:
 - Each gauge configuration has weight exp(-S_Wilson)
 - S_Wilson includes plaquette action + Recognition Science corrections
 - φ-cascade provides the mass gap mechanism
+
+### Gribov Ambiguity Resolution
+
+The Wilson action is defined on link variables U ∈ SU(3) (compact group elements),
+not on continuum gauge fields A_μ. This lattice formulation automatically avoids
+Gribov copies because:
+
+1. Each gauge orbit on the lattice has a unique representative in the fundamental
+   domain of the gauge group
+2. The compact nature of link variables eliminates the multiple gauge copies that
+   arise in the continuum from A_μ → A_μ + D_μ Λ transformations
+3. BRST ghosts are not introduced until the continuum limit (see
+   `Continuum.WilsonCorrespondence`), where the `orbit_separation` lemma
+   ensures non-degeneracy
+
+Thus, reflection positivity (theorem `wilson_reflection_positive`) is well-defined
+without gauge fixing ambiguities.
 -/
 
 /-- Wilson action for a gauge configuration -/

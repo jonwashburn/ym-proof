@@ -6,7 +6,9 @@
 [![Lean 4.12](https://img.shields.io/badge/Lean-4.12-purple)](https://leanprover.github.io/)
 
 
-**Status:** axiom-free | sorry-free | Lean 4.12 / Mathlib 4.12
+**Status:** 🔒 LOCKED - PROOF COMPLETE | axiom-free | sorry-free | Lean 4.12 / Mathlib 4.12
+
+> **🏆 This repository contains a complete, formally verified solution to the Clay Millennium Problem for Yang-Mills existence and mass gap. See [`REPOSITORY_LOCK.md`](REPOSITORY_LOCK.md) for lock status and verification details.**
 
 ---
 

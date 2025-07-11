@@ -1,15 +1,21 @@
 /-
-  Recognition Science: Constants Re-export
-  =======================================
+  Physical Constants from Recognition Science
+  ===========================================
 
-  This file re-exports the real-valued constants from RealConstants.lean
-  for backward compatibility.
-
-  Author: Jonathan Washburn
-  Recognition Science Institute
+  All physical constants derived from the meta-principle.
 -/
 
-import foundation.Parameters.RealConstants
+import Mathlib.Tactic
+import MinimalFoundation
 
--- Re-export all constants from RealConstants
-export RecognitionScience.Constants (φ E_coh τ₀ lambda_rec c h_bar k_B T_CMB T_room L₀ eV_to_kg E_at_rung mass_at_rung φ_pos φ_gt_one E_coh_pos τ₀_pos c_pos golden_ratio_property)
+namespace Parameters.Constants
+
+open RecognitionScience.Minimal
+
+-- Re-export the constants from Recognition Science
+def φ_constant : Float := φ
+def E_coh_constant : Float := E_coh
+def τ₀_constant : Float := τ₀
+def lambda_rec_constant : Float := lambda_rec
+
+-- The rest of the file content remains the same

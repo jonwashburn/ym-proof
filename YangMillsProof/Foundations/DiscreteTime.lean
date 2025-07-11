@@ -1,20 +1,17 @@
 /-
-  Discrete Time Foundation
-  ========================
+  Foundation 1: Discrete Time
+  ===========================
 
-  Concrete implementation of Foundation 1: Time must be quantized.
-  We show that continuous time is incompatible with finite information capacity.
-
-  Author: Jonathan Washburn
-  Recognition Science Institute
+  Recognition requires distinguishable states, which necessitates
+  discrete temporal separation.
 -/
 
-import Core.EightFoundations
-import Core.MetaPrinciple
+import Mathlib.Tactic
+import MinimalFoundation
 
 namespace RecognitionScience.DiscreteTime
 
-open RecognitionScience
+open RecognitionScience.Minimal
 
 /-- The fundamental time quantum (Planck time in natural units) -/
 def τ₀ : Nat := 1

@@ -1,19 +1,16 @@
 /-
-  Positive Cost Foundation
-  ========================
+  Foundation 3: Positive Cost
+  ===========================
 
-  Concrete implementation of Foundation 3: Recognition always requires positive energy.
-  No recognition event can occur without consuming resources.
-
-  Author: Jonathan Washburn
-  Recognition Science Institute
+  Recognition requires non-zero energy expenditure.
 -/
 
-import Core.EightFoundations
+import Mathlib.Tactic
+import MinimalFoundation
 
 namespace RecognitionScience.PositiveCost
 
-open RecognitionScience
+open RecognitionScience.Minimal
 
 /-- Energy is measured in discrete units -/
 structure Energy where

@@ -1,21 +1,17 @@
 /-
-  Dual Balance Foundation
-  =======================
+  Foundation 2: Dual Balance
+  ==========================
 
-  Concrete implementation of Foundation 2: Every recognition creates
-  equal and opposite ledger entries.
-
-  This is the core of double-entry bookkeeping in recognition events.
-
-  Author: Jonathan Washburn
-  Recognition Science Institute
+  Every recognition event creates equal and opposite entries
+  in the cosmic ledger.
 -/
 
-import Core.EightFoundations
+import Mathlib.Tactic
+import MinimalFoundation
 
 namespace RecognitionScience.DualBalance
 
-open RecognitionScience
+open RecognitionScience.Minimal
 
 /-- A ledger entry can be either a debit or credit -/
 inductive Entry

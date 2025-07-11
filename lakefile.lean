@@ -25,3 +25,7 @@ lean_lib «YangMillsProof» where
   -- Specify the main entry point
   roots := #[`Main, `RecognitionScience, `PhysicalConstants, `MinimalFoundation,
              `Continuum, `Gauge, `Renormalisation, `ContinuumOS, `Foundations, `Parameters]
+
+lean_lib «foundation_clean» where
+  srcDir := "YangMillsProof/foundation_clean"
+  roots := #[`RecognitionScience, `MinimalFoundation, `ZeroAxiomFoundation, `Fintype.Basic, `Core.Physics.MassGap, `Core.Physics.RungGap]

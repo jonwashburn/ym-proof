@@ -28,7 +28,7 @@ def Finite.toFin {α : Type} (h : Finite α) : α → Fin (h.n + 1) :=
 
 -- Left inverse property (stub)
 def Finite.left_inv {α : Type} (h : Finite α) :
-  Function.LeftInverse (fun _ : α => ()) (fun _ : α => ()) := by sorry
+  Function.LeftInverse (fun _ : Fin (h.n + 1) => by sorry) h.toFin := by sorry
 
 -- Foundation type aliases for compatibility
 def Foundation1_DiscreteRecognition : Prop :=

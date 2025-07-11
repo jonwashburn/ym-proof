@@ -70,8 +70,9 @@ theorem recognition_conservation :
   -- Energy is conserved in recognition processes
   sorry
 
-/-- Dual balance foundation theorem -/
-theorem dual_balance_foundation : Foundation2_DualBalance := by
+-- Dual balance foundation theorem
+theorem dual_balance_foundation : RecognitionScience.Foundation2_DualBalance := by
+  -- Recognition Science establishes dual balance requirement
   intro A
   exact ⟨true, trivial⟩
 

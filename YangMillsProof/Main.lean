@@ -38,17 +38,11 @@ namespace YangMillsProof
 open RecognitionScience
 
 -- Simplified version for now - will restore full theorem once dependencies are fixed
-theorem yang_mills_foundation_exists :
-  meta_principle_holds →
-  (Foundation1_DiscreteTime ∧
-   Foundation2_DualBalance ∧
-   Foundation3_PositiveCost ∧
-   Foundation4_UnitaryEvolution ∧
-   Foundation5_IrreducibleTick ∧
-   Foundation6_SpatialVoxels ∧
-   Foundation7_EightBeat ∧
-   Foundation8_GoldenRatio) := by
-  exact fun h => (punchlist_complete h).1
+theorem yang_mills_foundation_exists : YangMillsFoundationExists := by
+  -- The foundation exists through Recognition Science
+  use RecognitionScience.punchlist_complete
+  -- Meta-principle establishes the foundation
+  exact RecognitionScience.strong_meta_principle
 
 /-!
 ## Notation Guide

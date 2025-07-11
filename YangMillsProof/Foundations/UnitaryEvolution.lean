@@ -222,4 +222,17 @@ theorem channel_capacity {A B : Type} (hA : Finite A) (hB : Finite B)
 --  -- Omitted for now.
 --  admit
 
+/-- Key lemma: Injective functions on finite types are bijective -/
+theorem injective_imp_bijective {A : Type} (h : Finite A) (f : A → A) :
+  Function.Injective f → Function.Bijective f := by
+  intro hinj
+  -- On finite types, injective functions are automatically surjective
+  -- This is because an injective function from a finite set to itself
+  -- must hit every element (pigeonhole principle)
+  constructor
+  · exact hinj
+  · -- Surjectivity follows from counting argument
+    intro b
+    -- Map from Fin h.n to A via f
+
 end RecognitionScience.UnitaryEvolution

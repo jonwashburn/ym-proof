@@ -1,11 +1,9 @@
 /-
-  Recognition Science: Minimal Core Module
-  ========================================
+  Recognition Science: The Meta-Principle (Minimal)
+  ================================================
 
-  This file contains the foundational meta-principle with NO external imports.
-  Only Lean's builtin PEmpty is used.
-
-  The proof is constructive - no classical axioms are used.
+  This file contains only the minimal definitions needed for the meta-principle.
+  No external dependencies, no mathematical machinery - just pure logic.
 
   Author: Jonathan Washburn
   Recognition Science Institute
@@ -13,26 +11,35 @@
 
 namespace Core.MetaPrincipleMinimal
 
-/-- The empty type used to represent "nothing". -/
-abbrev Nothing : Type := PEmpty
+/-!
+## Core Definitions
 
-/-- Recognition requires an inhabitant of each participant. -/
-structure Recognition (A B : Type) where
+We define recognition and nothingness at the most fundamental level.
+-/
+
+/-- The empty type represents absolute nothingness -/
+inductive Nothing : Type where
+  -- No constructors - this type has no inhabitants
+
+/-- Recognition is a relationship between a recognizer and what is recognized -/
+structure Recognition (A : Type) (B : Type) where
   recognizer : A
   recognized : B
-  event      : A → B → Prop
-  occurrence : event recognizer recognized
 
-/-- Meta-principle: *Nothing cannot recognize itself* (formulated constructively). -/
-@[simp]
+/-!
+## The Meta-Principle
+
+The foundational impossibility from which everything emerges.
+-/
+
+/-- The meta-principle: Nothing cannot recognize itself -/
 def MetaPrinciple : Prop :=
-  ¬∃ (_ : Recognition Nothing Nothing), True
+  ¬∃ (r : Recognition Nothing Nothing), True
 
-/-- Constructive proof of `MetaPrinciple`. It exploits the fact that `Nothing` (≈ `PEmpty`) has no inhabitants, so any supposed recognizer must be impossible. -/
-@[simp]
-def meta_principle_holds : MetaPrinciple := by
-  intro h
-  rcases h with ⟨r, _⟩
-  cases r.recognizer -- impossible: recognizer : Nothing has no inhabitants
+/-- The meta-principle holds by the very nature of nothingness -/
+theorem meta_principle_holds : MetaPrinciple := by
+  intro ⟨r, _⟩
+  -- r.recognizer has type Nothing, which has no inhabitants
+  cases r.recognizer
 
 end Core.MetaPrincipleMinimal

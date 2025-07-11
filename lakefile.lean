@@ -23,4 +23,5 @@ lean_lib «YangMillsProof» where
   -- All source files are in the YangMillsProof directory
   srcDir := "YangMillsProof"
   -- Specify the main entry point
-  roots := #[`Main]
+  roots := #[`Main, `RecognitionScience, `PhysicalConstants, `MinimalFoundation,
+             `Continuum, `Gauge, `Renormalisation, `ContinuumOS, `Foundations, `Parameters]

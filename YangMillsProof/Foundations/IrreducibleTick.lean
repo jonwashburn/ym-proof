@@ -17,7 +17,8 @@ namespace RecognitionScience.IrreducibleTick
 open RecognitionScience
 open RecognitionScience.DiscreteTime
 
-/-- The fundamental time quantum (Planck time) -/
+/-- The fundamental tick value -/
+@[simp, reducible]
 def τ₀ : Nat := 1
 
 /-- A time interval measured in ticks -/

@@ -50,104 +50,114 @@ structure DiscreteProcess (State : Type) where
 --  -- framework, so we omit it for now.
 --  admit
 
-/-- Time evolution must be periodic in finite systems -/
+/-- Key theorem: Finite systems must be periodic -/
+@[simp]
 theorem finite_system_periodic {State : Type} :
   PhysicallyRealizable State →
-  ∀ (proc : DiscreteProcess State),
-  ∃ (period : Time), period ≠ zero_time ∧
-  ∀ (t : Time), proc.evolve proc.initial (t + period) =
-                proc.evolve proc.initial t := by
-  intro hReal proc
-  rcases hReal with ⟨hFin⟩
-  -- build the evolution sequence on `State`
+  ∀ (process : DiscreteProcess State),
+  ∃ (period : Nat) (h : Finite State),
+    period > 0 ∧ period ≤ card State h ∧
+    ∀ (start : State) (t : Nat),
+      process.evolve^[t + period] start = process.evolve^[t] start := by
+  intro ⟨hfinite⟩ proc
+  -- Build the evolution sequence
   let seq : Nat → State := fun n => proc.evolve proc.initial ⟨n⟩
-  -- apply pigeon-hole to obtain i<j with seq i = seq j
-  have hPigeon := RecognitionScience.pigeonhole hFin seq
-  rcases hPigeon with ⟨i,j,h_lt,h_j_le,h_eq⟩
-  -- define period k = j - i (>0)
-  set k : Nat := j - i with hk
-  have hk_pos : 0 < k := Nat.sub_pos_of_lt h_lt
-  -- build the required Time period
-  refine ⟨⟨k⟩, ?period_ne, ?global⟩
-  · intro hzero; cases hzero with | mk hval =>
-      have : k = 0 := by simpa using hval
-      exact (Nat.lt_irrefl 0) (by simpa [this] using hk_pos)
-  -- prove global periodicity by induction on t.tick
-  intro t
-  revert t
-  -- prove for natural n := t.tick
-  suffices ∀ n, seq (n + k) = seq n from
-    (fun t => by
-      have := this t.tick
-      simpa [seq, Time.add, Time.mk.injEq, hk] using this)
-  intro n; induction n with
-  | zero =>
-      -- n=0 gives seq k = seq 0 using the pigeon-hole equality
-      simpa [seq, hk] using h_eq
-  | succ n ih =>
-      -- use process.decompose
-      have : seq (n + 1 + k) = seq (n + 1) := by
-        -- rewrite in terms of `proc.evolve`
-        have := congrArg (fun s => proc.evolve s ⟨1⟩)
-            (congrArg (fun m => proc.evolve proc.initial ⟨m⟩) ih)
-        -- use decomposition property of `proc`
-        simp [seq, hk, Nat.add_comm, Nat.add_left_comm, proc.decompose] at this
-        exact this
-      simpa [Nat.add_comm, Nat.add_left_comm, Nat.add_assoc] using this
+
+  -- By pigeonhole, seq 0 must repeat somewhere in the first hfinite.n + 1 positions
+  -- This gives us a global period from position 0
+  have : ∃ k, 0 < k ∧ k ≤ hfinite.n ∧ seq 0 = seq k := by
+    by_contra h_not
+    push_neg at h_not
+    -- If seq 0 doesn't repeat, then seq 0, seq 1, ..., seq hfinite.n are all distinct
+    -- That's hfinite.n + 1 distinct values, impossible in a space of size hfinite.n
+    let f : Fin (hfinite.n + 1) → State := fun i => seq i.val
+    have f_inj : Function.Injective f := by
+      intro ⟨i, hi⟩ ⟨j, hj⟩ h_eq
+      simp [f] at h_eq
+      by_contra h_ne
+      cases Nat.lt_trichotomy i j with
+      | inl h_lt =>
+        have : 0 < j ∧ j ≤ hfinite.n := by
+          constructor
+          · by_contra h; push_neg at h; have : j = 0 := Nat.eq_zero_of_not_pos h; subst this; exact Nat.not_lt_zero i h_lt
+          · exact Nat.le_of_succ_le_succ hj
+        exact h_not j this.1 this.2 h_eq
+      | inr h_ge =>
+        cases h_ge with
+        | inl h_eq => exact h_ne (Fin.eq_of_val_eq h_eq)
+        | inr h_gt =>
+          have : 0 < i ∧ i ≤ hfinite.n := by
+            constructor
+            · by_contra h; push_neg at h; have : i = 0 := Nat.eq_zero_of_not_pos h; subst this; exact Nat.not_lt_zero j h_gt
+            · exact Nat.le_of_succ_le_succ hi
+          exact h_not i this.1 this.2 h_eq.symm
+    -- f injective from size n+1 to size n is impossible
+    let g := hfinite.toFin ∘ f
+    have g_inj : Function.Injective g := fun x y h =>
+      f_inj x y (by simp [g, Function.comp] at h; rw [hfinite.left_inv, hfinite.left_inv] at h; exact h)
+    exact Nat.Card.no_inj_succ_to_self g g_inj
+
+  obtain ⟨k, hk_pos, _, h_cycle⟩ := this
+
+  -- Use period = k
+  use k
+  constructor
+  · -- period ≠ zero_time
+    intro h
+    have : k = 0 := by cases h; rfl
+    rw [this] at hk_pos
+    exact Nat.lt_irrefl 0 hk_pos
+
+  · -- Global periodicity: for all n, seq n = seq (n + k)
+    intro t
+    have : seq t.tick = seq (t.tick + k) := by
+      -- Prove by induction that seq n = seq (n + k) for all n
+      clear h_cycle
+      suffices ∀ n, seq n = seq (n + k) by exact this t.tick
+      intro n
+      induction n with
+      | zero => exact h_cycle
+      | succ n ih =>
+        -- seq (n+1) = evolve (seq n) ⟨1⟩ = evolve (seq (n+k)) ⟨1⟩ = seq (n+k+1)
+        simp [seq]
+        rw [← proc.decompose, ← proc.decompose]
+        simp [Time.mk.injEq]
+        rw [ih]
+    exact this
 
 /-- Discrete time satisfies Foundation 1 -/
 theorem discrete_time_foundation : Foundation1_DiscreteRecognition := by
-  -- choose tick = 1 (τ₀)
-  refine ⟨τ₀, by decide, ?_⟩
-  intro event hReal
-  -- period 1 works for any sequence because mod 1 is always 0
+  refine ⟨τ₀, Nat.zero_lt_one, ?_⟩
+  intro event hreal
+  -- Any finite system must have periodic behavior
   refine ⟨1, ?_⟩
   intro t
-  simp [τ₀, Nat.mod_one] at *
+  -- Since τ₀ = 1, we have (t + 1) % 1 = 0 = t % 1
+  simp [τ₀]
 
 /-- Discrete time prevents Zeno's paradox -/
 theorem no_zeno_paradox :
   ¬∃ (infinite_subdivision : Nat → Time),
     ∀ n, infinite_subdivision (n + 1) < infinite_subdivision n := by
-  intro hExists
-  rcases hExists with ⟨seq, hdec⟩
-  -- derive contradiction by evaluating at n = seq 0 + 1
-  let N : Nat := seq 0 |>.tick
-  have h1 : (seq (N + 1)).tick < (seq N).tick := by
-    have := hdec N
-    -- compare tick fields
-    simpa using this
-  -- but (seq N).tick ≤ N by decreasing property induction
-  have h_le : (seq N).tick ≤ N := by
-    -- strong induction: for m ≤ N, seq m ≤ N
-    have : ∀ m ≤ N, (seq m).tick ≤ N := by
-      intro m hm
-      induction m with
-      | zero => simp
-      | succ m ih =>
-          have hdec_m := hdec m
-          have hm' : m ≤ N := Nat.le_of_lt_succ hm
-          have ih' := ih hm'
-          have : (seq (m+1)).tick < (seq m).tick := by simpa using hdec_m
-          have : (seq (m+1)).tick ≤ (seq m).tick := Nat.le_of_lt this
-          have : (seq (m+1)).tick ≤ N := le_trans this ih'
-          simpa using this
-    exact this N (Nat.le_refl _)
-  -- combine: (seq (N+1)).tick < (seq N).tick ≤ N  so tick < N
-  have h2 : (seq (N + 1)).tick ≤ N := Nat.le_trans (Nat.le_of_lt h1) h_le
-  -- but also by definition seq (N+1).tick ≥ N+1? not necessarily
-  -- yet Nat cannot have infinite descending sequence; derive contradiction using lt_self
-  have h_lt : (seq (N+1)).tick < (seq (N+1)).tick :=
-    calc (seq (N+1)).tick < (seq N).tick := h1
-      _ ≤ N := h_le
-      _ < (seq (N+1)).tick := by
-        -- since ticks are natural, seq (N+1) less than N would contradict
-        -- but we don't have bound. We'll produce contradiction with Nat.not_lt_zero
-        have : (seq (N+1)).tick ≤ N := h2
-        have : (seq (N+1)).tick < (seq (N+1)).tick :=
-          Nat.lt_of_lt_of_le (Nat.lt_of_le_of_lt this (Nat.lt_succ_self _)) (le_rfl)
-        exact this
-  exact (Nat.lt_irrefl _ h1)
+  intro ⟨seq, hdecreasing⟩
+  -- In discrete time, we can't have infinite decreasing sequences
+  -- Each step must decrease by at least 1 tick
+  have h1 : ∀ n, seq (n + 1).tick + 1 ≤ seq n.tick := by
+    intro n
+    have : seq (n + 1) < seq n := hdecreasing n
+    exact Nat.succ_le_of_lt this
+  -- This gives us seq n.tick ≤ seq 0.tick - n
+  have h2 : ∀ n, seq n.tick ≤ seq 0.tick - n := by
+    intro n
+    induction n with
+    | zero => simp
+    | succ k ih =>
+      have : seq (k + 1).tick + 1 ≤ seq k.tick := h1 k
+      have : seq k.tick ≤ seq 0.tick - k := ih
+      exact Nat.le_trans (Nat.le_of_succ_le_succ this) (Nat.sub_le_sub_left this 1)
+  -- But this means seq (seq 0.tick + 1) < 0, which is impossible
+  have : seq (seq 0.tick + 1).tick ≤ seq 0.tick - (seq 0.tick + 1) := h2 (seq 0.tick + 1)
+  simp at this
 
 /-- Time evolution is locally predictable -/
 theorem local_predictability :
@@ -155,6 +165,11 @@ theorem local_predictability :
   (∀ t, process t = ⟨t.tick + 1⟩) →
   ∀ t, process (process t) = ⟨t.tick + 2⟩ := by
   intro process hdef t
-  simp [hdef] at *
+  rw [hdef, hdef]
+  simp
+  -- Local evolution is deterministic in discrete time
+  -- process t = ⟨t.tick + 1⟩, so process (process t) = process ⟨t.tick + 1⟩
+  -- = ⟨(t.tick + 1) + 1⟩ = ⟨t.tick + 2⟩
+  ring
 
 end RecognitionScience.DiscreteTime

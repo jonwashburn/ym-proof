@@ -1,24 +1,15 @@
--- Yang-Mills Parameters (after RSJ integration)
--- --------------------------------------------
--- All constants are now DERIVED, not postulated!
+/-
+  Recognition Science: Constants Re-export
+  =======================================
 
-import Parameters.FromRS
-import Parameters.DerivedConstants
+  This file re-exports the real-valued constants from RealConstants.lean
+  for backward compatibility.
 
-namespace RS.Param
+  Author: Jonathan Washburn
+  Recognition Science Institute
+-/
 
--- All constants are now theorem-backed definitions:
+import foundation.Parameters.RealConstants
 
-/-- Physical string tension in GeV² -/
-noncomputable def σ_phys : ℝ := σ_phys_derived
-
-/-- Critical lattice coupling -/
-noncomputable def β_critical : ℝ := β_critical_calibrated
-
-/-- Lattice spacing in femtometres -/
-noncomputable def a_lattice : ℝ := a_lattice_derived
-
-/-- Step-scaling product constant -/
-noncomputable def c₆ : ℝ := c₆_RG
-
-end RS.Param
+-- Re-export all constants from RealConstants
+export RecognitionScience.Constants (φ E_coh τ₀ lambda_rec c h_bar k_B T_CMB T_room L₀ eV_to_kg E_at_rung mass_at_rung φ_pos φ_gt_one E_coh_pos τ₀_pos c_pos golden_ratio_property)

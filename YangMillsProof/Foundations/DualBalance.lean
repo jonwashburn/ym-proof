@@ -95,4 +95,9 @@ theorem unbalanced_recognition_impossible :
   have trans := recognition_to_transaction r
   exact no_trans ⟨trans, True.intro⟩
 
+/-- The dual of a balance entry swaps debits and credits -/
+@[simp]
+def dual_entry (e : Entry) : Entry :=
+  e.opposite
+
 end RecognitionScience.DualBalance

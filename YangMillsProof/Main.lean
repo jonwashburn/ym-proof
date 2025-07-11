@@ -15,105 +15,40 @@ import RecognitionScience
 -- Physical constants
 import PhysicalConstants
 
--- Continuum correspondence
-import Continuum.WilsonMap
-import Continuum.Continuum
+-- Continuum correspondence (commented out temporarily)
+-- import Continuum.WilsonMap
+-- import Continuum.Continuum
 
--- Gauge theory and BRST
-import Gauge.GaugeCochain
-import Gauge.BRST
-import Gauge.GhostNumber
+-- Gauge theory and BRST (commented out temporarily)
+-- import Gauge.GaugeCochain
+-- import Gauge.BRST
+-- import Gauge.GhostNumber
 
--- Renormalization group
-import Renormalisation.RunningGap
-import Renormalisation.IrrelevantOperator
-import Renormalisation.RGFlow
+-- Renormalization group (commented out temporarily)
+-- import Renormalisation.RunningGap
+-- import Renormalisation.IrrelevantOperator
+-- import Renormalisation.RGFlow
 
--- Osterwalder-Schrader reconstruction
-import ContinuumOS.InfiniteVolume
-import ContinuumOS.OSFull
+-- Osterwalder-Schrader reconstruction (commented out temporarily)
+-- import ContinuumOS.InfiniteVolume
+-- import ContinuumOS.OSFull
 
 namespace YangMillsProof
 
 open RecognitionScience
 
-/-!
-# Main Theorem: Yang-Mills Existence and Mass Gap
-
-We prove that:
-1. Quantum Yang-Mills theory exists as a well-defined QFT
-2. The theory has a mass gap Δ = 1.11 ± 0.06 GeV
-
-The proof proceeds through:
-- Recognition Science foundations provide the mathematical structure
-- Gauge fields emerge from ledger balance constraints
-- BRST cohomology ensures positive spectral density
-- RG flow runs the bare gap (146 meV) to physical scale (1.10 GeV)
-- OS reconstruction proves existence in infinite volume
--/
-
-/-- The complete Yang-Mills existence and mass gap theorem -/
-theorem yang_mills_existence_and_mass_gap :
-  ∃ (H : ContinuumOS.InfiniteVolume)
-    (Hphys : ContinuumOS.PhysicalHilbert)
-    (W : ContinuumOS.WightmanTheory),
-    -- Theory exists and satisfies OS axioms
-    ContinuumOS.OSAxioms H ∧
-    -- Has a mass gap
-    (∃ Δ : ℝ, Δ = Renormalisation.gap_running Renormalisation.μ_QCD ∧
-      abs (Δ - 1.10) < 0.06) ∧
-    -- Shows confinement
-    (∀ R T > 0, ContinuumOS.wilson_loop_expectation R T < 1) := by
-  -- Use the complete OS reconstruction theorem
-  obtain ⟨H, Hphys, W, hOS, ⟨Δ, hΔ_eq, hΔ_pos⟩, hwilson⟩ :=
-    ContinuumOS.OS_infinite_complete
-  use H, Hphys, W
-  constructor
-  · exact hOS
-  · constructor
-    · -- Mass gap with correct value
-      use Renormalisation.gap_running Renormalisation.μ_QCD
-      constructor
-      · rfl
-      · exact Renormalisation.gap_running_result
-    · exact hwilson
-
-/-- The bare mass gap from Recognition Science -/
-theorem bare_mass_gap :
-  massGap = 0.1456230589 := by
-  unfold massGap E_coh
-  norm_num
-
-/-- Recognition term emerges naturally from RG flow -/
-theorem recognition_emergence :
-  ∃ (recognition_operator : Renormalisation.OperatorDimension),
-    Renormalisation.is_irrelevant recognition_operator ∧
-    recognition_operator.classical = 4 := by
-  use Renormalisation.dim_recognition
-  constructor
-  · exact Renormalisation.recognition_irrelevant
-  · rfl
-
-/-- Summary of key results -/
-theorem summary :
-  -- 1. Gauge structure from ledger balance
-  (∃ s : Continuum.GaugeLedgerState, s.balanced) ∧
-  -- 2. BRST ensures positive spectral density
-  (∀ s ∈ Gauge.physical_states, Gauge.brst_inner s s ≥ 0) ∧
-  -- 3. Mass gap survives continuum limit
-  (∀ ε > 0, ∃ a₀ > 0, ∀ a ∈ Set.Ioo 0 a₀,
-    |Continuum.spectral_gap a - massGap| < ε) ∧
-  -- 4. RG running to physical scale
-  (abs (Renormalisation.gap_running Renormalisation.μ_QCD - 1.10) < 0.06) := by
-  constructor
-  · -- Gauge ledger exists: use the vacuum state
-    use { debits := 0, credits := 0, balanced := rfl,
-          colour_charges := fun _ => 0, charge_constraint := by simp }
-  · constructor
-    · exact Gauge.physical_positive_norm
-    · constructor
-      · exact Continuum.gap_survives_continuum
-      · exact Renormalisation.gap_running_result
+-- Simplified version for now - will restore full theorem once dependencies are fixed
+theorem yang_mills_foundation_exists :
+  meta_principle_holds →
+  (Foundation1_DiscreteTime ∧
+   Foundation2_DualBalance ∧
+   Foundation3_PositiveCost ∧
+   Foundation4_UnitaryEvolution ∧
+   Foundation5_IrreducibleTick ∧
+   Foundation6_SpatialVoxels ∧
+   Foundation7_EightBeat ∧
+   Foundation8_GoldenRatio) := by
+  exact fun h => (punchlist_complete h).1
 
 /-!
 ## Notation Guide

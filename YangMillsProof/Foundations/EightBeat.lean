@@ -240,4 +240,10 @@ theorem eight_beat_necessity :
   -- Apply this to our specific n
   exact this n h_insufficient (hperiodic initial_state)
 
+/-- An eight-beat recognition cycle -/
+structure EightBeatCycle where
+  -- Current position in the cycle
+  position : Fin 8
+  deriving DecidableEq, Fintype
+
 end RecognitionScience.EightBeat

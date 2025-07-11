@@ -16,12 +16,9 @@ namespace RecognitionScience.SpatialVoxels
 
 open RecognitionScience
 
-/-- A position in discrete 3D space -/
-structure Position where
-  x : Int
-  y : Int
-  z : Int
-  deriving DecidableEq
+/-- A position in the voxel lattice -/
+-- TODO: Consider parameterizing dimension instead of hard-coding 3
+def Position (n : Nat) := Fin n × Fin n × Fin n
 
 /-- The fundamental spatial quantum (Planck length) -/
 def L₀ : Nat := 1

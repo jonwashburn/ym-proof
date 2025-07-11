@@ -17,8 +17,10 @@ inductive FundamentalConstant : Type where
   | E_cohConst : FundamentalConstant  -- Coherent energy quantum
   | phiConst : FundamentalConstant    -- Golden ratio
   | oneConst : FundamentalConstant    -- Unity
+  deriving DecidableEq
 
 /-- Every fundamental constant is one of E_coh, φ, or 1 -/
+@[simp]
 theorem fundConst_cases (c : FundamentalConstant) :
   c = FundamentalConstant.E_cohConst ∨
   c = FundamentalConstant.phiConst ∨

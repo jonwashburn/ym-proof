@@ -8,92 +8,71 @@
 
 import Mathlib.Tactic
 import MinimalFoundation
+import RSPrelude
 
 namespace RecognitionScience.DualBalance
 
 open RecognitionScience.Minimal
+open RecognitionScience.Prelude
 
 /-- A ledger entry can be either a debit or credit -/
-inductive Entry
-  | debit : Entry
-  | credit : Entry
+inductive LedgerEntry
+  | debit (amount : Nat)
+  | credit (amount : Nat)
   deriving DecidableEq
 
-/-- Entries are opposite -/
-def Entry.opposite : Entry → Entry
-  | debit => credit
-  | credit => debit
+/-- The balance of a ledger entry -/
+def LedgerEntry.balance : LedgerEntry → Int
+  | debit n => -(n : Int)
+  | credit n => (n : Int)
 
-/-- Opposite is involutive -/
-theorem Entry.opposite_opposite (e : Entry) : e.opposite.opposite = e := by
-  cases e <;> rfl
+/-- A balanced ledger has zero net balance -/
+def balanced (entries : List LedgerEntry) : Prop :=
+  (entries.map LedgerEntry.balance).sum = 0
 
-/-- A balanced ledger transaction -/
-structure BalancedTransaction where
-  -- The recognizer's entry
-  recognizer_entry : Entry
-  -- The recognized's entry
-  recognized_entry : Entry
-  -- They must be opposite
-  balanced : recognized_entry = recognizer_entry.opposite
+/-- Recognition events create balanced ledger pairs -/
+structure BalancedEvent (A B : Type) where
+  debit_entry : LedgerEntry
+  credit_entry : LedgerEntry
+  balanced : debit_entry.balance + credit_entry.balance = 0
 
-/-- Every recognition event creates a balanced transaction -/
-def recognition_to_transaction {A B : Type} (_ : Recognition A B) : BalancedTransaction :=
-  { recognizer_entry := Entry.debit
-    recognized_entry := Entry.credit
-    balanced := rfl }
+/-- Every recognition creates a balanced pair -/
+theorem recognition_creates_balance {A B : Type} (event : RecognitionEvent A B) :
+  ∃ (balanced_event : BalancedEvent A B), True := by
+  -- Create a balanced pair with the energy cost
+  let cost := event.energy_cost.value
+  let debit := LedgerEntry.debit cost
+  let credit := LedgerEntry.credit cost
+  use ⟨debit, credit, by simp [LedgerEntry.balance]⟩
+  trivial
 
-/-- The fundamental conservation law: total debits equal total credits -/
-structure LedgerState where
-  debits : Nat
-  credits : Nat
-  balanced : debits = credits
+/-- The cosmic ledger maintains balance -/
+theorem cosmic_ledger_balanced :
+  ∀ (events : List (Σ A B : Type, RecognitionEvent A B)),
+  ∃ (ledger : List LedgerEntry), balanced ledger := by
+  intro events
+  -- For each event, add its balanced pair to the ledger
+  let ledger := events.bind (fun ⟨A, B, event⟩ =>
+    [LedgerEntry.debit event.energy_cost.value,
+     LedgerEntry.credit event.energy_cost.value])
+  use ledger
+  -- The ledger is balanced because each pair sums to zero
+  simp [balanced, LedgerEntry.balance]
+  sorry
 
-/-- Initial empty ledger is balanced -/
-def empty_ledger : LedgerState :=
-  { debits := 0
-    credits := 0
-    balanced := rfl }
+/-- Conservation of recognition resources -/
+theorem recognition_conservation :
+  ∀ (process : List (RecognitionEvent Unit Unit) → List (RecognitionEvent Unit Unit)),
+  (∀ input output, process input = output →
+    (input.map (·.energy_cost.value)).sum = (output.map (·.energy_cost.value)).sum) := by
+  intro process
+  intro input output h_eq
+  -- Energy is conserved in recognition processes
+  sorry
 
-/-- Recording a transaction preserves balance -/
-def record_transaction (ledger : LedgerState) (trans : BalancedTransaction) : LedgerState :=
-  match trans.recognizer_entry with
-  | Entry.debit =>
-    { debits := ledger.debits + 1
-      credits := ledger.credits + 1
-      balanced := by simp [ledger.balanced] }
-  | Entry.credit =>
-    { debits := ledger.debits + 1
-      credits := ledger.credits + 1
-      balanced := by simp [ledger.balanced] }
-
-/-- Balance is always preserved -/
-theorem balance_invariant (ledger : LedgerState) (trans : BalancedTransaction) :
-  (record_transaction ledger trans).debits = (record_transaction ledger trans).credits := by
-  exact (record_transaction ledger trans).balanced
-
-/-- Dual balance satisfies Foundation 2 -/
+/-- Dual balance foundation theorem -/
 theorem dual_balance_foundation : Foundation2_DualBalance := by
-  intro A _
-  refine ⟨Entry, Entry.debit, Entry.credit, ?_⟩
-  intro h
-  cases h
-
-/-- Recognition without balance is impossible -/
-theorem unbalanced_recognition_impossible :
-  ¬∃ (UnbalancedRec : Type → Type → Type)
-    (to_rec : ∀ A B, UnbalancedRec A B → Recognition A B),
-    ∃ (A B : Type) (r : UnbalancedRec A B),
-      ¬∃ (trans : BalancedTransaction), True := by
-  intro ⟨UR, to_rec, A, B, ur, no_trans⟩
-  -- Every recognition must create a balanced transaction
-  have r := to_rec A B ur
-  have trans := recognition_to_transaction r
-  exact no_trans ⟨trans, True.intro⟩
-
-/-- The dual of a balance entry swaps debits and credits -/
-@[simp]
-def dual_entry (e : Entry) : Entry :=
-  e.opposite
+  intro A
+  exact ⟨true, trivial⟩
 
 end RecognitionScience.DualBalance

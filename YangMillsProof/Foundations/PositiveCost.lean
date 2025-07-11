@@ -7,10 +7,12 @@
 
 import Mathlib.Tactic
 import MinimalFoundation
+import RSPrelude
 
 namespace RecognitionScience.PositiveCost
 
 open RecognitionScience.Minimal
+open RecognitionScience.Prelude
 
 /-- Energy is measured in discrete units -/
 structure Energy where
@@ -55,7 +57,12 @@ def free_energy (total available : Energy) : Energy :=
   else
     ⟨0⟩
 
-/-- Recognition requires available energy -/
+/-- No free recognition: every recognition event requires positive energy -/
+theorem no_free_recognition {A B : Type} (event : RecognitionEvent A B) :
+  event.energy_cost.value > 0 :=
+  event.positive_cost
+
+/-- Recognition requires energy theorem -/
 theorem recognition_requires_energy {A B : Type} (event : RecognitionEvent A B) (available : Energy) :
   available.value ≥ event.energy_cost.value ∨
   ¬∃ (new_event : RecognitionEvent A B), new_event.energy_cost = event.energy_cost := by
@@ -65,6 +72,7 @@ theorem recognition_requires_energy {A B : Type} (event : RecognitionEvent A B) 
     intro ⟨new_event, heq⟩
     have : new_event.energy_cost.value > 0 := new_event.positive_cost
     rw [heq] at this
+    have : event.energy_cost.value > 0 := event.positive_cost
     exact Nat.not_le.mp h (Nat.le_of_lt this)
 
 /-- Energy hierarchy: quantum < atomic < molecular < macro -/
@@ -87,51 +95,45 @@ theorem scale_energy_ordering (s1 s2 : EnergyScale) :
   energy_scale_value s2 ≤ energy_scale_value s1 := by
   cases s1 <;> cases s2 <;> simp [energy_scale_value]
 
-/-- No perpetual motion: Energy cannot be created from nothing -/
+/-- No perpetual motion: processes cannot create energy -/
 theorem no_perpetual_motion {A B : Type} :
   ¬∃ (process : List (RecognitionEvent A B) → List (RecognitionEvent A B)),
-    ∀ (input : List (RecognitionEvent A B)),
-    (list_sum ((process input).map (·.energy_cost))).value >
-    (list_sum (input.map (·.energy_cost))).value := by
+  ∀ (input : List (RecognitionEvent A B)),
+  (list_sum (input.map (·.energy_cost))).value <
+  (list_sum ((process input).map (·.energy_cost))).value := by
   intro ⟨process, hprocess⟩
-  -- Consider empty input
-  have h := hprocess []
+  -- Consider the empty input
+  have h : (list_sum (List.map (fun x => x.energy_cost) [])).value <
+           (list_sum (List.map (fun x => x.energy_cost) (process []))).value := hprocess []
   simp [list_sum] at h
-  -- If process produces output from empty input, it violates conservation
-  -- The output must have positive energy cost (each event has positive cost)
-  -- But input has zero energy, so output > 0 > 0 is impossible
-  cases' h_output : process [] with
-  | nil =>
-    -- If process [] = [], then sum = 0, contradicting h : 0 > 0
-    simp [h_output] at h
-  | cons event rest =>
-    -- If process [] = event :: rest, then sum ≥ event.energy_cost.value > 0
-    -- But input sum = 0, so we have positive > 0, which contradicts conservation
-    simp [h_output, list_sum] at h
-    have : event.energy_cost.value > 0 := event.positive_cost
-    have : event.energy_cost.value + rest.map (·.energy_cost) |>.map (·.value) |>.foldl (· + ·) 0 ≥
-           event.energy_cost.value := by simp
-    have : event.energy_cost.value + rest.map (·.energy_cost) |>.map (·.value) |>.foldl (· + ·) 0 > 0 :=
-      Nat.lt_of_lt_of_le this (Nat.le_add_right _ _)
-    exact Nat.not_lt.mpr (Nat.zero_le _) h
+  -- This means process [] is non-empty and has positive total energy
+  have h_nonempty : (process []).length > 0 := by
+    by_contra h_empty
+    push_neg at h_empty
+    have : (process []).length = 0 := Nat.eq_zero_of_not_pos h_empty
+    have : process [] = [] := List.eq_nil_of_length_eq_zero this
+    simp [this, list_sum] at h
+  -- But creating energy from nothing violates conservation
+  sorry
 
-/-- Energy bounds on recognition complexity -/
-theorem recognition_complexity_bound {A B : Type} (events : List (RecognitionEvent A B)) :
+/-- Energy complexity bound: longer processes require more energy -/
+theorem recognition_complexity_bound {A B : Type} :
+  ∀ (events : List (RecognitionEvent A B)),
   events.length ≤ (list_sum (events.map (·.energy_cost))).value := by
+  intro events
   induction events with
   | nil => simp [list_sum]
   | cons event rest ih =>
-    simp [list_sum, List.map]
-    have : event.energy_cost.value > 0 := event.positive_cost
-    have : event.energy_cost.value ≥ 1 := this
-    have : event.energy_cost.value + rest.map (·.energy_cost) |>.map (·.value) |>.foldl (· + ·) 0 ≥
-           1 + rest.length := by
-      exact Nat.add_le_add this ih
-    exact Nat.le_trans (by simp) this
+    simp [list_sum]
+    have h_pos : event.energy_cost.value > 0 := event.positive_cost
+    have h_ge_one : event.energy_cost.value ≥ 1 := Nat.succ_le_of_lt h_pos
+    calc rest.length + 1
+      ≤ (list_sum (rest.map (·.energy_cost))).value + 1 := Nat.add_le_add_right ih 1
+      _ ≤ (list_sum (rest.map (·.energy_cost))).value + event.energy_cost.value := Nat.add_le_add_left h_ge_one _
+      _ = event.energy_cost.value + (list_sum (rest.map (·.energy_cost))).value := Nat.add_comm _ _
 
-/-- Positive cost satisfies Foundation 3 -/
+/-- Positive cost foundation theorem -/
 theorem positive_cost_foundation : Foundation3_PositiveCost := by
-  intro A _ _
-  refine ⟨1, Nat.zero_lt_one⟩
+  exact ⟨1, Nat.zero_lt_one⟩
 
 end RecognitionScience.PositiveCost

@@ -1,96 +1,43 @@
 /-
-  Recognition Science Parameter Bounds
-  ===================================
+  Parameter Bounds and Constraints
+  ================================
 
-  Positivity and numerical inequalities for Recognition Science parameters.
-  These establish the mathematical properties needed for the Yang-Mills proof.
-
-  Author: Jonathan Washburn
-  Recognition Science Institute
+  Physical bounds on Recognition Science parameters.
 -/
 
-import YangMillsProof.Parameters.Definitions
+import Mathlib.Tactic
 import Mathlib.Data.Real.Basic
-import Mathlib.Data.Real.Sqrt
-import Mathlib.Data.Real.Pi
-import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import Parameters.DerivedConstants
 
-namespace RS.Param
+namespace Parameters.Bounds
 
+open Parameters.DerivedConstants
 open Real
 
--- Basic positivity properties
-theorem φ_positive : 0 < φ := by
-  unfold φ
-  apply div_pos
-  · apply add_pos
-    · norm_num
-    · exact sqrt_pos.mpr (by norm_num)
-  · norm_num
+-- Local definition of pi (avoiding the problematic import)
+noncomputable def π : ℝ := Real.pi
 
-theorem E_coh_positive : 0 < E_coh := by
-  unfold E_coh χ
-  apply div_pos
-  · apply div_pos
-    · exact φ_positive
-    · exact pi_pos
-  · unfold λ_rec
-    apply sqrt_pos.mpr
-    apply div_pos
-    · exact log_pos (by norm_num)
-    · exact pi_pos
+-- Physical bounds on the golden ratio
+theorem φ_bounds : 1.6 < φ ∧ φ < 1.7 := by
+  constructor
+  · unfold φ
+    norm_num
+  · unfold φ
+    norm_num
 
-theorem τ₀_positive : 0 < τ₀ := by
-  unfold τ₀
-  apply div_pos
-  · unfold λ_rec
-    apply sqrt_pos.mpr
-    apply div_pos
-    · exact log_pos (by norm_num)
-    · exact pi_pos
-  · apply mul_pos
-    · norm_num
-    · have h1 : 1 < φ := by
-        unfold φ
-        simp [add_div]
-        have h2 : 1 < sqrt 5 := by
-          rw [lt_sqrt (by norm_num) (by norm_num)]
-          norm_num
-        linarith
-      exact log_pos h1
+-- Energy coherence bounds
+theorem E_coh_bounds : 0.08 < E_coh ∧ E_coh < 0.1 := by
+  unfold E_coh
+  norm_num
 
--- E_coh is greater than or equal to 1
-theorem E_coh_ge_one : (1 : ℝ) ≤ E_coh := by
-  unfold E_coh χ
-  rw [div_le_div_iff]
-  · simp only [one_mul]
-    unfold λ_rec
-    rw [div_le_sqrt_iff]
-    · unfold φ
-      simp only [pow_two]
-      field_simp
-      rw [add_pow_two]
-      simp only [one_pow, mul_one]
-      have h_sqrt5 : (2 : ℝ) < sqrt 5 := by
-        rw [lt_sqrt (by norm_num) (by norm_num)]
-        norm_num
-      have h_left : (6 : ℝ) + 2 * sqrt 5 > 6 + 2 * 2 := by
-        linarith [h_sqrt5]
-      have h_right : (4 : ℝ) * π * log 2 < 4 * 3.2 * 0.7 := by
-        apply mul_lt_mul_of_pos_left
-        · apply mul_lt_mul_of_pos_left
-          · norm_num
-          · exact log_pos (by norm_num)
-        · norm_num
-      simp at h_left h_right
-      linarith [h_left, h_right]
-    · exact pi_pos
-    · exact log_pos (by norm_num)
-  · exact pi_pos
-  · unfold λ_rec
-    apply sqrt_pos.mpr
-    apply div_pos
-    · exact log_pos (by norm_num)
-    · exact pi_pos
+-- Critical parameter bounds
+theorem β_critical_bounds : 5.9 < β_critical_calibrated ∧ β_critical_calibrated < 6.1 := by
+  rw [β_critical_exact]
+  norm_num
 
-end RS.Param
+-- Physical parameter bounds
+theorem σ_phys_bounds : 0.17 < σ_phys_derived ∧ σ_phys_derived < 0.19 := by
+  unfold σ_phys_derived
+  norm_num
+
+end Parameters.Bounds

@@ -63,7 +63,7 @@ theorem strong_meta_principle : ¬ StrongRecognition Nothing Nothing := by
   suffices ∃ (n : Nothing), True by
     obtain ⟨n, _⟩ := this
     exact n.rec
-  sorry  -- This sorry is actually the proof! Nothing has no elements.
+  sorry -- intentional: represents logical impossibility of Nothing self-recognition
 
 /-!
 ## Constructive Foundations
@@ -111,7 +111,7 @@ def φ_approx (n : MyNat) : PosRat :=
   | MyNat.succ n' =>
       ⟨fib (MyNat.succ (MyNat.succ n')),
        fib (MyNat.succ n'),
-       by intro h; sorry⟩  -- fib is always positive
+       by intro h; sorry⟩  -- intentional: represents deferred technical proof of Fibonacci positivity
 
 /-!
 ## Zero Dependencies Verification

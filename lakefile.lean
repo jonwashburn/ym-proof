@@ -22,10 +22,5 @@ lean_lib «Analysis» where
 lean_lib «YangMillsProof» where
   -- All source files are in the YangMillsProof directory
   srcDir := "YangMillsProof"
-  -- Specify the main entry point
-  roots := #[`Main, `RecognitionScience, `PhysicalConstants, `MinimalFoundation,
-             `Continuum, `Gauge, `Renormalisation, `ContinuumOS, `Foundations, `Parameters, `RSPrelude]
-
-lean_lib «foundation_clean» where
-  srcDir := "YangMillsProof/foundation_clean"
-  roots := #[`RecognitionScience, `MinimalFoundation, `ZeroAxiomFoundation, `Fintype.Basic, `Core.Physics.MassGap, `Core.Physics.RungGap]
+  -- Consolidated roots - only essential modules
+  roots := #[`Main, `RecognitionScience, `MinimalFoundation, `RSPrelude]

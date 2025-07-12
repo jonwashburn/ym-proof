@@ -1,40 +1,23 @@
 import Lake
 open Lake DSL
 
-package «recognition-science» where
-  -- Basic settings
+package ym_proof where
+  srcDir := "YangMillsProof"
   leanOptions := #[
     ⟨`autoImplicit, false⟩,
-    ⟨`relaxedAutoImplicit, false⟩,
-    ⟨`linter.docPrime, false⟩
+    ⟨`relaxedAutoImplicit, false⟩
   ]
 
 require mathlib from git
   "https://github.com/leanprover-community/mathlib4.git" @ "v4.12.0"
 
--- TODO: Add Recognition Science library when structure is finalized
--- require recognition_framework from git
---   "https://github.com/jonwashburn/RecognitionScience.git" @ "main" / "recognition-framework"
-
 @[default_target]
-lean_lib «Core» where
-  -- Core modules
-  srcDir := "YangMillsProof"
-  roots := #[`Core.Finite, `Core.MetaPrincipleMinimal, `Core.MetaPrinciple, `Core.EightFoundations, `Core.Nat.Card]
-
-lean_lib «Foundations» where
-  -- Concrete foundation implementations
-  srcDir := "YangMillsProof"
+lean_lib YangMillsProof where
   roots := #[
-    `Foundations.DualBalance
+    `Core, `Foundations, `RecognitionScience, `Parameters,
+    `Gauge, `Continuum, `ContinuumOS, `Renormalisation, `RG,
+    `Measure, `Topology, `Stage0_RS_Foundation, `Stage1_GaugeEmbedding,
+    `Stage2_LatticeTheory, `Stage3_OSReconstruction, `Stage5_Renormalization,
+    `Stage6_MainTheorem, `Numerical, `Tests, `Wilson, `Infrastructure,
+    `Analysis.Trig.MonotoneCos, `Analysis.Hilbert.Cyl, `Main, `Complete
   ]
-
-lean_lib «RecognitionScience» where
-  -- Main library combining everything
-  srcDir := "YangMillsProof"
-  roots := #[`RecognitionScience]
-
-lean_lib «YangMillsProof» where
-  -- Yang-Mills proof components
-  srcDir := "YangMillsProof"
-  roots := #[`Stage3_OSReconstruction.ContinuumReconstruction, `Stage3_OSReconstruction.ContinuumReconstruction_Simple, `Main, `Measure.ReflectionPositivity, `Measure.Wilson, `Parameters.RSParam, `Parameters.Assumptions, `Parameters.Constants, `Parameters.FromRS, `Analysis.Hilbert.Cyl]

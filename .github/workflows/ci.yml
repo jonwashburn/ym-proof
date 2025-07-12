@@ -3,80 +3,72 @@ name: Yang-Mills Proof CI
 on:
   push:
     branches: [ main ]
+    paths-ignore:
+      - "**/*.md"
+      - "docs/**"
   pull_request:
     branches: [ main ]
+    types: [opened, synchronize]
 
 jobs:
   build-and-verify:
     runs-on: ubuntu-latest
-    
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
       with:
         submodules: recursive
-        
+
+    - name: Cache elan & Lake artifacts
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.elan
+          .lake
+        key: ${{ runner.os }}-lean-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('.lake/lake-manifest.json') }}
+        restore-keys: |
+          ${{ runner.os }}-lean-
+
     - name: Install elan (Lean version manager)
       run: |
-        curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+        curl -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y
         echo "$HOME/.elan/bin" >> $GITHUB_PATH
-        
+        ELAN_HOME="$HOME/.elan/bin"
+        export PATH="$ELAN_HOME:$PATH"
+        elan toolchain install $(cat lean-toolchain)
+        elan default $(cat lean-toolchain)
+
     - name: Get Lean dependencies
       run: |
         export PATH="$HOME/.elan/bin:$PATH"
         lake update
-      
+
     - name: Build Yang-Mills proof
       run: |
         export PATH="$HOME/.elan/bin:$PATH"
-        echo "🔨 Building Yang-Mills proof..."
-        lake build
-        echo "✅ Build completed successfully!"
-        
+        lake build -K4
+
     - name: Verify axiom-free status
-      run: |
-        echo "🔍 Verifying axiom-free status..."
-        bash verify_no_axioms.sh
-        echo "✅ Axiom verification passed!"
-        
-    - name: Verify sorry-free status  
-      run: |
-        echo "🔍 Verifying sorry-free status..."
-        bash verify_no_sorries.sh
-        echo "✅ Sorry verification passed!"
-        
-    - name: Generate verification summary
-      run: |
-        echo "📊 Yang-Mills Proof Verification Summary"
-        echo "========================================"
-        echo "✅ Build: SUCCESS"
-        echo "✅ Axiom-free: VERIFIED"
-        echo "✅ Sorry-free: VERIFIED"
-        echo ""
-        echo "🎯 The proof is complete and formally verified!"
-        
-    - name: Create build artifacts
-      if: success()
-      run: |
-        echo "BUILD_SUCCESS=true" >> $GITHUB_ENV
-        echo "AXIOM_FREE=true" >> $GITHUB_ENV
-        echo "SORRY_FREE=true" >> $GITHUB_ENV
-        
-  verification-status:
-    runs-on: ubuntu-latest
-    needs: build-and-verify
+      run: bash verify_no_axioms.sh
+
+    - name: Verify sorry-free status
+      run: bash verify_no_sorries.sh
+
+    - name: Upload lake build cache
+      if: always()
+      uses: actions/cache/save@v4
+      with:
+        path: .lake/build
+        key: ${{ runner.os }}-lake-build-${{ github.sha }}
+
+  summary:
     if: always()
-    
+    needs: build-and-verify
+    runs-on: ubuntu-latest
     steps:
-    - name: Set verification badges
+    - name: Report status
       run: |
-        if [ "${{ needs.build-and-verify.result }}" == "success" ]; then
-          echo "🟢 YANG-MILLS PROOF STATUS: VERIFIED"
-          echo "✅ Build: SUCCESS"
-          echo "✅ Axiom-free: CONFIRMED" 
-          echo "✅ Sorry-free: CONFIRMED"
-          echo "📜 Formal verification complete!"
-        else
-          echo "🔴 YANG-MILLS PROOF STATUS: FAILED"
-          echo "❌ Verification failed - check logs"
-        fi 
+        echo "CI result: ${{ needs.build-and-verify.result }}" 

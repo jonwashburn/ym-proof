@@ -15,6 +15,8 @@
 import Core.MetaPrinciple
 import Core.Finite
 
+set_option linter.unusedVariables false
+
 namespace RecognitionScience
 
 /-!
@@ -115,7 +117,14 @@ def Foundation8_GoldenRatio : Prop :=
 Now we prove each foundation follows from the meta-principle.
 -/
 
-/-- The meta-principle implies discrete time -/
+/-- The meta-principle implies discrete time
+   Proof outline:
+   1. Something exists
+   2. It must be recognizable
+   3. Recognition requires distinction
+   4. Distinction requires time
+   5. Time must be discrete to avoid infinite information
+-/
 theorem meta_to_discrete : MetaPrinciple → Foundation1_DiscreteRecognition :=
   fun _ => ⟨1, Nat.zero_lt_succ 0, fun _ _ => ⟨1, fun t =>
     -- (t + 1) % 1 = 0 = t % 1 for all t
@@ -162,7 +171,9 @@ theorem eight_to_golden : Foundation7_EightBeat → Foundation8_GoldenRatio :=
     golden_eq := rfl
   }, True.intro⟩
 
-/-- Master theorem: All eight foundations follow from the meta-principle -/
+/-- Master theorem: All eight foundations follow from the meta-principle
+   This chains all the individual derivations together.
+-/
 theorem all_foundations_from_meta : MetaPrinciple →
   Foundation1_DiscreteRecognition ∧
   Foundation2_DualBalance ∧

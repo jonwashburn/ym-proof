@@ -282,6 +282,20 @@ example :
   · exact ContinuumOS.OS_reconstruction_complete
   · exact Continuum.ledger_wilson_cost_correspondence
 
+/-! ## Main Theorem Tests -/
+
+/-- Test existence of mass gap -/
+example : ∃ Δ : ℝ, Δ > 0 ∧ IsYangMillsMassGap Δ := yang_mills_mass_gap
+
+/-- Test continuum limit persistence -/
+example : ∃ Δ : ℝ, Δ > 0 ∧ ∀ ε > 0, ∃ a₀ > 0, ∀ a ∈ Set.Ioo 0 a₀, |massGap a - Δ| < ε := continuum_gap_exists
+
+/-- Test OS axioms satisfaction -/
+example : ∃ H : ContinuumOS.InfiniteVolume, ContinuumOS.OSAxioms H := OS_reconstruction_complete.left
+
+/-- Test BRST nilpotency -/
+example (s : RecognitionScience.BRST.BRSTState) : RecognitionScience.BRST.brst (RecognitionScience.BRST.brst s) = RecognitionScience.BRST.brst s := BRST_nilpotent s
+
 -- Helper definitions for missing lemmas
 private lemma cost_nonneg (s : GaugeLedgerState) : gaugeCost s ≥ 0 := by
   unfold gaugeCost

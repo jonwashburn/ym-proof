@@ -5,7 +5,8 @@ package «recognition-science» where
   -- Basic settings
   leanOptions := #[
     ⟨`autoImplicit, false⟩,
-    ⟨`relaxedAutoImplicit, false⟩
+    ⟨`relaxedAutoImplicit, false⟩,
+    ⟨`linter.docPrime, false⟩
   ]
 
 require mathlib from git

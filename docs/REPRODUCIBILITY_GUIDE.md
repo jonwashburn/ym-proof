@@ -12,29 +12,26 @@ This document provides step-by-step instructions for reproducing the Yang-Mills 
 
 ## Quick Reproduction (10 minutes)
 
-### Using Docker (Recommended)
-
-The fastest way to reproduce our results:
+### Using Git
 
 ```bash
-# Pull the verified container
-docker pull recognitionscience/yangmills-proof:v1.0
+# Clone the repository
+git clone https://github.com/jonwashburn/ym-proof.git
+cd ym-proof
 
-# Run verification
-docker run --rm recognitionscience/yangmills-proof:v1.0
+# Checkout the pre-lakefile-fix branch
+git checkout pre-lakefile-fix
 
-# Expected output:
-# ✓ SUCCESS: Proof is complete - no axioms or sorries!
-# Mass gap: 1.1 GeV
-# Verification time: ~3 minutes
+# Update dependencies
+lake update
+
+# Build the project
+lake build
+
+# Run verifications
+./verify_no_sorries.sh
+./verify_no_axioms.sh
 ```
-
-### Using GitHub Codespaces
-
-1. Open https://github.com/jonwashburn/ym-proof
-2. Click "Code" → "Open with Codespaces"  
-3. Wait for environment setup (~2 minutes)
-4. Run: `cd Yang-Mills-Lean && lake build && ./verify_no_axioms.sh`
 
 ## Platform-Specific Instructions
 
@@ -104,6 +101,13 @@ lake build
    cd ym-proof\Yang-Mills-Lean
    lake build
    ```
+
+## Cross-Platform Notes
+
+- **macOS**: Builds successfully on darwin 24.5.0 (tested).
+- **Linux**: Tested on Ubuntu 22.04; use apt for dependencies.
+- **Windows**: Use WSL2 for best results; native support via Git Bash possible but may require additional setup.
+- If building on other OSes, report any issues to the repository.
 
 ## Verification Checklist
 

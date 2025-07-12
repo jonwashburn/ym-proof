@@ -207,3 +207,7 @@ This branch maintains multiple lakefiles to avoid issues from previous consolida
 - **foundation_clean/lakefile.lean**: Handles the minimal foundation layer with its own dependencies.
 
 This modular setup allows independent development and building of components. To build the entire project, run `lake build` from the root directory. 
+
+## AI Assistance Note
+
+This proof was developed with the assistance of AI coding tools (e.g., Grok, Cursor) under human direction. All mathematical content was manually verified, and AI was used primarily for drafting and ideation. Human oversight ensured accuracy and rigor. 

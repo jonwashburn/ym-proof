@@ -140,7 +140,9 @@ theorem spectral_gap_positive (L : ℕ) (hL : 0 < L) :
 lemma no_small_loops (k : ℕ) (h : k < 3) : ∀ (γ : ℕ → VoxelLattice), ClosedWalk γ k → ¬LedgerBalance γ := by
   intro γ h_closed
   have h_damp : damping A (2 * k) < 1 / φ := by
-    sorry -- Use Mathlib.Real.log_lt_log for φ properties
+    have h_phi : 1 < φ := golden_ratio_gt_one
+    have h_log : Real.log (damping A (2 * k)) < Real.log (1 / φ) := damping_lt_log h h_phi
+    exact Real.log_lt_log (damping_pos (2 * k)) h_log
   have h_threshold : ledger_threshold ≤ 1 / φ := ledger_threshold_def
   linarith [h_damp, h_threshold]
 

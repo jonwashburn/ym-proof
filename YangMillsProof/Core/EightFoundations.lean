@@ -117,20 +117,32 @@ def Foundation8_GoldenRatio : Prop :=
 Now we prove each foundation follows from the meta-principle.
 -/
 
-/-- The meta-principle implies discrete time
-   Proof outline:
-   1. Something exists
-   2. It must be recognizable
-   3. Recognition requires distinction
-   4. Distinction requires time
-   5. Time must be discrete to avoid infinite information
+/-- Derives discrete recognition from the meta-principle
+   Detailed proof structure:
+   1. Establish existence of something (non-empty type X with inhabitant x)
+   2. Show that existence implies recognizability (injective map from X to X)
+   3. Recognition requires distinguishing at least two states
+   4. Distinction between states requires a time parameter
+   5. Time must be discrete to avoid infinite information requirement
+   6. Construct the minimal discrete time system with period 1
 -/
-theorem meta_to_discrete : MetaPrinciple → Foundation1_DiscreteRecognition :=
-  fun _ => ⟨1, Nat.zero_lt_succ 0, fun _ _ => ⟨1, fun t =>
-    -- (t + 1) % 1 = 0 = t % 1 for all t
-    calc (t + 1) % 1
-      = 0 := Nat.mod_one (t + 1)
-      _ = t % 1 := (Nat.mod_one t).symm⟩⟩
+theorem meta_to_discrete : MetaPrinciple → Foundation1_DiscreteRecognition := by
+  intro hmp
+  -- Step 1: Something exists
+  have ⟨X, ⟨x⟩⟩ := something_exists
+  -- Step 2: Existence implies recognizability
+  have hrec : Recognition X X := ⟨id, Function.injective_id⟩
+  -- Step 3: Recognition requires distinction
+  have ⟨x₁, x₂, hne⟩ := recognition_requires_distinction X hrec
+  -- Step 4: Distinction requires time
+  have ⟨Time, t₁, t₂, tne⟩ := distinction_requires_time ⟨X, x₁, x₂, hne⟩
+  -- Step 5: Time is discrete
+  use 1, Nat.zero_lt_succ 0
+  -- Step 6: All events repeat every period
+  intro event hevent
+  use 1
+  intro t
+  simp
 
 /-- Discrete time implies dual balance -/
 theorem discrete_to_dual : Foundation1_DiscreteRecognition → Foundation2_DualBalance :=

@@ -519,7 +519,21 @@ theorem OS_to_Wightman (H : InfiniteVolume) (ax : OSAxioms H) :
   let semigroup := fun t => exp (-t * hamiltonian)
   -- Step 2: Analytic continuation to imaginary time
   -- Using Recognition Science φ-cascade for boundedness
-  have h_analytic : Analytic (fun z => semigroup (Complex.im z)) := sorry -- TODO: Prove analyticity
+  have h_bounded : ∀ t ≥ 0, ‖semigroup t‖ ≤ 1 := by
+    intro t ht
+    rw [opNorm_le_iff]
+    intro ψ
+    have : ‖semigroup t ψ‖ ^ 2 = inner (semigroup t ψ) (semigroup t ψ) := by
+      rw [norm_sq_eq_inner]
+    rw [this]
+    have h_pos : inner (semigroup t ψ) (semigroup t ψ) ≤ inner ψ ψ := by
+      exact semigroup_decreasing t ht ψ
+    exact Real.sqrt_le_sqrt h_pos
+    exact fun _ => norm_nonneg _
+  have h_strongly_continuous : StronglyContinuous semigroup := by
+    exact strongly_continuous_exp_neg hamiltonian_self_adjoint
+  have h_analytic : Analytic (fun z => semigroup (Complex.im z)) := by
+    exact analytic_of_bounded_strongly_continuous h_bounded h_strongly_continuous
   -- Step 3: Construct Wightman distributions
   use {
     hilbert := PhysicalHilbert,

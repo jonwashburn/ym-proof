@@ -12,6 +12,7 @@ require mathlib from git
   "https://github.com/leanprover-community/mathlib4.git" @ "v4.12.0"
 
 @[default_target]
+<<<<<<< HEAD
 lean_lib YangMillsProof where
   roots := #[
     `Foundations, `RecognitionScience, `Parameters,
@@ -21,3 +22,6 @@ lean_lib YangMillsProof where
     `Stage6_MainTheorem, `Numerical, `Tests, `Wilson, `Infrastructure,
     `Analysis.Trig.MonotoneCos, `Analysis.Hilbert.Cyl, `Main, `Complete
   ]
+=======
+lean_lib YangMillsProof
+>>>>>>> 0ce0d744066b91222d10f001ef65a5a095de4ea6

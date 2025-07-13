@@ -137,7 +137,11 @@ theorem spectral_gap_positive (L : ℕ) (hL : 0 < L) :
   have : 1 - Real.exp (-β_wilson) > 0 := by linarith
   simpa [this] using this
 
-lemma no_small_loops (k : ℕ) (h : k < 3) : ∀ (γ : ℕ → VoxelLattice), ClosedWalk γ k → ¬LedgerBalance γ :=
-  sorry  -- Prove using φ-damping A^{2k} < threshold for k<3, per voxel paper Eq. (2)
+lemma no_small_loops (k : ℕ) (h : k < 3) : ∀ (γ : ℕ → VoxelLattice), ClosedWalk γ k → ¬LedgerBalance γ := by
+  intro γ h_closed
+  have h_damp : damping A (2 * k) < 1 / φ := by
+    sorry -- Use Mathlib.Real.log_lt_log for φ properties
+  have h_threshold : ledger_threshold ≤ 1 / φ := ledger_threshold_def
+  linarith [h_damp, h_threshold]
 
 end YangMillsProof.LatticeTheory

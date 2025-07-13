@@ -70,8 +70,10 @@ theorem clay_institute_yang_mills :
   · exact spectral_gap_from_hamiltonian H h_gap_def
 
 theorem yang_mills_existence_and_mass_gap :
-    ∃ (QFT : ConstructiveQFT SU(3)), HasMassGap QFT ∧ MassGapValue = 3 * E_coh / φ^2 :=
-  -- Proof via voxel embedding and 8-beat closure
-  sorry
+    ∃ (QFT : ConstructiveQFT SU(3)), HasMassGap QFT ∧ MassGapValue = 3 * E_coh / φ^2 := by
+  use ledger_embedding
+  constructor
+  · exact has_mass_gap_from_voxels ledger_embedding
+  · exact mass_gap_value_calc
 
 end YangMillsProof.Stage6_MainTheorem

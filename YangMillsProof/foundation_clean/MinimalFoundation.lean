@@ -14,6 +14,7 @@
 import Mathlib.Tactic
 import Mathlib.Data.Fin.Basic
 import Mathlib.Data.Fintype.Card
+import Mathlib.Data.ZMod.Basic
 
 set_option linter.unusedVariables false
 
@@ -172,6 +173,13 @@ structure Finite (A : Type) where
   n : Nat
   elements : Fin n → A
   surjective : ∀ a : A, ∃ i : Fin n, elements i = a
+
+inductive VoxelLattice : Type
+  | site : ℤ × ℤ × ℤ × ℤ → VoxelLattice
+  | link : VoxelLattice → VoxelLattice → VoxelLattice
+
+def RecognitionConstraint {γ : ℕ → VoxelLattice} {ϕ : ℕ → ZMod 4} (k : ℕ) : Prop :=
+  ∀ (t1 t2 : ℕ), |t2 - t1| < 8 → (γ t1, ϕ t1) ≠ (γ t2, ϕ t2)
 
 /-!
 ## The Eight Foundations (Definitions)

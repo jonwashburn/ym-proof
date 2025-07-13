@@ -69,4 +69,9 @@ theorem clay_institute_yang_mills :
   · exact wightman_from_OS H
   · exact spectral_gap_from_hamiltonian H h_gap_def
 
+theorem yang_mills_existence_and_mass_gap :
+    ∃ (QFT : ConstructiveQFT SU(3)), HasMassGap QFT ∧ MassGapValue = 3 * E_coh / φ^2 :=
+  -- Proof via voxel embedding and 8-beat closure
+  sorry
+
 end YangMillsProof.Stage6_MainTheorem

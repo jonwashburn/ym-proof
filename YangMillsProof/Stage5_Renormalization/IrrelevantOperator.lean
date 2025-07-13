@@ -127,4 +127,10 @@ theorem rho_R_finite (D : Diagram) (h : D.rhoVertices ≥ 1) :
       -- So we have at least 5.236 + 4 - 2 = 7.236 to subtract from 0
       linarith [h_rho_contrib]
 
+theorem geometric_regularization (op : IrrelevantOperator) : Vanishes op :=
+  let φ := (1 + Real.sqrt 5) / 2
+  let Λ_eff := 2 / (2 * (2/3) * Real.log φ)
+  -- Proof that op converges via Pauli-Villars equivalent cutoff Λ_eff
+  sorry
+
 end YangMillsProof.Stage5_Renormalization

@@ -13,6 +13,8 @@ import Mathlib.Analysis.Matrix
 import Mathlib.Order.Filter.Basic
 import Parameters.Assumptions
 import Gauge.SU3
+import Mathlib.Data.Real.Basic
+import YangMillsProof.foundation_clean.MinimalFoundation
 
 namespace YangMillsProof.LatticeTheory
 
@@ -134,5 +136,8 @@ theorem spectral_gap_positive (L : ℕ) (hL : 0 < L) :
     ring
   have : 1 - Real.exp (-β_wilson) > 0 := by linarith
   simpa [this] using this
+
+lemma no_small_loops (k : ℕ) (h : k < 3) : ∀ (γ : ℕ → VoxelLattice), ClosedWalk γ k → ¬LedgerBalance γ :=
+  sorry  -- Prove using φ-damping A^{2k} < threshold for k<3, per voxel paper Eq. (2)
 
 end YangMillsProof.LatticeTheory

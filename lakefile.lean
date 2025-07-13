@@ -14,7 +14,7 @@ require mathlib from git
 @[default_target]
 lean_lib YangMillsProof where
   roots := #[
-    `Core, `Foundations, `RecognitionScience, `Parameters,
+    `Foundations, `RecognitionScience, `Parameters,
     `Gauge, `Continuum, `ContinuumOS, `Renormalisation, `RG,
     `Measure, `Topology, `Stage0_RS_Foundation, `Stage1_GaugeEmbedding,
     `Stage2_LatticeTheory, `Stage3_OSReconstruction, `Stage5_Renormalization,

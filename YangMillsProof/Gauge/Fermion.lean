@@ -126,7 +126,14 @@ noncomputable def staggered_hopping_matrix (U : VoxelSite → Fin 4 → Matrix (
 /-- Staggered fermion action on voxel lattice -/
 noncomputable def staggered_fermion_action (ψ : FermionField)
     (U : VoxelSite → Fin 4 → Matrix (Fin 3) (Fin 3) ℂ) : ℂ :=
-  sorry  -- Implementation requires finite lattice summation
+  -- Sum over all voxel sites and directions
+  (finite_lattice_sites.sum fun x =>
+    (Finset.range 4).sum fun μ =>
+      -- Kinetic term: ψ†(x) D_μ ψ(x+μ)
+      Complex.conj (ψ.ψ x 0 0 0) * staggered_dirac_operator ψ U x μ * (ψ.ψ (next_site x μ) 0 0 0)) +
+  -- Mass term
+  (finite_lattice_sites.sum fun x =>
+    mass_term x * Complex.conj (ψ.ψ x 0 0 0) * (ψ.ψ x 0 0 0))
 
 /-!
 ## Chiral Recognition Symmetry
@@ -135,15 +142,20 @@ Chiral symmetry emerges from the recognition structure,
 with anomalies cancelled by dual balance.
 -/
 
+/-- The fifth Dirac gamma matrix (chiral matrix) -/
+def γ₅ : Matrix (Fin 4) (Fin 4) ℂ :=
+  !![0, 0, -Complex.I, 0;
+     0, 0, 0, -Complex.I;
+     Complex.I, 0, 0, 0;
+     0, Complex.I, 0, 0]
+
 /-- Left-handed fermion projection -/
 def left_projection : Matrix (Fin 4) (Fin 4) ℂ :=
   (1 - Complex.I • γ₅) / 2
-  where γ₅ : Matrix (Fin 4) (Fin 4) ℂ := sorry  -- Dirac gamma matrix
 
 /-- Right-handed fermion projection -/
 def right_projection : Matrix (Fin 4) (Fin 4) ℂ :=
   (1 + Complex.I • γ₅) / 2
-  where γ₅ : Matrix (Fin 4) (Fin 4) ℂ := sorry
 
 /-- Chiral recognition transformation -/
 def chiral_recognition_transform (ψ : FermionField) (α : ℝ) : FermionField :=

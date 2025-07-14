@@ -6,7 +6,7 @@
 -/
 
 import RecognitionScience.Basic
-import Parameters.Assumptions
+import YangMillsProof.Parameters.Assumptions
 
 namespace YangMillsProof
 

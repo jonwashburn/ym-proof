@@ -17,7 +17,7 @@ import Mathlib.MeasureTheory.Function.L2Space
 import Mathlib.MeasureTheory.Constructions.Prod.Basic
 import Mathlib.Topology.Algebra.InfiniteSum.Basic
 import Mathlib.Data.Real.Sqrt
-import Parameters.Bounds
+import YangMillsProof.Parameters.Bounds
 -- Obsolete auxiliary modules commented out to remove dependency cycles
 -- import RecognitionScience.Ledger.Quantum
 -- import RecognitionScience.Ledger.Energy

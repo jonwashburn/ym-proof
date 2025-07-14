@@ -1,7 +1,7 @@
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import RSImport.BasicDefinitions
 import Mathlib.Analysis.InnerProductSpace.Basic
-import Mathlib.Analysis.NormedSpace.LinearIsometry
+import Mathlib.Analysis.NormedSpace.LinearIsometry.Basic
 import Mathlib.Analysis.InnerProductSpace.L2Space
 
 namespace YangMillsProof.Stage3_OSReconstruction

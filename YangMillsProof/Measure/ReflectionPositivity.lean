@@ -5,7 +5,7 @@
   Proves that the ledger-weighted measure satisfies OS axiom (OS2).
 -/
 
-import Parameters.Assumptions
+import YangMillsProof.Parameters.Assumptions
 import GaugeLayer
 import Mathlib.MeasureTheory.Integral.Lebesgue
 import Mathlib.MeasureTheory.Function.L2Space

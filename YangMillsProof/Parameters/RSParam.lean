@@ -10,8 +10,8 @@
 -/
 
 -- Import both modules to provide all symbols
-import Parameters.Definitions
-import Parameters.Bounds
+import YangMillsProof.Parameters.Definitions
+import YangMillsProof.Parameters.Bounds
 
 -- Re-export everything from the RS.Param namespace
 -- This ensures backward compatibility for existing imports

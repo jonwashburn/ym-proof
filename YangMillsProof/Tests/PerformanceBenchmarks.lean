@@ -8,8 +8,8 @@
 -/
 
 import Complete
-import Parameters.Definitions
-import Stage3_OSReconstruction.ContinuumReconstruction
+import YangMillsProof.Parameters.Definitions
+import YangMillsProof.Stage3_OSReconstruction.ContinuumReconstruction
 import RecognitionScience.BRST.Cohomology
 import ContinuumOS.OSFull
 import Continuum.WilsonCorrespondence

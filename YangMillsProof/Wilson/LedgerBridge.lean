@@ -5,7 +5,7 @@
   Shows the ledger cost functional bounds the Wilson action from below.
 -/
 
-import Parameters.Assumptions
+import YangMillsProof.Parameters.Assumptions
 import GaugeLayer
 import Gauge.SU3
 import Gauge.Lattice

@@ -11,7 +11,7 @@
   Recognition Science Institute
 -/
 
-import Parameters.Assumptions
+import YangMillsProof.Parameters.Assumptions
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import Mathlib.Analysis.Normed.Field.InfiniteSum
 import Mathlib.Analysis.InnerProductSpace.Basic

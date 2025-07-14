@@ -9,8 +9,8 @@
   Recognition Science Institute
 -/
 
-import YangMillsProof.Core.EightFoundations
-import YangMillsProof.Core.MetaPrinciple
+import foundation_clean.Core.EightFoundations
+import foundation_clean.Core.MetaPrinciple
 
 namespace RecognitionScience.DiscreteTime
 

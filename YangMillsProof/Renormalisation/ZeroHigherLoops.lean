@@ -12,8 +12,8 @@
   Recognition Science Institute
 -/
 
-import Parameters.Constants
-import Parameters.FromRS
+import YangMillsProof.Parameters.Constants
+import YangMillsProof.Parameters.FromRS
 import Foundations.EightBeat
 
 namespace YangMillsProof.Renormalisation

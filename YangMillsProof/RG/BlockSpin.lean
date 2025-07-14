@@ -7,10 +7,10 @@
 -/
 
 import Mathlib.Data.Real.Basic
-import Mathlib.Analysis.SpecialFunctions.Pow
+import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import Mathlib.Analysis.NormedSpace.Exponential
 import Mathlib.LinearAlgebra.Matrix.Block
-import Parameters.Assumptions
+import YangMillsProof.Parameters.Assumptions
 import TrigExtras
 
 namespace YangMillsProof.RG

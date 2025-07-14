@@ -1,10 +1,10 @@
 import Infrastructure.PhysicalConstants
 import Stage0_RS_Foundation.LedgerThermodynamics
-import Stage1_GaugeEmbedding.GaugeToLedger
-import Stage2_LatticeTheory.TransferMatrixGap
-import Stage3_OSReconstruction.ContinuumReconstruction
-import Stage4_ContinuumLimit.MassGapPersistence
-import Stage5_Renormalization.IrrelevantOperator
+import YangMillsProof.Stage1_GaugeEmbedding.GaugeToLedger
+import YangMillsProof.Stage2_LatticeTheory.TransferMatrixGap
+import YangMillsProof.Stage3_OSReconstruction.ContinuumReconstruction
+import YangMillsProof.Stage4_ContinuumLimit.MassGapPersistence
+import YangMillsProof.Stage5_Renormalization.IrrelevantOperator
 
 namespace YangMillsProof.Stage6_MainTheorem
 

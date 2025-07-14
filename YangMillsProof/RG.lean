@@ -1,6 +1,6 @@
-import RG.BlockSpin
-import RG.ContinuumLimit
-import RG.ExactSolution
+import YangMillsProof.RG.BlockSpin
+import YangMillsProof.RG.ContinuumLimit
+import YangMillsProof.RG.ExactSolution
 
 -- Re-export
 open YangMillsProof.RG.BlockSpin

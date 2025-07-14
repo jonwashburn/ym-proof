@@ -1,5 +1,5 @@
-import Measure.Wilson
-import Measure.ReflectionPositivity
+import YangMillsProof.Measure.Wilson
+import YangMillsProof.Measure.ReflectionPositivity
 
 -- Re-export
 open YangMillsProof.Measure.Wilson

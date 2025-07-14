@@ -11,7 +11,7 @@ import Mathlib.LinearAlgebra.Matrix.Trace
 import Mathlib.Analysis.Complex.Basic
 import Mathlib.Data.Complex.Exponential
 import Mathlib.Analysis.InnerProductSpace.Basic
-import Parameters.Assumptions
+import YangMillsProof.Parameters.Assumptions
 import Gauge.Lattice
 
 namespace YangMillsProof.Gauge

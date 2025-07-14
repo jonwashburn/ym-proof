@@ -1,10 +1,10 @@
-import Parameters.Assumptions
-import Parameters.Bounds
-import Parameters.Constants
-import Parameters.Definitions
-import Parameters.DerivedConstants
-import Parameters.FromRS
-import Parameters.RSParam
+import YangMillsProof.Parameters.Assumptions
+import YangMillsProof.Parameters.Bounds
+import YangMillsProof.Parameters.Constants
+import YangMillsProof.Parameters.Definitions
+import YangMillsProof.Parameters.DerivedConstants
+import YangMillsProof.Parameters.FromRS
+import YangMillsProof.Parameters.RSParam
 
 -- Re-export
 open Parameters.Assumptions

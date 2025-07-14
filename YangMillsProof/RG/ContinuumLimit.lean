@@ -5,7 +5,7 @@
   Proves the mass gap survives as lattice spacing a → 0.
 -/
 
-import Parameters.Assumptions
+import YangMillsProof.Parameters.Assumptions
 import TransferMatrix
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
 -- import Mathlib.Topology.MetricSpace.CauchiSeqFilter -- Module path issue

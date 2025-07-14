@@ -1,4 +1,4 @@
-import Stage1_GaugeEmbedding.GaugeToLedger
+import YangMillsProof.Stage1_GaugeEmbedding.GaugeToLedger
 
 namespace YangMillsProof.Topology
 

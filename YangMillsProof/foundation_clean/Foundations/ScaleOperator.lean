@@ -14,8 +14,8 @@
   Author: Recognition Science Institute
 -/
 
-import YangMillsProof.Core.EightFoundations
-import YangMillsProof.Core.MetaPrinciple
+import foundation_clean.Core.EightFoundations
+import foundation_clean.Core.MetaPrinciple
 import Foundations.CostFunctional
 
 namespace RecognitionScience.Foundations.ScaleOperator

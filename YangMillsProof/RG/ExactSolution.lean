@@ -32,7 +32,7 @@
   step-scaling module can treat `g_exact` as an *axiom-free black box*.
 -/
 
-import Parameters.Assumptions
+import YangMillsProof.Parameters.Assumptions
 import Numerical.Constants
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
 import Mathlib.Analysis.SpecialFunctions.Pow.Real

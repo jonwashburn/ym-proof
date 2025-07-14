@@ -12,8 +12,8 @@
   Recognition Science Institute
 -/
 
-import YangMillsProof.Core.MetaPrinciple
-import YangMillsProof.Core.Arith
+import foundation_clean.Core.MetaPrinciple
+import foundation_clean.Core.Arith
 
 namespace RecognitionScience.EightFoundations
 

@@ -9,7 +9,7 @@
   Recognition Science Institute
 -/
 
-import Parameters.Definitions
+import YangMillsProof.Parameters.Definitions
 import Mathlib.Data.Real.Basic
 import Mathlib.Data.Real.Sqrt
 import Mathlib.Data.Real.Pi.Bounds

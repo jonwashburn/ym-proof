@@ -5,8 +5,8 @@ import Mathlib.Analysis.InnerProductSpace.Basic
 import Mathlib.Data.Real.Basic
 import Mathlib.Data.Real.Sqrt
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
-import Parameters.RSParam
-import Analysis.Hilbert.Cyl
+import YangMillsProof.Parameters.RSParam
+import YangMillsProof.Analysis.Hilbert.Cyl
 
 namespace YangMillsProof.OSReconstruction
 

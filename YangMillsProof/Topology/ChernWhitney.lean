@@ -6,7 +6,7 @@
   from the topology of SU(3) bundles over T⁴.
 -/
 
-import Parameters.Assumptions
+import YangMillsProof.Parameters.Assumptions
 import Mathlib.Topology.Homotopy.Fundamental
 import Mathlib.AlgebraicTopology.SimplicalSet
 import Mathlib.GroupTheory.GroupAction.Basic

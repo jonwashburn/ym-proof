@@ -6,9 +6,9 @@ import Mathlib.Data.Real.Basic
 import Mathlib.Data.Real.Sqrt
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
 
-import Parameters.RSParam
-import Analysis.Hilbert.Cyl
-import Measure.Wilson
+import YangMillsProof.Parameters.RSParam
+import YangMillsProof.Analysis.Hilbert.Cyl
+import YangMillsProof.Measure.Wilson
 
 namespace YangMillsProof.OSReconstruction
 

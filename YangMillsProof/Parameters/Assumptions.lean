@@ -6,8 +6,8 @@
   NO AXIOMS - everything is proven from the definitions.
 -/
 
-import Parameters.Constants
-import Parameters.DerivedConstants
+import YangMillsProof.Parameters.Constants
+import YangMillsProof.Parameters.DerivedConstants
 import Mathlib.Data.Real.Sqrt
 
 namespace RS.Param

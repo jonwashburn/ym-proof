@@ -6,7 +6,7 @@
 -/
 
 import Mathlib.Data.Real.Basic
-import Mathlib.Data.Rat.Basic
+import Mathlib.Data.Rat.Defs
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import Numerical.Constants

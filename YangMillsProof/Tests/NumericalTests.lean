@@ -6,7 +6,7 @@
 -/
 
 import Numerical.Envelope
-import RG.ExactSolution
+import YangMillsProof.RG.ExactSolution
 import Wilson.LedgerBridge
 
 namespace YangMillsProof.Tests

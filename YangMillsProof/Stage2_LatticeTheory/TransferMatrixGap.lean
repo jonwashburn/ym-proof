@@ -11,7 +11,7 @@ import Mathlib.LinearAlgebra.Matrix.Spectrum
 import Mathlib.LinearAlgebra.Matrix.NonsingularInverse
 import Mathlib.Analysis.Matrix
 import Mathlib.Order.Filter.Basic
-import Parameters.Assumptions
+import YangMillsProof.Parameters.Assumptions
 import Gauge.SU3
 import Mathlib.Data.Real.Basic
 import foundation_clean.MinimalFoundation

@@ -20,7 +20,7 @@ import Mathlib.Data.Complex.Basic
 import Mathlib.Data.Fin.Basic
 import Gauge.SU3
 import foundation_clean.Core.Constants
-import Stage1_GaugeEmbedding.VoxelLattice
+import YangMillsProof.Stage1_GaugeEmbedding.VoxelLattice
 
 namespace YangMillsProof.Gauge.Fermion
 

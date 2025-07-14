@@ -2,8 +2,8 @@
 -- --------------------------------------------
 -- All constants are now DERIVED, not postulated!
 
-import Parameters.FromRS
-import Parameters.DerivedConstants
+import YangMillsProof.Parameters.FromRS
+import YangMillsProof.Parameters.DerivedConstants
 
 namespace RS.Param
 

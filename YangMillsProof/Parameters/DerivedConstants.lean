@@ -6,7 +6,7 @@
   completing the elimination of all free parameters in the Yang-Mills proof.
 -/
 
-import Parameters.FromRS
+import YangMillsProof.Parameters.FromRS
 -- import Wilson.LedgerBridge -- Removed to break circular dependency
 import Mathlib.Data.Real.Basic
 import Mathlib.Analysis.SpecialFunctions.Pow.Real

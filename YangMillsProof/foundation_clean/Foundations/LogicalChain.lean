@@ -13,8 +13,8 @@
   Recognition Science Institute
 -/
 
-import YangMillsProof.Core.MetaPrincipleMinimal
-import YangMillsProof.Core.EightFoundations
+import foundation_clean.Core.MetaPrincipleMinimal
+import foundation_clean.Core.EightFoundations
 import Foundations.DiscreteTime
 import Foundations.DualBalance
 import Foundations.PositiveCost

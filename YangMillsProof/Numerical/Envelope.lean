@@ -6,7 +6,7 @@
 -/
 
 import Numerical.Interval
-import Parameters.Constants
+import YangMillsProof.Parameters.Constants
 
 namespace YangMillsProof.Numerical
 

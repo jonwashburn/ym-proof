@@ -6,10 +6,10 @@
   our assumptions, Yang-Mills theory has a positive mass gap.
 -/
 
-import Parameters.Assumptions
+import YangMillsProof.Parameters.Assumptions
 import TransferMatrix
-import RG.ContinuumLimit
-import Measure.ReflectionPositivity
+import YangMillsProof.RG.ContinuumLimit
+import YangMillsProof.Measure.ReflectionPositivity
 
 namespace YangMillsProof
 

@@ -37,3 +37,5 @@ __pycache__/
 *.o
 *.so
 *.dylib
+._*
+.DS_Store

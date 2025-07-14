@@ -16,32 +16,43 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
       
-    - name: Generate Build Badge
-      uses: schneegans/dynamic-badges-action@v1.7.0
-      with:
-        auth: ${{ secrets.GITHUB_TOKEN }}
-        gistID: yangmills-badges
-        filename: build-badge.json
-        label: Build
-        message: ${{ github.event.workflow_run.conclusion == 'success' && 'Passing' || 'Failed' }}
-        color: ${{ github.event.workflow_run.conclusion == 'success' && 'brightgreen' || 'red' }}
+    # Use shields.io endpoint badges instead of gist-based badges
+    # These work without requiring gist creation
+    
+    - name: Generate Build Status
+      run: |
+        echo "Build Status: ${{ github.event.workflow_run.conclusion }}"
+        if [ "${{ github.event.workflow_run.conclusion }}" = "success" ]; then
+          echo "BUILD_STATUS=passing" >> $GITHUB_ENV
+          echo "BUILD_COLOR=brightgreen" >> $GITHUB_ENV
+        else
+          echo "BUILD_STATUS=failing" >> $GITHUB_ENV
+          echo "BUILD_COLOR=red" >> $GITHUB_ENV
+        fi
         
-    - name: Generate Axiom-Free Badge
-      uses: schneegans/dynamic-badges-action@v1.7.0
-      with:
-        auth: ${{ secrets.GITHUB_TOKEN }}
-        gistID: yangmills-badges
-        filename: axiom-badge.json
-        label: Axiom-Free
-        message: ${{ github.event.workflow_run.conclusion == 'success' && 'Verified' || 'Unknown' }}
-        color: ${{ github.event.workflow_run.conclusion == 'success' && 'blue' || 'orange' }}
+    - name: Run Axiom Check
+      run: |
+        if ./verify_no_axioms.sh | grep -q "no actual axiom statements found"; then
+          echo "AXIOM_STATUS=verified" >> $GITHUB_ENV
+          echo "AXIOM_COLOR=blue" >> $GITHUB_ENV
+        else
+          echo "AXIOM_STATUS=unknown" >> $GITHUB_ENV
+          echo "AXIOM_COLOR=orange" >> $GITHUB_ENV
+        fi
         
-    - name: Generate Sorry-Free Badge
-      uses: schneegans/dynamic-badges-action@v1.7.0
-      with:
-        auth: ${{ secrets.GITHUB_TOKEN }}
-        gistID: yangmills-badges
-        filename: sorry-badge.json
-        label: Sorry-Free
-        message: ${{ github.event.workflow_run.conclusion == 'success' && 'Verified' || 'Unknown' }}
-        color: ${{ github.event.workflow_run.conclusion == 'success' && 'green' || 'orange' }} 
+    - name: Run Sorry Check  
+      run: |
+        if ./verify_no_sorries.sh | grep -q "no actual sorry statements found"; then
+          echo "SORRY_STATUS=verified" >> $GITHUB_ENV
+          echo "SORRY_COLOR=green" >> $GITHUB_ENV
+        else
+          echo "SORRY_STATUS=unknown" >> $GITHUB_ENV
+          echo "SORRY_COLOR=orange" >> $GITHUB_ENV
+        fi
+        
+    - name: Generate Badge URLs
+      run: |
+        echo "Badge URLs (for README):"
+        echo "Build: ![Build Status](https://img.shields.io/badge/Build-$BUILD_STATUS-$BUILD_COLOR)"
+        echo "Axiom-Free: ![Axiom Free](https://img.shields.io/badge/Axiom--Free-$AXIOM_STATUS-$AXIOM_COLOR)"  
+        echo "Sorry-Free: ![Sorry Free](https://img.shields.io/badge/Sorry--Free-$SORRY_STATUS-$SORRY_COLOR)" 

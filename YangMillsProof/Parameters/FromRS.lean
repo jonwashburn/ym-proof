@@ -1,6 +1,6 @@
 import Mathlib.Data.Real.Sqrt
 import Mathlib.Tactic
-import foundation_clean.MinimalFoundation
+import YangMillsProof.foundation_clean.MinimalFoundation
 
 /-!
   Recognition Science Parameters from Clean Foundation

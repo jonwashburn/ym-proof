@@ -21,7 +21,7 @@ import Mathlib.Data.Int.Defs
 import Mathlib.Algebra.BigOperators.Finsupp
 import YangMillsProof.Core.Nat.Card
 import Gauge.Fermion
-import foundation_clean.Core.Constants
+import YangMillsProof.foundation_clean.Core.Constants
 
 namespace YangMillsProof.Gauge.AnomalyCancel
 

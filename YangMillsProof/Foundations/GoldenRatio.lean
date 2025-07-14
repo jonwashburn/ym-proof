@@ -9,7 +9,7 @@
   Recognition Science Institute
 -/
 
-import foundation_clean.Core.EightFoundations
+import YangMillsProof.foundation_clean.Core.EightFoundations
 
 namespace RecognitionScience.GoldenRatio
 

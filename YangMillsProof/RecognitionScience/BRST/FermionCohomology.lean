@@ -19,7 +19,7 @@ import Mathlib.Data.Matrix.Basic
 import Mathlib.Data.Complex.Basic
 import RecognitionScience.BRST.Cohomology
 import Gauge.Fermion
-import foundation_clean.Core.Constants
+import YangMillsProof.foundation_clean.Core.Constants
 
 namespace YangMillsProof.RecognitionScience.BRST
 

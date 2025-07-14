@@ -8,6 +8,8 @@
   Recognition Science Institute
 -/
 
+import Mathlib.Logic.Function.Basic
+
 namespace RecognitionScience.Nat.Card
 
 /-- There is no injection from Fin (n+1) to Fin n -/

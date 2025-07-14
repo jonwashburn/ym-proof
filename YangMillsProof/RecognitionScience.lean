@@ -10,8 +10,8 @@
 -/
 
 -- Import the clean foundation
-import foundation_clean.RecognitionScience
-import foundation_clean.MinimalFoundation
+import YangMillsProof.foundation_clean.RecognitionScience
+import YangMillsProof.foundation_clean.MinimalFoundation
 
 namespace RecognitionScience
 

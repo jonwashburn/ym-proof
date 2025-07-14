@@ -21,9 +21,12 @@ lean_lib YangMillsProof where
     `foundation_clean.Parameters,
     -- Main proof components
     `Foundations, `RecognitionScience, `Parameters,
-    `Gauge, `Continuum, `ContinuumOS, `Renormalisation, `RG,
+    `Gauge, `Gauge.Fermion, `Gauge.AnomalyCancel,  -- Fermion modules active
+    `Continuum, `ContinuumOS, `Renormalisation, `RG,
     `Measure, `Topology, `Stage0_RS_Foundation, `Stage1_GaugeEmbedding,
-    `Stage2_LatticeTheory, `Stage3_OSReconstruction, `Stage4_ContinuumLimit,
-    `Stage5_Renormalization, `Stage6_MainTheorem, `Numerical, `Tests, `Wilson,
-    `Infrastructure, `Analysis, `Main, `Complete
+    `Stage2_LatticeTheory, `Stage2_LatticeTheory.FermionTransferMatrix,  -- Fermion modules active
+    `Stage3_OSReconstruction, `Stage4_ContinuumLimit,
+    `Stage5_Renormalization, `Stage6_MainTheorem,
+    `RecognitionScience.BRST.FermionCohomology,  -- Fermion modules active
+    `Numerical, `Tests, `Wilson, `Infrastructure, `Analysis, `Main, `Complete
   ]

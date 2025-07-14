@@ -2,7 +2,7 @@ import Lake
 open Lake DSL
 
 package ym_proof where
-  srcDir := "YangMillsProof"
+  srcDir := "."
   leanOptions := #[
     ⟨`autoImplicit, false⟩,
     ⟨`relaxedAutoImplicit, false⟩

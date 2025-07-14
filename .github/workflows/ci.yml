@@ -23,20 +23,39 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Cache mathlib build
+    - name: Cache elan toolchain
+      uses: actions/cache@v4
+      with:
+        path: ~/.elan
+        key: ${{ runner.os }}-elan-${{ hashFiles('lean-toolchain') }}
+        restore-keys: |
+          ${{ runner.os }}-elan-
+
+    - name: Cache mathlib dependencies
       uses: actions/cache@v4
       with:
         path: |
-          ~/.elan
           .lake/packages/mathlib/.lake/build
           .lake/packages/batteries/.lake/build
           .lake/packages/aesop/.lake/build
           .lake/packages/proofwidgets/.lake/build
-          .lake/build
-        key: ${{ runner.os }}-mathlib-${{ hashFiles('lake-manifest.json') }}-${{ hashFiles('lean-toolchain') }}
+          .lake/packages/Qq/.lake/build
+          .lake/packages/Cli/.lake/build
+          .lake/packages/importGraph/.lake/build
+          .lake/packages/LeanSearchClient/.lake/build
+        key: ${{ runner.os }}-mathlib-deps-${{ hashFiles('lake-manifest.json') }}-${{ hashFiles('lean-toolchain') }}
         restore-keys: |
-          ${{ runner.os }}-mathlib-${{ hashFiles('lake-manifest.json') }}-
-          ${{ runner.os }}-mathlib-
+          ${{ runner.os }}-mathlib-deps-${{ hashFiles('lake-manifest.json') }}-
+          ${{ runner.os }}-mathlib-deps-
+
+    - name: Cache project build
+      uses: actions/cache@v4
+      with:
+        path: .lake/build
+        key: ${{ runner.os }}-project-${{ hashFiles('**/*.lean') }}-${{ hashFiles('lakefile.lean') }}
+        restore-keys: |
+          ${{ runner.os }}-project-${{ hashFiles('lakefile.lean') }}-
+          ${{ runner.os }}-project-
 
     - name: Install elan (Lean version manager)
       run: |
@@ -76,17 +95,9 @@ jobs:
         bash verify_no_sorries.sh || echo "Sorry check failed - expected due to build issues"
       continue-on-error: true
 
-    - name: Build summary
+    - name: Generate build summary
       run: |
-        echo "Build attempted - see individual steps for details"
-        echo "Note: Build failures expected due to known issues in proof implementation"
-
-  summary:
-    if: always()
-    needs: build-and-verify
-    runs-on: ubuntu-latest
-    steps:
-    - name: Report status
-      run: |
-        echo "CI result: ${{ needs.build-and-verify.result }}"
-        echo "Build issues are known and documented" 
+        echo "## Build Summary" >> $GITHUB_STEP_SUMMARY
+        echo "- Mathlib cache size: $(du -sh .lake/packages/mathlib/.lake/build/ | cut -f1)" >> $GITHUB_STEP_SUMMARY
+        echo "- Total cache size: $(du -sh .lake/ | cut -f1)" >> $GITHUB_STEP_SUMMARY
+        echo "- Build time: $(date)" >> $GITHUB_STEP_SUMMARY 

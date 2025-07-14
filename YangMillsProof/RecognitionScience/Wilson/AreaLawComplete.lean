@@ -9,10 +9,10 @@
 -/
 
 import RecognitionScience.Basic
-import Core.Constants
+import YangMillsProof.Core.Constants
 import RecognitionScience.Ledger.FirstPrinciples
 import Mathlib.Analysis.SpecialFunctions.Exponential
-import Mathlib.Algebra.BigOperators.Basic
+import Mathlib.Algebra.BigOperators.Finsupp
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import Mathlib.Topology.Algebra.InfiniteSum.Basic
 

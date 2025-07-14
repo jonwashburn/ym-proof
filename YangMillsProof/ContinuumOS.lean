@@ -1,5 +1,5 @@
-import YangMillsProof.ContinuumOS.InfiniteVolume
-import YangMillsProof.ContinuumOS.OSFull
+import ContinuumOS.InfiniteVolume
+import ContinuumOS.OSFull
 
 -- Re-export
 open YangMillsProof.ContinuumOS.InfiniteVolume

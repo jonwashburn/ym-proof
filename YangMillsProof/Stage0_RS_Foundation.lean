@@ -1,5 +1,5 @@
-import YangMillsProof.Stage0_RS_Foundation.LedgerThermodynamics
-import YangMillsProof.Stage0_RS_Foundation.ActivityCost
+import Stage0_RS_Foundation.LedgerThermodynamics
+import Stage0_RS_Foundation.ActivityCost
 
 -- Re-export
 open YangMillsProof.Stage0_RS_Foundation.LedgerThermodynamics

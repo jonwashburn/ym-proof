@@ -15,7 +15,7 @@
 -/
 
 -- Minimal self-contained foundation
-import MinimalFoundation
+import foundation_clean.MinimalFoundation
 
 namespace RecognitionScience
 

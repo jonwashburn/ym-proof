@@ -15,7 +15,7 @@
   Author: Recognition Science Yang-Mills Proof Team
 -/
 
-import Mathlib.LinearAlgebra.Matrix.Basic
+import Mathlib.Data.Matrix.Basic
 import Mathlib.Data.Complex.Basic
 import RecognitionScience.BRST.Cohomology
 import Gauge.Fermion

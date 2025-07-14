@@ -1,8 +1,8 @@
-import YangMillsProof.Tests.PropertyTests
-import YangMillsProof.Tests.Regression
-import YangMillsProof.Tests.FaithfulnessTests
-import YangMillsProof.Tests.NumericalTests
-import YangMillsProof.Tests.PerformanceBenchmarks
+import Tests.PropertyTests
+import Tests.Regression
+import Tests.FaithfulnessTests
+import Tests.NumericalTests
+import Tests.PerformanceBenchmarks
 
 -- Re-export
 open YangMillsProof.Tests.PropertyTests

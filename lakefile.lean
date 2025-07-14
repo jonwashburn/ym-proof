@@ -11,6 +11,11 @@ package ym_proof where
 require mathlib from git
   "https://github.com/leanprover-community/mathlib4.git" @ "v4.12.0"
 
+-- Analysis library in root directory
+lean_lib Analysis where
+  srcDir := "Analysis"
+  roots := #[`Analysis, `Analysis.Trig.MonotoneCos]
+
 @[default_target]
 lean_lib YangMillsProof where
   srcDir := "YangMillsProof"
@@ -28,5 +33,5 @@ lean_lib YangMillsProof where
     `Stage3_OSReconstruction, `Stage4_ContinuumLimit,
     `Stage5_Renormalization, `Stage6_MainTheorem,
     `RecognitionScience.BRST.FermionCohomology,  -- Fermion modules active
-    `Numerical, `Tests, `Wilson, `Infrastructure, `Analysis, `Main, `Complete
+    `Numerical, `Tests, `Wilson, `Infrastructure, `Main, `Complete
   ]

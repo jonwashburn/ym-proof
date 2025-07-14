@@ -17,7 +17,7 @@
 
 import Foundations.ScaleOperator
 import Foundations.CostFunctional
-import Core.EightFoundations
+import YangMillsProof.Core.EightFoundations
 import MinimalFoundation
 
 namespace RecognitionScience.Foundations.GoldenRatioProof

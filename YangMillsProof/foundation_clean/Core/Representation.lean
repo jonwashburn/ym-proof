@@ -12,7 +12,7 @@
   Author: Recognition Science Institute
 -/
 
-import Core.EightFoundations
+import YangMillsProof.Core.EightFoundations
 import Foundations.ScaleOperator
 
 namespace RecognitionScience.Core.Representation

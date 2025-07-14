@@ -9,7 +9,7 @@
 -/
 
 import RecognitionScience.Basic
-import Core.Constants
+import YangMillsProof.Core.Constants
 import RecognitionScience.Ledger.FirstPrinciples
 
 namespace RecognitionScience.Ledger

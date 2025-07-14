@@ -5,7 +5,7 @@
   in the Recognition Science framework.
 -/
 
-import Core.EightFoundations
+import YangMillsProof.Core.EightFoundations
 import Foundations.GoldenRatio
 
 namespace RecognitionScience.Core.Constants

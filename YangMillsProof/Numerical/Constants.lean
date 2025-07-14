@@ -3,7 +3,7 @@ Copyright (c) 2024 YangMillsProof Authors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: YangMillsProof Contributors
 -/
-import Mathlib.Data.Real.Pi
+import Mathlib.Data.Real.Pi.Bounds
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 

@@ -9,7 +9,7 @@
   Recognition Science Institute
 -/
 
-import Core.EightFoundations
+import YangMillsProof.Core.EightFoundations
 import Foundations.DiscreteTime
 
 namespace RecognitionScience.EightBeat

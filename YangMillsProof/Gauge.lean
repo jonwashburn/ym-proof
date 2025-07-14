@@ -1,7 +1,7 @@
-import YangMillsProof.Gauge.BRST
-import YangMillsProof.Gauge.GaugeCochain
-import YangMillsProof.Gauge.GhostNumber
-import YangMillsProof.Gauge.SU3
+import Gauge.BRST
+import Gauge.GaugeCochain
+import Gauge.GhostNumber
+import Gauge.SU3
 
 -- Re-export
 open YangMillsProof.Gauge.BRST

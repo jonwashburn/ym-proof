@@ -17,9 +17,9 @@
 -/
 
 import Mathlib.Data.Finset.Basic
-import Mathlib.Data.Int.Basic
-import Mathlib.Algebra.BigOperators.Basic
-import Core.Nat.Card
+import Mathlib.Data.Int.Defs
+import Mathlib.Algebra.BigOperators.Finsupp
+import YangMillsProof.Core.Nat.Card
 import Gauge.Fermion
 import foundation_clean.Core.Constants
 

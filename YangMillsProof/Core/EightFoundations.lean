@@ -12,8 +12,8 @@
   Recognition Science Institute
 -/
 
-import Core.MetaPrinciple
-import Core.Finite
+import YangMillsProof.Core.MetaPrinciple
+import YangMillsProof.Core.Finite
 
 set_option linter.unusedVariables false
 

@@ -8,7 +8,7 @@
   Recognition Science Institute
 -/
 
-import Core.Finite
+import YangMillsProof.Core.Finite
 
 namespace RecognitionScience.Arith
 

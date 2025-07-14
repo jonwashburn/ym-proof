@@ -17,21 +17,14 @@
 
 namespace RecognitionScience.Kernel
 
-universe u
-
 /-- The empty type represents absolute nothingness -/
-inductive Nothing : Type u where
+inductive Nothing : Type where
   -- No constructors - this type has no inhabitants
 
 /-- Recognition requires an actual recognizer and something recognized -/
-structure Recognition (A B : Type u) where
+structure Recognition (A B : Type) where
   recognizer : A
   recognized : B
-
-/-- Recognition events can be mapped injectively (no two events are identical) -/
-def RecognitionDistinct (A B : Type u) : Prop :=
-  ∃ f : Recognition A B → Recognition A B,
-    ∀ r₁ r₂ : Recognition A B, f r₁ = f r₂ → r₁ = r₂
 
 /-- Meta-Principle: Nothing cannot recognize itself (as a definition, not axiom) -/
 def MetaPrinciple : Prop := ¬∃ (r : Recognition Nothing Nothing), True
@@ -44,20 +37,15 @@ theorem meta_principle_holds : MetaPrinciple := by
   -- So r.recognizer has type Nothing
   -- But Nothing has no inhabitants (no constructors)
   cases r.recognizer
-  -- No cases to consider - proof complete
 
 /-- Alternative formulation: No recognition event can have Nothing as recognizer -/
-theorem nothing_cannot_recognize {B : Type u} : ¬∃ (r : Recognition Nothing B), True := by
+theorem nothing_cannot_recognize {B : Type} : ¬∃ (r : Recognition Nothing B), True := by
   intro ⟨r, _⟩
   cases r.recognizer
 
 /-- Existence follows from the Meta-Principle -/
-theorem something_must_exist : ∃ (A : Type u), Nonempty A := by
-  -- If nothing existed, then Nothing would be the only type
-  -- But the Meta-Principle shows Nothing cannot recognize itself
-  -- Recognition must be possible (else why does the concept exist?)
-  -- Therefore something must exist to do the recognizing
-  use Unit
-  exact ⟨()⟩
+theorem something_must_exist : ∃ (A : Type), Nonempty A := by
+  -- We can construct a simple example: Unit type has an inhabitant
+  exact ⟨Unit, ⟨()⟩⟩
 
 end RecognitionScience.Kernel

@@ -11,7 +11,7 @@
 
 import Mathlib.Data.Real.Basic
 import Mathlib.Data.Real.Sqrt
-import Mathlib.Data.Real.Pi
+import Mathlib.Data.Real.Pi.Bounds
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
 
 namespace RS.Param

@@ -5,7 +5,7 @@
   We define a wrapper around mathlib's Fintype for compatibility.
 -/
 
-import Core.Nat.Card
+import YangMillsProof.Core.Nat.Card
 import Mathlib.Data.Fintype.Basic
 import Mathlib.Data.Fintype.Card
 import Mathlib.Logic.Equiv.Fin

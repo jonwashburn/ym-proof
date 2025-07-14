@@ -12,11 +12,11 @@
 
 import RecognitionScience.Basic
 import Gauge.GaugeCochain
-import Core.Constants
+import YangMillsProof.Core.Constants
 import Mathlib.GroupTheory.GroupAction.Basic
 import Mathlib.Algebra.Group.Fin
 import Mathlib.Data.ZMod.Basic
-import Mathlib.Algebra.BigOperators.Basic
+import Mathlib.Algebra.BigOperators.Finsupp
 
 namespace RecognitionScience.Ledger.FirstPrinciples
 

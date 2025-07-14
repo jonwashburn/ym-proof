@@ -1,7 +1,7 @@
-import YangMillsProof.Continuum.Continuum
-import YangMillsProof.Continuum.TransferMatrix
-import YangMillsProof.Continuum.WilsonCorrespondence
-import YangMillsProof.Continuum.WilsonMap
+import Continuum.Continuum
+import Continuum.TransferMatrix
+import Continuum.WilsonCorrespondence
+import Continuum.WilsonMap
 
 -- Re-export
 open YangMillsProof.Continuum.Continuum

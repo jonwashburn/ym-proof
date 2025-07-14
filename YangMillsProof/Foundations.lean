@@ -1,11 +1,11 @@
-import YangMillsProof.Foundations.UnitaryEvolution
-import YangMillsProof.Foundations.DiscreteTime
-import YangMillsProof.Foundations.DualBalance
-import YangMillsProof.Foundations.EightBeat
-import YangMillsProof.Foundations.GoldenRatio
-import YangMillsProof.Foundations.IrreducibleTick
-import YangMillsProof.Foundations.PositiveCost
-import YangMillsProof.Foundations.SpatialVoxels
+import Foundations.UnitaryEvolution
+import Foundations.DiscreteTime
+import Foundations.DualBalance
+import Foundations.EightBeat
+import Foundations.GoldenRatio
+import Foundations.IrreducibleTick
+import Foundations.PositiveCost
+import Foundations.SpatialVoxels
 
 -- Re-export
 open YangMillsProof.Foundations.UnitaryEvolution

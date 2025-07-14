@@ -9,9 +9,9 @@
   Recognition Science Institute
 -/
 
-import Core.Kernel
-import Core.Finite
-import Core.Nat.Card
+import YangMillsProof.Core.Kernel
+import YangMillsProof.Core.Finite
+import YangMillsProof.Core.Nat.Card
 
 namespace Core.MetaPrinciple
 

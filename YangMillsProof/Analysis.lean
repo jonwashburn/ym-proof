@@ -1,6 +1,6 @@
-import YangMillsProof.Analysis.Trig.MonotoneCos
-import YangMillsProof.Analysis.Hilbert.Cyl
+import Analysis.Trig.MonotoneCos
+import Analysis.Hilbert.Cyl
 
 -- Re-export
-open YangMillsProof.Analysis.Trig.MonotoneCos
-open YangMillsProof.Analysis.Hilbert.Cyl
+open Analysis.Trig.MonotoneCos
+open Analysis.Hilbert.Cyl

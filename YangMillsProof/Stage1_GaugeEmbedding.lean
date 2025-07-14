@@ -1,5 +1,5 @@
-import YangMillsProof.Stage1_GaugeEmbedding.GaugeToLedger
-import YangMillsProof.Stage1_GaugeEmbedding.VoxelLattice
+import Stage1_GaugeEmbedding.GaugeToLedger
+import Stage1_GaugeEmbedding.VoxelLattice
 
 -- Re-export
 open YangMillsProof.Stage1_GaugeEmbedding.GaugeToLedger

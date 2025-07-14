@@ -1,9 +1,9 @@
-import YangMillsProof.Renormalisation.RGFlow
-import YangMillsProof.Renormalisation.RecognitionBounds
-import YangMillsProof.Renormalisation.RunningGap
-import YangMillsProof.Renormalisation.ZeroHigherLoops
-import YangMillsProof.Renormalisation.IrrelevantOperator
-import YangMillsProof.Renormalisation.NumericalBounds
+import Renormalisation.RGFlow
+import Renormalisation.RecognitionBounds
+import Renormalisation.RunningGap
+import Renormalisation.ZeroHigherLoops
+import Renormalisation.IrrelevantOperator
+import Renormalisation.NumericalBounds
 
 -- Re-export
 open YangMillsProof.Renormalisation.RGFlow

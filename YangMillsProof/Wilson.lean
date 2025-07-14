@@ -1,4 +1,4 @@
-import YangMillsProof.Wilson.LedgerBridge
+import Wilson.LedgerBridge
 
 -- Re-export
 open YangMillsProof.Wilson.LedgerBridge

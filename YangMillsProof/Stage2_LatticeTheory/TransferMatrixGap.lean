@@ -14,7 +14,7 @@ import Mathlib.Order.Filter.Basic
 import Parameters.Assumptions
 import Gauge.SU3
 import Mathlib.Data.Real.Basic
-import YangMillsProof.foundation_clean.MinimalFoundation
+import foundation_clean.MinimalFoundation
 
 namespace YangMillsProof.LatticeTheory
 

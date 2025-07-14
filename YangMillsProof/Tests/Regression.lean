@@ -9,8 +9,8 @@
   Recognition Science Institute
 -/
 
-import YangMillsProof.Parameters.Bounds
-import YangMillsProof.Parameters.Definitions
+import Parameters.Bounds
+import Parameters.Definitions
 
 namespace YangMillsProof.Tests
 

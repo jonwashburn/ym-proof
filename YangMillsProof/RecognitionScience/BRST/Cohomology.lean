@@ -12,7 +12,7 @@
 import RecognitionScience.Basic
 import Mathlib.Algebra.Homology.HomologicalComplex
 import Mathlib.Algebra.DirectSum.Basic
-import Mathlib.LinearAlgebra.Basic
+import Mathlib.Algebra.Module.Basic
 import Mathlib.Analysis.InnerProductSpace.Basic
 -- import Gauge.GhostNumber -- Temporarily removed to break circular dependency
 

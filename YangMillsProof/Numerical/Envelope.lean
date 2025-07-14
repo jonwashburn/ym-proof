@@ -144,7 +144,7 @@ end Tests
 /-- Generate envelope verification script -/
 def generateEnvelopeTests : String :=
   "-- Auto-generated envelope tests\n" ++
-  "import YangMillsProof.Numerical.Envelope\n\n" ++
+  "import Numerical.Envelope\n\n" ++
   "#check test_b₀\n" ++
   "#check test_φ\n" ++
   "#check test_c_exact\n" ++

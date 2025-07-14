@@ -10,7 +10,7 @@
 -/
 
 -- Import the complete foundation
-import foundation.RecognitionScience
+import foundation_clean.RecognitionScience
 
 namespace foundation
 

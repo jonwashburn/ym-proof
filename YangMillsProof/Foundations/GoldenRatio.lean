@@ -9,7 +9,7 @@
   Recognition Science Institute
 -/
 
-import Core.EightFoundations
+import foundation_clean.Core.EightFoundations
 
 namespace RecognitionScience.GoldenRatio
 
@@ -18,7 +18,7 @@ open RecognitionScience
 /-- Simple rational numbers as pairs of integers -/
 structure SimpleRat where
   num : Int
-  den : Nat
+  den : Int
   den_pos : den > 0
 
 /-- Numeric literals for SimpleRat -/

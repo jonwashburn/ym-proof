@@ -5,7 +5,7 @@
   Self-contained implementation using only Lean 4 standard library.
 -/
 
-import Core.Nat.Card
+import YangMillsProof.Core.Nat.Card
 
 namespace RecognitionScience
 

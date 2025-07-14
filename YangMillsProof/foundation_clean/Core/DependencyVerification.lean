@@ -10,7 +10,7 @@
   Recognition Science Institute
 -/
 
-import Core.ConstantsFromFoundations
+import YangMillsProof.Core.ConstantsFromFoundations
 import Foundations.LogicalChain
 
 namespace RecognitionScience.Core.DependencyVerification

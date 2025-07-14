@@ -1,5 +1,5 @@
-import YangMillsProof.Topology.ChernWhitney
-import YangMillsProof.Topology.GaugeSector
+import Topology.ChernWhitney
+import Topology.GaugeSector
 
 -- Re-export
 open YangMillsProof.Topology.ChernWhitney

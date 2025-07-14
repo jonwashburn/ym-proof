@@ -13,9 +13,9 @@
   Recognition Science Institute
 -/
 
-import Core.MetaPrincipleMinimal
-import Core.Finite
-import Core.Nat.Card
+import YangMillsProof.Core.MetaPrincipleMinimal
+import YangMillsProof.Core.Finite
+import YangMillsProof.Core.Nat.Card
 export Core.MetaPrincipleMinimal (Nothing Recognition MetaPrinciple meta_principle_holds)
 
 namespace RecognitionScience

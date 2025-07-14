@@ -7,12 +7,12 @@
   Author: Jonathan Washburn
 -/
 
-import YangMillsProof.Complete
-import YangMillsProof.Parameters.Definitions
-import YangMillsProof.Stage3_OSReconstruction.ContinuumReconstruction
-import YangMillsProof.RecognitionScience.BRST.Cohomology
-import YangMillsProof.ContinuumOS.OSFull
-import YangMillsProof.Continuum.WilsonCorrespondence
+import Complete
+import Parameters.Definitions
+import Stage3_OSReconstruction.ContinuumReconstruction
+import RecognitionScience.BRST.Cohomology
+import ContinuumOS.OSFull
+import Continuum.WilsonCorrespondence
 import Mathlib.Data.Real.Basic
 import Mathlib.Algebra.Order.Field.Basic
 

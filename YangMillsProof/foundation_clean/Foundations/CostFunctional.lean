@@ -14,8 +14,8 @@
   Author: Recognition Science Institute
 -/
 
-import Core.MetaPrinciple
-import Core.MiniContinuity
+import YangMillsProof.Core.MetaPrinciple
+import YangMillsProof.Core.MiniContinuity
 
 namespace RecognitionScience.Foundations.CostFunctional
 

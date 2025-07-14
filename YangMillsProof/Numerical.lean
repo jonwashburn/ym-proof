@@ -1,7 +1,7 @@
-import YangMillsProof.Numerical.Constants
-import YangMillsProof.Numerical.Envelope
-import YangMillsProof.Numerical.Interval
-import YangMillsProof.Numerical.PrintMassGap
+import Numerical.Constants
+import Numerical.Envelope
+import Numerical.Interval
+import Numerical.PrintMassGap
 
 -- Re-export
 open YangMillsProof.Numerical.Constants

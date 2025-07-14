@@ -16,6 +16,11 @@ lean_lib Analysis where
   srcDir := "Analysis"
   roots := #[`Analysis, `Analysis.Trig.MonotoneCos]
 
+-- RSImport library for Recognition Science definitions
+lean_lib RSImport where
+  srcDir := "RSImport"
+  roots := #[`RSImport, `RSImport.BasicDefinitions]
+
 @[default_target]
 lean_lib YangMillsProof where
   srcDir := "YangMillsProof"

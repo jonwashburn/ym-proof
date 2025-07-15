@@ -1,4 +1,5 @@
 import Stage0_RS_Foundation.ActivityCost
+import RSImport.BasicDefinitions
 
 namespace YangMillsProof.Stage0_RS_Foundation
 
@@ -20,14 +21,15 @@ theorem landauer_bound (S : LedgerState) (h_distinct : S ≠ vacuumState) :
 
   -- Take ε = activityCost S
   use activityCost S
-  exact ⟨h_pos, le_refl _⟩
+  constructor
+  · exact h_pos
+  · exact le_refl (activityCost S)
 
 /-- Energy-Information principle as theorem, not axiom -/
 theorem energy_information_principle (S : LedgerState) :
-  isBalanced S ∧ zeroCostFunctional S = 0 → S = vacuumState := by
-  intro h
-  -- `cost_zero_iff_vacuum` in BasicDefinitions already shows that
-  -- zero cost functional implies the vacuum state, regardless of balance.
-  exact (cost_zero_iff_vacuum S).mp h.2
+  activityCost S = 0 → S = vacuumState := by
+  intro h_zero
+  -- Use the activity_zero_iff_vacuum theorem from ActivityCost
+  exact (activity_zero_iff_vacuum S).mp h_zero
 
 end YangMillsProof.Stage0_RS_Foundation

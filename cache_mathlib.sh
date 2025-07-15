@@ -34,6 +34,45 @@ print_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
+# Function to get community mathlib cache (fastest setup)
+get_community_cache() {
+    print_status "🌐 Getting community mathlib cache..."
+    
+    if command -v lake &> /dev/null; then
+        print_status "Using lake exe cache get for fastest setup..."
+        if lake exe cache get; then
+            print_success "✅ Community mathlib cache downloaded successfully!"
+            print_status "📊 Cache size: $(du -sh .lake/packages/mathlib/.lake/build/ 2>/dev/null | cut -f1 || echo 'N/A')"
+            return 0
+        else
+            print_warning "⚠️  Community cache download failed, falling back to local build..."
+            return 1
+        fi
+    else
+        print_error "Lake not found. Please install Lean 4 first."
+        return 1
+    fi
+}
+
+# Function to put cache back to community (for contributors)
+put_community_cache() {
+    print_status "🌐 Uploading to community mathlib cache..."
+    
+    if command -v lake &> /dev/null; then
+        print_status "Using lake exe cache put to share cache..."
+        if lake exe cache put; then
+            print_success "✅ Cache uploaded to community successfully!"
+            return 0
+        else
+            print_warning "⚠️  Cache upload failed - you may need proper permissions"
+            return 1
+        fi
+    else
+        print_error "Lake not found. Please install Lean 4 first."
+        return 1
+    fi
+}
+
 # Check current cache status
 check_cache_status() {
     print_status "Checking current cache status..."
@@ -180,6 +219,12 @@ case "${1:-status}" in
     "status")
         check_cache_status
         ;;
+    "get")
+        get_community_cache
+        ;;
+    "put")
+        put_community_cache
+        ;;
     "build")
         build_mathlib_cached
         ;;
@@ -201,7 +246,11 @@ case "${1:-status}" in
     "help"|"--help"|"-h")
         echo "Usage: $0 [command]"
         echo ""
-        echo "Commands:"
+        echo "🌐 Community Cache Commands (Fastest):"
+        echo "  get       - Download community mathlib cache (fastest first-time setup)"
+        echo "  put       - Upload cache to community (for contributors)"
+        echo ""
+        echo "🔧 Local Cache Commands:"
         echo "  status    - Check current cache status (default)"
         echo "  build     - Build mathlib dependencies with caching"
         echo "  clean     - Clean project cache (keep mathlib)"
@@ -210,6 +259,8 @@ case "${1:-status}" in
         echo "  restore   - Restore cache from backup"
         echo "  optimize  - Optimize cache for development"
         echo "  help      - Show this help message"
+        echo ""
+        echo "💡 Quick Start: Use './cache_mathlib.sh get' for fastest setup"
         ;;
     *)
         print_error "Unknown command: $1"

@@ -1,14 +1,86 @@
 # Yang-Mills Existence & Mass Gap – Lean 4 Proof
 
 [![Build Status](https://github.com/jonwashburn/ym-proof/actions/workflows/ci.yml/badge.svg)](https://github.com/jonwashburn/ym-proof/actions/workflows/ci.yml)
-[![Axiom-Free](https://img.shields.io/badge/Axiom--Free-Verified-blue)](https://github.com/jonwashburn/ym-proof/actions/workflows/ci.yml)
-[![Sorry-Free](https://img.shields.io/badge/Sorry--Free-Verified-green)](https://github.com/jonwashburn/ym-proof/actions/workflows/ci.yml)
 [![Lean 4.12](https://img.shields.io/badge/Lean-4.12-purple)](https://leanprover.github.io/)
 
+**Status:** Active Development - Incremental Proof Construction | Lean 4.12 / Mathlib 4.12
 
-**Status:** Development branch (pre-lakefile-fix) - AXIOM-FREE | SORRY-FREE | Lean 4.12 / Mathlib 4.12
+> **🚧 This repository contains an incremental, formally verified approach to the Clay Millennium Problem for Yang-Mills existence and mass gap. Working modules are verified complete (no sorries/axioms) via CI.**
 
-> **🏆 This repository contains a complete, formally verified solution to the Clay Millennium Problem for Yang-Mills existence and mass gap. See [`REPOSITORY_LOCK.md`](REPOSITORY_LOCK.md) for lock status and verification details.**
+---
+
+## 🎯 Current Status
+
+**Working Modules (Complete - No Sorries/Axioms):**
+- ✅ **Stage 0**: `ActivityCost` - Recognition Science foundation
+- ✅ **Stage 1**: `VoxelLattice` - Gauge theory embedding  
+- ✅ **Stage 2**: `TransferMatrixGap` - Lattice spectral analysis
+- ✅ **Foundation**: Core mathematical principles
+- ✅ **Analysis**: Trigonometric utilities
+- ✅ **RSImport**: Basic definitions and lemmas
+
+**Total**: 10/10 lakefile roots are complete and verified by CI
+
+**Build System**: Incremental approach - only working modules included in build
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+- [Lean 4.12](https://leanprover.github.io/) (installed via elan)
+- Git
+
+### Fast Setup with Cached Dependencies
+```bash
+git clone https://github.com/jonwashburn/ym-proof.git
+cd ym-proof
+
+# Get community mathlib cache for instant setup
+lake exe cache get
+
+# Or build mathlib locally (slower but more reliable)
+./cache_mathlib.sh build
+
+# Build working modules
+lake build
+```
+
+### Cache Management Commands
+```bash
+# Check cache status
+./cache_mathlib.sh status
+
+# Get community cache (fastest first-time setup)
+./cache_mathlib.sh get
+
+# Clean and rebuild cache
+./cache_mathlib.sh clean && ./cache_mathlib.sh build
+
+# Backup current cache
+./cache_mathlib.sh backup
+
+# Restore from backup
+./cache_mathlib.sh restore
+
+# Upload to community cache (for contributors)
+./cache_mathlib.sh put
+```
+
+### Docker Environment (Hermetic Builds)
+```bash
+# Build Docker image
+docker build -t yang-mills-lean .
+
+# Run interactive container
+docker run -it -v $(pwd):/workspace yang-mills-lean
+
+# Build proof in container
+docker run -it yang-mills-lean bash -c "cd /workspace && lake build"
+
+# Run verification in container
+docker run -it yang-mills-lean bash -c "cd /workspace && ./verify_roots_complete.sh"
+```
 
 ---
 

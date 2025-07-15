@@ -85,6 +85,11 @@ jobs:
         lake build -j2 --continue-on-error YangMillsProof || true
       continue-on-error: true
 
+    - name: Verify lakefile roots are complete (REQUIRED)
+      run: |
+        bash verify_roots_complete.sh
+      # This step does NOT have continue-on-error, so it will fail the build
+
     - name: Verify axiom-free status (ignore failures)
       run: |
         bash verify_no_axioms.sh || echo "Axiom check failed - expected due to build issues"

@@ -59,12 +59,16 @@ jobs:
 
     - name: Install elan (Lean version manager)
       run: |
-        curl -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y
+        # Install elan if not already present
+        if ! command -v elan &> /dev/null; then
+          curl -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y
+        fi
         echo "$HOME/.elan/bin" >> $GITHUB_PATH
-        ELAN_HOME="$HOME/.elan/bin"
-        export PATH="$ELAN_HOME:$PATH"
-        elan toolchain install $(cat lean-toolchain)
-        elan default $(cat lean-toolchain)
+        export PATH="$HOME/.elan/bin:$PATH"
+        # Install the specific toolchain, but don't fail if already installed
+        TOOLCHAIN=$(cat lean-toolchain)
+        elan toolchain install $TOOLCHAIN || echo "Toolchain $TOOLCHAIN already installed"
+        elan default $TOOLCHAIN
 
     - name: Get Lean dependencies
       run: |

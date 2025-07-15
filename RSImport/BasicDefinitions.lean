@@ -95,6 +95,7 @@ theorem tsum_eq_zero_iff_all_eq_zero {α : Type*} (f : α → ℝ) (h_nonneg : �
   tsum_eq_zero_iff h_nonneg
 
 -- Extensionality for LedgerState
+@[ext]
 theorem LedgerState.ext {S T : LedgerState} (h : ∀ n, S.entries n = T.entries n) : S = T := by
   cases S with
   | mk entries_S =>
@@ -105,6 +106,7 @@ theorem LedgerState.ext {S T : LedgerState} (h : ∀ n, S.entries n = T.entries 
       exact h n
 
 -- LedgerEntry extensionality
+@[ext]
 theorem LedgerEntry.ext {e1 e2 : LedgerEntry} (h_debit : e1.debit = e2.debit) (h_credit : e1.credit = e2.credit) : e1 = e2 := by
   cases e1 with
   | mk debit1 credit1 h_debit_nonneg1 h_credit_nonneg1 =>

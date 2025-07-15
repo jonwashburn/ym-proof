@@ -88,9 +88,11 @@ theorem activity_cost_nonneg : ∀ s : LedgerState, 0 ≤ activityCost s := by
   simp [activityCost]
 
 -- Additional mathematical functions needed by ActivityCost
+open scoped Topology
+
 theorem tsum_eq_zero_iff_all_eq_zero {α : Type*} (f : α → ℝ) (h_nonneg : ∀ a, 0 ≤ f a) :
-  ∑' a, f a = 0 ↔ ∀ a, f a = 0 := by
-  sorry -- This would require more sophisticated infinite sum theory
+  ∑' a, f a = 0 ↔ ∀ a, f a = 0 :=
+  tsum_eq_zero_iff h_nonneg
 
 -- Extensionality for LedgerState
 theorem LedgerState.ext {S T : LedgerState} (h : ∀ n, S.entries n = T.entries n) : S = T := by

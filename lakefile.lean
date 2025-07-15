@@ -14,29 +14,28 @@ require mathlib from git
 -- Analysis library in root directory
 lean_lib Analysis where
   srcDir := "Analysis"
-  roots := #[`Analysis, `Analysis.Trig.MonotoneCos]
+  roots := #[`Trig.MonotoneCos]
 
 -- RSImport library for Recognition Science definitions
 lean_lib RSImport where
   srcDir := "RSImport"
   roots := #[`RSImport, `RSImport.BasicDefinitions]
 
+-- Incrementally add working YangMillsProof modules
 @[default_target]
 lean_lib YangMillsProof where
   srcDir := "YangMillsProof"
   roots := #[
-    -- Foundation layer (integrated from foundation_clean)
-    `foundation_clean.MinimalFoundation, `foundation_clean.RecognitionScience,
-    `foundation_clean.Main, `foundation_clean.Core, `foundation_clean.Foundations,
-    `foundation_clean.Parameters,
-    -- Main proof components
-    `Foundations, `RecognitionScience, `Parameters,
-    `Gauge, `Gauge.Fermion, `Gauge.AnomalyCancel,  -- Fermion modules active
-    `Continuum, `ContinuumOS, `Renormalisation, `RG,
-    `Measure, `Topology, `Stage0_RS_Foundation, `Stage1_GaugeEmbedding,
-    `Stage2_LatticeTheory, `Stage2_LatticeTheory.FermionTransferMatrix,  -- Fermion modules active
-    `Stage3_OSReconstruction, `Stage4_ContinuumLimit,
-    `Stage5_Renormalization, `Stage6_MainTheorem,
-    `RecognitionScience.BRST.FermionCohomology,  -- Fermion modules active
-    `Numerical, `Tests, `Wilson, `Infrastructure, `Main, `Complete
+    `Stage0_RS_Foundation.ActivityCost,
+    `Stage1_GaugeEmbedding.VoxelLattice,
+    `Stage1_GaugeEmbedding.GaugeToLedger,
+    `Stage2_LatticeTheory.TransferMatrixGap,
+    `Stage2_LatticeTheory.FermionTransferMatrix,
+    `Stage3_OSReconstruction.ContinuumReconstruction_Simple,
+    `Stage3_OSReconstruction.FractionalActionRP,
+    `Stage4_ContinuumLimit.MassGapPersistence,
+    `Stage5_Renormalization.IrrelevantOperator,
+    `foundation_clean.MinimalFoundation,
+    `foundation_clean.RecognitionScience,
+    `Stage0_RS_Foundation.LedgerThermodynamics
   ]

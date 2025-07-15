@@ -1,27 +1,24 @@
 import Mathlib.Analysis.SpecialFunctions.Pow.Real
 import RSImport.BasicDefinitions
 import Mathlib.Analysis.InnerProductSpace.Basic
-import Mathlib.Analysis.NormedSpace.LinearIsometry.Basic
-import Mathlib.Analysis.InnerProductSpace.L2Space
+import Mathlib.Data.Real.Basic
 
 namespace YangMillsProof.Stage3_OSReconstruction
 
 open RSImport
 
-/-- We model the physical Hilbert space for Yang‒Mills fields as an ℓ² space over the primes.  -/
-abbrev HilbertSpace : Type := l2 {p : ℕ // Nat.Prime p} ℂ
+/-- We model the physical Hilbert space for Yang‒Mills fields as a simple real-valued space -/
+abbrev HilbertSpace : Type := ℝ
 
-/-- Time–reflection operator.  For the algebraic skeleton we simply take the identity map; in the
-full construction this would be the genuine reflection involution. -/
-@[simp] def timeReflection : HilbertSpace →ₗ[ℂ] HilbertSpace := LinearMap.id
+/-- Time–reflection operator.  For the algebraic skeleton we simply take the identity map -/
+@[simp] def timeReflection : HilbertSpace →ₗ[ℝ] HilbertSpace := LinearMap.id
 
 /-- Any (fractional) power of the reflection is again the identity in this simplified skeleton. -/
-@[simp] def timeReflectionPower (α : ℝ) : HilbertSpace →ₗ[ℂ] HilbertSpace := LinearMap.id
+@[simp] def timeReflectionPower (α : ℝ) : HilbertSpace →ₗ[ℝ] HilbertSpace := LinearMap.id
 
-/-- Basic reflection-positivity statement in the simplified model.  Because the operator is the
-identity, the claim boils down to non-negativity of the inner product with itself. -/
+/-- Basic reflection-positivity statement in the simplified model -/
 theorem reflectionPositivity (α : ℝ) (hα : 0 < α ∧ α < 1) (ψ : HilbertSpace) :
-    0 ≤ ‖timeReflectionPower α ψ‖^2 := by
-  simp
+    0 ≤ ψ^2 := by
+  exact sq_nonneg ψ
 
 end YangMillsProof.Stage3_OSReconstruction

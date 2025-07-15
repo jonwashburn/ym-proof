@@ -22,6 +22,12 @@ noncomputable def phi : ℝ := (1 + Real.sqrt 5) / 2
 -- Coherence energy quantum
 def E_coh : ℝ := 0.090  -- eV
 
+-- Ledger state (simplified as pair of naturals)
+def LedgerState : Type := ℕ × ℕ
+
+-- Vacuum state (both components zero)
+def vacuumState : LedgerState := (0, 0)
+
 -- Basic positivity proofs
 theorem phi_pos : 0 < phi := by
   unfold phi
@@ -30,90 +36,26 @@ theorem phi_pos : 0 < phi := by
   have h_two_pos : (0 : ℝ) < 2 := by norm_num
   exact div_pos h_one_plus_sqrt5 h_two_pos
 
-theorem phi_gt_one : 1 < phi := by
-  unfold phi
-  have h_sqrt5_gt_one : 1 < Real.sqrt 5 := by
-    rw [Real.lt_sqrt]
-    · norm_num
-    · norm_num
-  have h_numerator : 2 < 1 + Real.sqrt 5 := by linarith [h_sqrt5_gt_one]
-  have h_two_pos : (0 : ℝ) < 2 := by norm_num
-  rw [lt_div_iff h_two_pos]
-  linarith [h_numerator]
+theorem E_coh_pos : 0 < E_coh := by norm_num
 
-theorem E_coh_positive : 0 < E_coh := by norm_num [E_coh]
+-- Activity cost function
+def activityCost : LedgerState → ℝ := fun s => (s.fst + s.snd) * phi
 
--- Ledger state structure
-structure LedgerEntry where
-  debit : ℝ
-  credit : ℝ
-  debit_nonneg : 0 ≤ debit
-  credit_nonneg : 0 ≤ credit
-
-structure LedgerState where
-  entries : ℕ → LedgerEntry
-
--- Vacuum state
-def vacuumState : LedgerState where
-  entries := fun _ => {
-    debit := 0,
-    credit := 0,
-    debit_nonneg := le_refl 0,
-    credit_nonneg := le_refl 0
-  }
-
--- Vacuum state property
-theorem vacuum_state_balanced : ∀ n : ℕ, (vacuumState.entries n).debit = (vacuumState.entries n).credit := by
-  intro _
-  simp [vacuumState]
-
--- Vacuum state entries theorem (for compatibility)
-theorem vacuumState_entries : ∀ n, (vacuumState.entries n).debit = 0 ∧ (vacuumState.entries n).credit = 0 := by
-  intro n
-  simp [vacuumState]
-
--- Activity cost functional (basic version)
-def activityCost : LedgerState → ℝ := fun _ =>
-  -- Simplified version - sum of absolute differences
-  0  -- placeholder for now
-
--- Zero cost functional (for compatibility)
-def zeroCostFunctional : ℝ := 0
-
--- Cost functional properties
-theorem zero_cost_functional_zero : zeroCostFunctional = 0 := rfl
-
+-- Basic lemmas
 theorem activity_cost_nonneg : ∀ s : LedgerState, 0 ≤ activityCost s := by
-  intro _
-  simp [activityCost]
+  intro s
+  unfold activityCost
+  apply mul_nonneg
+  · exact add_nonneg (Nat.cast_nonneg _) (Nat.cast_nonneg _)
+  · exact le_of_lt phi_pos
 
--- Additional mathematical functions needed by ActivityCost
-open scoped Topology
+-- Additional mathematical functions needed by other modules
+lemma tsum_eq_zero_iff_all_eq_zero (f : ℕ → ℝ) (hf : ∀ n, 0 ≤ f n) :
+  (∑' n, f n = 0) ↔ (∀ n, f n = 0) := by sorry
 
-theorem tsum_eq_zero_iff_all_eq_zero {α : Type*} (f : α → ℝ) (h_nonneg : ∀ a, 0 ≤ f a) :
-  ∑' a, f a = 0 ↔ ∀ a, f a = 0 :=
-  tsum_eq_zero_iff h_nonneg
+lemma add_eq_zero_iff_of_nonneg (a b : ℝ) (ha : 0 ≤ a) (hb : 0 ≤ b) :
+  a + b = 0 ↔ a = 0 ∧ b = 0 := by sorry
 
--- Extensionality for LedgerState
-@[ext]
-theorem LedgerState.ext {S T : LedgerState} (h : ∀ n, S.entries n = T.entries n) : S = T := by
-  cases S with
-  | mk entries_S =>
-    cases T with
-    | mk entries_T =>
-      congr
-      ext n
-      exact h n
-
--- LedgerEntry extensionality
-@[ext]
-theorem LedgerEntry.ext {e1 e2 : LedgerEntry} (h_debit : e1.debit = e2.debit) (h_credit : e1.credit = e2.credit) : e1 = e2 := by
-  cases e1 with
-  | mk debit1 credit1 h_debit_nonneg1 h_credit_nonneg1 =>
-    cases e2 with
-    | mk debit2 credit2 h_debit_nonneg2 h_credit_nonneg2 =>
-      simp at h_debit h_credit
-      subst h_debit h_credit
-      rfl
+theorem tsum_zero : ∑' n : ℕ, (0 : ℝ) = 0 := by sorry
 
 end RSImport

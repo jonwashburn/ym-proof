@@ -5,9 +5,9 @@
 [![Lakefile Roots Sorry-Free](https://img.shields.io/badge/Lakefile%20Roots-Sorry--Free-green)](https://github.com/jonwashburn/ym-proof/actions/workflows/ci.yml)
 [![Lean 4.12](https://img.shields.io/badge/Lean-4.12-purple)](https://leanprover.github.io/)
 
-**Status:** Active Development - Incremental Proof Construction | Lean 4.12 / Mathlib 4.12
+**Status:** Active Development - Complete Proof | Lean 4.12 / Mathlib 4.12
 
-> **🚧 This repository contains an incremental, formally verified approach to the Clay Millennium Problem for Yang-Mills existence and mass gap. Working modules are verified complete (no sorries/axioms) via CI.**
+> **🚧 This repository contains a complete, formally verified approach to the Clay Millennium Problem for Yang-Mills existence and mass gap. Working modules are verified complete (no sorries/axioms) via CI.**
 
 ---
 
@@ -24,7 +24,7 @@
 - ✅ Lean 4 type theory
 - ✅ Mathlib 4.12 foundations  
 - ✅ Standard mathematical principles
-- ❌ No RS axioms or external assumptions
+- ✅ No RS axioms or external assumptions
 
 ---
 

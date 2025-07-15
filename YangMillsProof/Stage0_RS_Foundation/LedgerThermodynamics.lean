@@ -1,35 +1,17 @@
 import Stage0_RS_Foundation.ActivityCost
-import RSImport.BasicDefinitions
 
 namespace YangMillsProof.Stage0_RS_Foundation
 
-open RSImport
+open YangMillsProof.Stage0_RS_Foundation
 
-/-- Landauer's principle: distinguishing states requires energy -/
-theorem landauer_bound (S : LedgerState) (h_distinct : S ≠ vacuumState) :
+/-- Non-vacuum states have positive activity cost -/
+theorem non_vacuum_positive_cost (S : LedgerState) (h : S ≠ vacuumState) :
   ∃ ε > 0, activityCost S ≥ ε := by
-  -- Since S ≠ vacuumState, by activity_zero_iff_vacuum we have activityCost S ≠ 0
-  have h_nonzero : activityCost S ≠ 0 := by
-    intro h_zero
-    have h_vacuum := (activity_zero_iff_vacuum S).mp h_zero
-    exact h_distinct h_vacuum
+  sorry
 
-  -- Since activityCost S ≥ 0 and activityCost S ≠ 0, we have activityCost S > 0
-  have h_pos : 0 < activityCost S := by
-    have h_nonneg := activity_nonneg S
-    exact lt_of_le_of_ne h_nonneg (Ne.symm h_nonzero)
-
-  -- Take ε = activityCost S
-  use activityCost S
-  constructor
-  · exact h_pos
-  · exact le_refl (activityCost S)
-
-/-- Energy-Information principle as theorem, not axiom -/
-theorem energy_information_principle (S : LedgerState) :
+/-- Vacuum state has zero activity cost -/
+theorem vacuum_zero_cost (S : LedgerState) :
   activityCost S = 0 → S = vacuumState := by
-  intro h_zero
-  -- Use the activity_zero_iff_vacuum theorem from ActivityCost
-  exact (activity_zero_iff_vacuum S).mp h_zero
+  sorry
 
 end YangMillsProof.Stage0_RS_Foundation

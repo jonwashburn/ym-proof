@@ -17,7 +17,7 @@ def dim_rho_R : ℝ := 4 + 2 * (phi - 1)
 theorem rho_R_irrelevant : dim_rho_R > 4 := by
   unfold dim_rho_R
   have h_phi_gt_one : phi > 1 := phi_gt_one
-    have h_sub : phi - 1 > 0 := by linarith [h_phi_gt_one]
+  have h_sub : phi - 1 > 0 := by linarith [h_phi_gt_one]
   have h_two_pos : (0 : ℝ) < 2 := by norm_num
   have h_pos : 0 < 2 * (phi - 1) := mul_pos h_two_pos h_sub
   linarith [h_pos]

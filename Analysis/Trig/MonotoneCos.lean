@@ -9,6 +9,5 @@ open Real
 lemma cos_le_cos_of_le_of_nonneg_of_le_pi {x y : ℝ}
     (hx0 : 0 ≤ x) (hy : y ≤ π) (hxy : x ≤ y) :
     cos y ≤ cos x := by
-  -- This is a well-known result from Real analysis
-  -- For now, we use sorry to get the module to build
-  sorry
+  -- Cosine is strictly decreasing on [0, π], so this follows from monotonicity
+  exact cos_le_cos_of_zero_le_of_le_pi hx0 hy hxy

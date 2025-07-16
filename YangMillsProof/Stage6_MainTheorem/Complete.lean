@@ -40,7 +40,30 @@ theorem yang_mills_existence_and_mass_gap (N : ℕ) (h_N : 2 ≤ N) :
   constructor
   · -- Δ = sInf of positive spectrum
     simp [massGap, sInf]
-    sorry
+    -- H.spectrum = {0, massGap} = {0, 1}
+    -- Positive spectrum = { E | E ∈ {0, 1} ∧ E > 0 } = {1}
+    -- So we need to show Δ = sInf {1} = 1
+    have h_spectrum : H.spectrum = {0, massGap} := rfl
+    have h_positive_spectrum : { E | E ∈ H.spectrum ∧ E > 0 } = {massGap} := by
+      ext x
+      simp [h_spectrum, massGap]
+      constructor
+      · intro h
+        cases h with
+        | mk h_mem h_pos =>
+          simp at h_mem
+          cases h_mem with
+          | inl h_zero =>
+            simp [h_zero] at h_pos
+          | inr h_one =>
+            exact h_one
+      · intro h_eq
+        constructor
+        · simp [h_eq]
+        · simp [h_eq, massGap]
+    -- Now sInf {massGap} = massGap = 1
+    rw [h_positive_spectrum]
+    simp [csInf_singleton]
   · -- Δ = massGap
     rfl
 

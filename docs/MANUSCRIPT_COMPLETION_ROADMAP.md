@@ -41,12 +41,12 @@ M3. Section by section content work
   - [ ] Replace informal metaphors with precise mathematical mappings (objects, morphisms, invariants).
   - [x] Give the exact lattice objects and Wilson loop definitions used later.
 - OS reconstruction and reflection positivity
-  - [ ] State hypotheses precisely; isolate what is proven vs assumed.
+  - [x] State hypotheses precisely; isolate what is proven vs assumed.
   - [ ] Provide the structure of the reconstruction without code references.
 - Wilson correspondence / Continuum limit
   - [x] Clarify limits, topologies, and error terms. Include a statement of what “converges” means.
 - BRST/cohomology
-  - [ ] Define complexes, degrees, and the physical space quotient precisely.
+  - [x] Define complexes, degrees, and the physical space quotient precisely.
 - Main results
   - [x] Collect theorems in one place with consistent numbering and hypotheses.
   - [x] If keeping assertive framing, add an explicit “Verification Checklist” linking each theorem to evidence (see M5).

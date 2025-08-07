@@ -329,6 +329,15 @@ theorem brst_cohomology_physical :
 
 The quartets mechanism ensures positive definite inner product by pairing negative-norm states with ghosts that cancel in physical observables.
 
+\subsection{Definitions used in this manuscript}
+We fix the following conventions for BRST throughout:
+\begin{itemize}
+  \item The graded state space $\mathcal V = \bigoplus_{n\in\mathbb Z} \mathcal V_n$ is finite-energy and separable; $\mathcal V_n$ denotes ghost number $n$.
+  \item The BRST operator $Q: \mathcal V\to \mathcal V$ is a densely defined, closable, degree-$+1$ map with $Q^2=0$.
+  \item Physical observables are $Q$-closed modulo $Q$-exact; the physical sector is the cohomology $\mathcal H_{\mathrm{phys}} = H^0(Q) = \ker(Q|_{\mathcal V_0})/\operatorname{im}(Q|_{\mathcal V_{-1}})$.
+  \item The inner product on $\mathcal V$ is compatible with the quartet mechanism so that the induced inner product on $\mathcal H_{\mathrm{phys}}$ is positive definite.
+\end{itemize}
+
 \section{Osterwalder--Schrader Reconstruction}
 
 \subsection{Euclidean Path Integrals}
@@ -341,7 +350,14 @@ d\mu[U] = \mathcal{N} \exp\left(-S_{\text{Wilson}}[U]\right) \prod_{\text{links}
 
 where $S_{\text{Wilson}}$ is the lattice Yang--Mills action.
 
-\subsection{Reflection Positivity}
+\subsection{Assumptions and reflection positivity}
+We work on the Euclidean lattice $\mathbb Z^4$ with spacing $a>0$. Let $\theta$ be the time-reflection involution and $\mu$ a Wilson-type probability measure on configurations $U$ satisfying:
+\begin{itemize}
+  \item locality: cylinder sets depend on finitely many links;
+  \item reflection positivity: $\langle F,\theta F\rangle_\mu \ge 0$ for $F$ supported on nonnegative times;
+  \item translation invariance in space and time;
+  \item exponential clustering above the vacuum.
+\end{itemize}
 
 The time reflection operator $\theta: t \mapsto -t$ satisfies:
 

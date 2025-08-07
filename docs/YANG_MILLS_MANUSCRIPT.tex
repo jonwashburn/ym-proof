@@ -123,7 +123,36 @@ Our proof proceeds through five stages:
 
 Each stage is implemented and verified in Lean 4, with complete cross-references provided in the supplementary code archive.
 
+\section{Parameters and Notation}
+\label{sec:parameters}
+We fix notation once and use it consistently throughout the manuscript:
+\begin{center}
+\begin{tabular}{ll}
+\hline
+Symbol & Definition (units) \\
+\hline
+$\varphi$ & $\displaystyle \frac{1+\sqrt{5}}{2} \approx 1.61803$ (dimensionless) \\
+$\lambda_{\text{rec}}$ & $\displaystyle \sqrt{\frac{\ln 2}{\pi}}$ (recognition length unit) \\
+$\tau_0$ & $\displaystyle \lambda_{\text{rec}}/c$ (recognition tick) \\
+$E_{\text{coh}}$ & $\displaystyle \frac{\varphi}{\pi\,\lambda_{\text{rec}}}$ (coherence energy scale) \\
+$\Delta$ & $\displaystyle E_{\text{coh}}\,\varphi$ (mass gap) \\
+\hline
+\end{tabular}
+\end{center}
+Numerical values quoted later are computed from these definitions. Where needed, we include error bars from propagation of constants.
+
 \section{Recognition Science Framework}
+\subsection{RS Quick Reference}
+We summarize the RS principles used repeatedly in the manuscript:
+\begin{itemize}
+  \item \textbf{Meta-Principle}: Nothing cannot recognize itself (logical tautology; forces nonempty, dynamical reality).
+  \item \textbf{Positive Cost}: Every recognition event posts a finite, positive cost; no costless dynamics.
+  \item \textbf{Dual-Balance}: Ledger is double-entry; costs are paired by conjugate flows to prevent runaway accumulation.
+  \item \textbf{Countability and Conservation}: Fundamental alterations are quantized; total cost changes only by boundary flow.
+  \item \textbf{Self-Similarity and Minimization}: Scale-free structure and least-cost selection imply the golden ratio scaling and the cost functional $J(x)=\tfrac12(x+1/x)$.
+  \item \textbf{Voxel and Eight-Beat}: Minimal spatial unit is the voxel (8 vertices); one full recognition cycle takes 8 ticks.
+  \item \textbf{Finite Propagation}: A universal finite speed $c$ bounds cost flow; locality and reflection principles follow on the lattice.
+\end{itemize}
 
 \subsection{The Meta-Principle}
 

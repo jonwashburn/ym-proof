@@ -62,7 +62,7 @@
 \begin{document}
 
 \begin{abstract}
-We present a complete, formally verified proof of the Yang--Mills existence and mass gap problem, one of the Clay Institute's Millennium Prize Problems. Using Recognition Science as a foundational framework, we construct Yang--Mills theory as an emergent phenomenon from discrete recognition events and prove the existence of a mass gap $\massGap = \Ecoh \cdot \varphi \approx 1.78$ GeV, where $\varphi = (1+\sqrt{5})/2$ is the golden ratio. The entire proof is verified in Lean 4 with zero axioms and zero incomplete proofs (\lean{sorry} statements), ensuring complete mathematical rigor. Our approach avoids traditional renormalization techniques by working with inherently finite recognition processes that naturally regularize quantum field theory.
+We present a constructive derivation of Yang--Mills existence and a mass gap within the Recognition Science framework. We articulate a manuscript-first proof program and a Lean 4 formalization roadmap. The mass gap is given by $\massGap = \Ecoh \cdot \varphi \approx 1.78$ GeV, where $\varphi = (1+\sqrt{5})/2$ is the golden ratio. Current formalization status: zero external axioms in the RS foundations with verification scripts in place; several Yang--Mills modules remain under active formalization. Our approach avoids traditional renormalization techniques by working with inherently finite recognition processes that naturally regularize quantum field theory.
 \end{abstract}
 
 \maketitle
@@ -97,14 +97,13 @@ The Yang--Mills Hamiltonian has a mass gap
 where $\Ecoh$ is the coherence energy scale and $\varphi = (1+\sqrt{5})/2$ is the golden ratio.
 \end{theorem}
 
-\begin{theorem}[Formal Verification] \label{thm:verification}
-Theorems \ref{thm:existence} and \ref{thm:mass_gap} are completely verified in Lean 4 with:
+\subsection{Formalization status and plan}
+We maintain a manuscript-first program with an accompanying Lean 4 roadmap:
 \begin{itemize}
-\item Zero external axioms beyond Lean's foundational logic
-\item Zero incomplete proofs (\lean{sorry} statements)
-\item Complete constructive proofs of all intermediate results
+\item RS foundations: developed axiom-free; verification scripts demonstrate no external axioms in core RS modules.
+\item Yang--Mills layers: several modules remain under formalization (e.g., Wightman axioms bundle, renormalization constraints); corresponding proofs are stated here with cross-references and are being implemented in Lean.
+\item Axiom and sorry audits: repo-level scripts run as part of continuous verification; status is summarized in Appendix~\ref{app:formalization-status}.
 \end{itemize}
-\end{theorem}
 
 \subsection{Methodology}
 
@@ -409,6 +408,7 @@ Wilson loops satisfy an area law:
 with string tension $\sigma = \massGap^2/(8\Ecoh) \approx 0.2$ GeV$^2$, consistent with lattice QCD simulations.
 
 \section{Formal Verification}
+\label{sec:formal-verification}
 
 \subsection{Lean 4 Implementation}
 
@@ -445,14 +445,14 @@ Yang-Mills-Lean/
 └── verify_no_axioms.sh    # Axiom verification script
 \end{lstlisting}
 
-\subsection{Axiom Elimination}
+\subsection{Axiom and Sorry Audits}
 
-A key achievement is complete elimination of external axioms:
+We track elimination of external axioms and reduction of incomplete proofs via automated scripts:
 
 \begin{itemize}
 \item \textbf{Before}: 13 axiom declarations across 3 files
-\item \textbf{After}: 0 axiom declarations (verified by automated scripts)
-\item \textbf{Method}: Systematic replacement with constructive proofs
+\item \textbf{Axioms}: 0 in core RS modules; some legacy declarations outside RS are being removed in ongoing edits.
+\item \textbf{Sorries}: Being eliminated across YM modules according to the roadmap; see Appendix~\ref{app:formalization-status}.
 \end{itemize}
 
 Every mathematical step is proven from Recognition Science foundations, which themselves follow from logical necessity.
@@ -518,6 +518,21 @@ The verification methodology advances:
 \item Reliable quantum computing algorithms
 \item Certified scientific software
 \end{itemize}
+
+\appendix
+
+\section{Formalization Status and Evidence}
+\label{app:formalization-status}
+This appendix summarizes each manuscript claim with its current formalization status and evidence path.
+\\
+\textbf{Existence (Thm.~\ref{thm:existence})}: Stated and structured; formalization in progress in the Wightman bundle; reflection positivity and clustering components implemented at the level of RS primitives.
+\\
+\textbf{Mass gap (Thm.~\ref{thm:mass_gap})}: RS derivation complete in manuscript; canonical definition $\Delta=E_{\text{coh}}\,\varphi$ used across modules; code references unified under parameters.
+\\
+\textbf{Continuum limit}: Wilson correspondence stated here; implementation tracked in Continuum and OS modules.
+
+\section{Parameters and Notation}
+All symbols are defined once: $\varphi=(1+\sqrt5)/2$, $E_{\text{coh}}$, $\lambda_{\text{rec}}$, $\tau_0$, and $\Delta=E_{\text{coh}}\,\varphi$. Units and numeric approximations are consistent throughout.
 
 \section{Conclusion}
 

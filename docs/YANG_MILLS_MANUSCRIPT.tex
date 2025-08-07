@@ -582,11 +582,11 @@ All symbols are defined once: $\varphi=(1+\sqrt5)/2$, $E_{\text{coh}}$, $\lambda
 
 \section{Conclusion}
 
-We have presented a complete, formally verified proof of Yang--Mills existence and mass gap. Using Recognition Science as a foundation, we construct Yang--Mills theory from discrete recognition events and prove a mass gap of approximately 1.78 GeV. The entire proof is verified in Lean 4 with zero external axioms.
+We have presented a constructive RS-based derivation of Yang--Mills existence and a mass gap, together with a precise formalization roadmap. The mass gap takes the canonical form $\Delta=E_{\text{coh}}\,\varphi \approx 1.78$ GeV under the RS parameter scheme. Several components (Wightman bundle, renormalization constraints) are actively being formalized in Lean 4; the RS foundations are developed axiom-free with verification scripts to audit axioms and incomplete proofs.
 
-This achievement demonstrates that fundamental problems in mathematical physics can be solved using novel foundational approaches combined with computer-assisted verification. The Recognition Science framework not only solves the Yang--Mills problem but provides a unified foundation for all of physics based on logical necessity rather than empirical assumptions.
+This program illustrates how novel foundations plus computer-assisted verification can organize the Yang--Mills problem into constructive, testable layers. Recognition Science offers a unified foundation based on logical necessity; continued formalization work will complete the mechanically checked portions of the argument.
 
-The complete proof, including all Lean 4 source code and verification scripts, is available in the supplementary materials and archived for permanent public access.
+The full repository includes the manuscript, the formalization roadmap, and verification scripts, ensuring reproducibility as the code components are finalized.
 
 
 \bibliographystyle{amsplain}

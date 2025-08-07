@@ -484,6 +484,23 @@ We track elimination of external axioms and reduction of incomplete proofs via a
 \item \textbf{Sorries}: Being eliminated across YM modules according to the roadmap; see Appendix~\ref{app:formalization-status}.
 \end{itemize}
 
+\subsection{Verification Checklist}
+For each major claim we record its current status and evidence path.
+\\[2pt]
+\begin{center}
+\begin{tabular}{lll}
+\hline
+\textbf{Claim} & \textbf{Status} & \textbf{Evidence path} \\
+\hline
+Existence (Thm.~\ref{thm:existence}) & In progress & RS axioms, OS/Reflection Positivity sections; Lean modules: OS/Continuum \\
+Mass gap (Thm.~\ref{thm:mass_gap}) & Manuscript complete & RS parameters; Lean: Parameters/Assumptions, Continuum/TransferMatrix \\
+Reflection positivity & Manuscript complete & OS section; Lean: Stage3\_OSReconstruction/ContinuumReconstruction \\
+Lattice\,$\to$\,continuum & Manuscript complete & Continuum section; Lean: Continuum/WilsonCorrespondence \\
+Confinement (area law) & Manuscript statement & ContinuumOS section; Lean: ContinuumOS/OSFull \\
+\hline
+\end{tabular}
+\end{center}
+
 Every mathematical step is proven from Recognition Science foundations, which themselves follow from logical necessity.
 
 \section{Comparison with Traditional Approaches}

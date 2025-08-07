@@ -436,6 +436,36 @@ Wilson loops satisfy an area law:
 \end{equation}
 with string tension $\sigma = \massGap^2/(8\Ecoh) \approx 0.2$ GeV$^2$, consistent with lattice QCD simulations.
 
+\section{Figures}
+\subsection{The $\varphi$-cascade energy ladder}
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[scale=0.9]
+  \foreach \i/\lbl in {0/$E_{\text{coh}}$,1/$E_{\text{coh}}\,\varphi$,2/$E_{\text{coh}}\,\varphi^2$,3/$E_{\text{coh}}\,\varphi^3$} {
+    \draw[thick] (0,\i) -- (3,\i);
+    \node[anchor=west] at (3.2,\i) {\small $\lbl$};
+  }
+  \draw[->] (1.5,-0.5) -- (1.5,3.5) node[anchor=south] {\small energy};
+\end{tikzpicture}
+\caption{Discrete recognition energies scale by $\varphi$.}
+\end{figure}
+
+\subsection{Lattice-to-continuum schematic}
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[scale=0.8]
+  % lattice grid
+  \foreach \x in {0,...,4} {\draw[gray!70] (\x,0) -- (\x,4);} 
+  \foreach \y in {0,...,4} {\draw[gray!70] (0,\y) -- (4,\y);} 
+  % arrow
+  \draw[->,thick] (4.5,2) -- (6.5,2) node[midway,above]{\small $a\to 0$};
+  % smooth field
+  \draw[thick,blue] (7,0.5) to[out=45,in=180] (8,2) to[out=0,in=180] (9.5,3) to[out=0,in=120] (10.5,1.2);
+  \node[blue] at (9.8,0.7) {\small continuum field};
+\end{tikzpicture}
+\caption{Wilson correspondence: lattice observables converge to continuum fields as $a\to 0$.}
+\end{figure}
+
 \section{Formal Verification}
 \label{sec:formal-verification}
 
@@ -502,6 +532,9 @@ Confinement (area law) & Manuscript statement & ContinuumOS section; Lean: Conti
 \end{center}
 
 Every mathematical step is proven from Recognition Science foundations, which themselves follow from logical necessity.
+
+\subsection{Reproducibility}
+\noindent The repository includes a guide for environment setup and artifact layout (see \texttt{docs/REPRODUCIBILITY\_GUIDE.md}). Verification scripts \texttt{verify\_no\_axioms.sh} and \texttt{verify\_no\_sorries.sh} audit axioms and incomplete proofs without requiring full builds. The manuscript is canonical in \texttt{docs/YANG\_MILLS\_MANUSCRIPT.tex}.
 
 \section{Comparison with Traditional Approaches}
 

@@ -232,24 +232,16 @@ The remaining foundations establish spatial voxels, unitary evolution, irreducib
 
 \subsection{Gauge Theory Embedding}
 
-We embed SU(3) Yang--Mills theory into the recognition framework by identifying:
+\paragraph{Mathematical setup.} Let $M=\mathbb R^4$ be Minkowski spacetime and $G=\mathrm{SU}(3)$. A classical gauge configuration is a principal $G$-connection $A\in\Omega^1(M,\mathfrak{su}(3))$. Its curvature (field strength) is
+\[
+F_A \;=\; dA + A\wedge A \in \Omega^2(M,\mathfrak{su}(3)).
+\]
+With the standard invariant inner product $\mathrm{tr}$ on $\mathfrak{su}(3)$ and Hodge star $\,*\,$, the Yang--Mills action is
+\[
+S_{\mathrm{YM}}[A] \,=\, \frac{1}{4g^2}\int_M \mathrm{tr}\big(F_A \wedge *F_A\big) \,.
+\]
 
-\begin{itemize}
-\item \textbf{Gauge fields}: Recognition deficits between color charges
-\item \textbf{Field strength}: Recognition flux through closed loops  
-\item \textbf{Gauge transformations}: Changes of recognition accounting basis
-\end{itemize}
-
-The Yang--Mills action emerges as the total recognition cost:
-
-\begin{equation}
-S[\text{recognition}] = \frac{1}{4g^2} \int F_{\mu\nu} F^{\mu\nu} \, d^4x
-\end{equation}
-
-where the coupling constant is determined by the eight-beat structure:
-\begin{equation}
-g^2 = \frac{2\pi}{\sqrt{8}}
-\end{equation}
+\paragraph{Recognition-Science interpretation.} The RS framework supplies a canonical scale via $E_{\text{coh}}$ and the $\varphi$-cascade, grounding the dimensionful normalization and the existence of a spectral gap while leaving the geometric content of $S_{\mathrm{YM}}$ unchanged.
 
 \textbf{Lean Implementation:}
 \begin{lstlisting}
@@ -259,18 +251,19 @@ def yang_mills_action (A : GaugeField) : ℝ :=
 
 \subsection{Lattice Regularization}
 
-Recognition events occur on a discrete voxel lattice with spacing $\lambdarec$. This provides natural regularization:
-
-\begin{itemize}
-\item \textbf{UV cutoff}: Momentum $|p| \leq \pi/\lambdarec$
-\item \textbf{IR cutoff}: Energy $E \geq \hbar/\taunaught$  
-\item \textbf{Finite theory}: No loop divergences
-\end{itemize}
-
-Wilson loops become discrete path-ordered products:
-\begin{equation}
-W(C) = \prod_{\text{links} \in C} U(\text{link})
-\end{equation}
+On the hypercubic lattice $a\,\mathbb Z^4$ (spacing $a>0$), a gauge configuration is specified by link variables $U_{x,\mu}\in \mathrm{SU}(3)$ for sites $x$ and directions $\mu\in\{0,1,2,3\}$. The plaquette is
+\[
+U_{x,\mu\nu} \;=\; U_{x,\mu}\,U_{x+\hat\mu,\nu}\,U^{-1}_{x+\hat\nu,\mu}\,U^{-1}_{x,\nu}\,.
+\]
+The Wilson action is
+\[
+S_W[U] \,=\, \frac{\beta}{3}\sum_{x,\mu<\nu} \mathrm{Re}\,\mathrm{Tr}\,\big(\mathbf 1 - U_{x,\mu\nu}\big)\,,\qquad \beta=\frac{6}{g^2} \,.
+\]
+Wilson loops are path-ordered products along closed contours $C$:
+\[
+W(C) \,=\, \mathrm{Tr}\,\prod_{\ell\in C} U_\ell\,.
+\]
+RS provides a physical lattice spacing through $\lambda_{\text{rec}}$ and the eight-beat timing, while locality and reflection arguments proceed as in the standard lattice framework.
 
 \textbf{Lean Implementation:}
 \begin{lstlisting}
@@ -374,7 +367,7 @@ theorem reflection_positivity (F : GaugeConfig → ℝ) :
   0 ≤ ∫ F(U) * F(time_reflect U) dμ[U]
 \end{lstlisting}
 
-\subsection{Clustering and Mass Gap}
+\subsection{Clustering and mass gap roadmap}
 
 Correlations decay exponentially with distance:
 
@@ -382,7 +375,7 @@ Correlations decay exponentially with distance:
 |\langle O(x) O(y) \rangle - \langle O \rangle^2| \leq C e^{-\massGap |x-y|}
 \end{equation}
 
-This establishes the correlation length $\xi = 1/\massGap$ and proves mass gap persistence in the infinite volume limit.
+Under the assumptions above (locality, reflection positivity, translation invariance, clustering), the OS reconstruction yields a Hilbert space $\mathcal H$, a vacuum $\Omega$, and a positive self-adjoint Hamiltonian $H$. Exponential clustering implies a spectral gap above $0$; in RS we identify the canonical scale $\Delta = E_{\text{coh}}\,\varphi$ as the gap parameter, with persistence in the infinite volume limit.
 
 \section{Continuum Limit}
 

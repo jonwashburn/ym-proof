@@ -72,7 +72,7 @@
 \begin{document}
 
 \begin{abstract}
-We present a constructive derivation of Yang--Mills existence and a mass gap within the Recognition Science framework. We articulate a manuscript-first proof program and a Lean 4 formalization roadmap. The mass gap is given by $\massGap = \Ecoh \cdot \varphi \approx 1.78$ GeV, where $\varphi = (1+\sqrt{5})/2$ is the golden ratio. Current formalization status: zero external axioms in the RS foundations with verification scripts in place; several Yang--Mills modules remain under active formalization. Our approach avoids traditional renormalization techniques by working with inherently finite recognition processes that naturally regularize quantum field theory.
+We present a constructive derivation of Yang--Mills existence and a mass gap within the Recognition Science framework. We articulate a manuscript-first proof program and a Lean 4 formalization roadmap. The mass gap is given by $\massGap = \Ecoh \cdot \varphi \approx 1.775$ GeV, where $\varphi = (1+\sqrt{5})/2$ is the golden ratio. Current formalization status: zero external axioms in the RS foundations with verification scripts in place; several Yang--Mills modules remain under active formalization. Our approach avoids traditional renormalization techniques by working with inherently finite recognition processes that naturally regularize quantum field theory.
 \end{abstract}
 
 \maketitle
@@ -102,7 +102,7 @@ Yang--Mills theory with gauge group $SU(3)$ exists as a well-defined quantum fie
 \begin{theorem}[Mass Gap] \label{thm:mass_gap}
 The Yang--Mills Hamiltonian has a mass gap
 \begin{equation}
-\massGap = \Ecoh \cdot \varphi = \frac{\varphi^2}{\pi} \sqrt{\frac{\pi}{\ln 2}} \approx 1.78 \text{ GeV}
+\massGap = \Ecoh \cdot \varphi = \frac{\varphi^2}{\pi} \sqrt{\frac{\pi}{\ln 2}} \approx 1.775 \text{ GeV}
 \end{equation}
 where $\Ecoh$ is the coherence energy scale and $\varphi = (1+\sqrt{5})/2$ is the golden ratio.
 \end{theorem}
@@ -572,13 +572,13 @@ Every mathematical step is proven from Recognition Science foundations, which th
 \subsection{Advantages of Recognition Science}
 \begin{itemize}
 \item \textbf{Finite framework}: discrete recognition structure regularizes UV/IR behavior
-\item \textbf{Constructive path}: existence statements are realized by explicit constructions
+\item \textbf{Constructive path}: existence statements realized by explicit constructions
 \item \textbf{Parameter prediction}: canonical mass scale from RS parameters
 \item \textbf{Unified foundation}: single principle underlies multiple domains
 \end{itemize}
 
 \subsection{Relationship to standard QCD}
-In appropriate limits, the RS-based Yang--Mills construction is compatible with standard QCD: it employs the same gauge group (SU(3)) and fields, reproduces the classical action in the continuum, and aligns with renormalization flow and phenomenology within the stated uncertainties.
+In appropriate limits, the RS-based Yang--Mills construction is compatible with standard QCD: it employs the same gauge group (SU(3)) and fields, reproduces the classical action in the continuum, and aligns with renormalization flow and phenomenology within stated uncertainties.
 
 The key difference is the underlying discrete structure that provides natural regularization.
 
@@ -595,7 +595,7 @@ This work demonstrates several important principles:
 \item Computer-assisted proof can ensure complete rigor
 \end{itemize}
 
-\subsection{Physical Applications}
+\subsection{Physical applications}
 
 Recognition Science opens new research directions:
 
@@ -606,7 +606,7 @@ Recognition Science opens new research directions:
 \item Discrete models of spacetime structure
 \end{itemize}
 
-\subsection{Technological Applications}
+\subsection{Technological applications}
 
 The verification methodology advances:
 
@@ -650,18 +650,18 @@ Clay Mathematics Institute.
 Cambridge, MA: Clay Mathematics Institute, 2000.
 
 \bibitem{Jaffe2006}
-Arthur Jaffe and Edward Witten.
+A. Jaffe and E. Witten.
 Quantum Yang--Mills theory.
 In \emph{The Millennium Prize Problems}, pages 129--152.
 Clay Mathematics Institute, 2006.
 
 \bibitem{Wilson1974}
-Kenneth G. Wilson.
+K. G. Wilson.
 Confinement of quarks.
 \emph{Physical Review D}, 10(8):2445--2459, 1974.
 
 \bibitem{Osterwalder1973}
-Konrad Osterwalder and Robert Schrader.
+K. Osterwalder and R. Schrader.
 Axioms for Euclidean Green's functions.
 \emph{Communications in Mathematical Physics}, 31(2):83--112, 1973.
 

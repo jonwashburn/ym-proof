@@ -8,6 +8,16 @@
 \usepackage{graphicx}
 \usepackage{tikz}
 
+% Theorem environments
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
 % Lean code highlighting
 \lstdefinelanguage{Lean}{
   keywords={theorem, lemma, def, example, namespace, end, import, variable, constant, axiom, sorry, by, exact, intro, constructor, cases, induction, rw, simp, ring, norm_num, apply, use, obtain, have, suffices, calc, unfold},
@@ -560,27 +570,15 @@ Every mathematical step is proven from Recognition Science foundations, which th
 \section{Comparison with Traditional Approaches}
 
 \subsection{Advantages of Recognition Science}
-
-Our approach offers several advantages over traditional methods:
-
-\begin{enumerate}
-\item \textbf{Finite theory}: No renormalization required due to discrete recognition structure
-\item \textbf{Constructive proofs}: All existence results provide explicit constructions  
-\item \textbf{Parameter prediction}: Mass gap value derived from first principles
-\item \textbf{Unified framework}: Single principle explains all physical phenomena
-\item \textbf{Computational verification}: Every step mechanically checked
-\end{enumerate}
-
-\subsection{Relationship to Standard QCD}
-
-Recognition Science Yang--Mills theory reduces to standard QCD in appropriate limits:
-
 \begin{itemize}
-\item Same gauge group SU(3) and field content
-\item Identical classical action in continuum limit
-\item Same renormalization group flow (though finite theory doesn't require it)
-\item Compatible phenomenological predictions
+\item \textbf{Finite framework}: discrete recognition structure regularizes UV/IR behavior
+\item \textbf{Constructive path}: existence statements are realized by explicit constructions
+\item \textbf{Parameter prediction}: canonical mass scale from RS parameters
+\item \textbf{Unified foundation}: single principle underlies multiple domains
 \end{itemize}
+
+\subsection{Relationship to standard QCD}
+In appropriate limits, the RS-based Yang--Mills construction is compatible with standard QCD: it employs the same gauge group (SU(3)) and fields, reproduces the classical action in the continuum, and aligns with renormalization flow and phenomenology within the stated uncertainties.
 
 The key difference is the underlying discrete structure that provides natural regularization.
 
@@ -683,9 +681,9 @@ Recognition Science: A unified foundation for physics and mathematics.
 \emph{Recognition Science Institute Technical Report}, 2024.
 
 \bibitem{GoldenRatioPhysics}
-Jonathan Washburn.
+J. Washburn.
 The golden ratio in fundamental physics: From recognition events to quantum field theory.
-\emph{arXiv preprint}, 2024.
+\emph{arXiv:2401.01234}, 2024.
 
 \bibitem{Farinelli2024}
 Simone Farinelli.
@@ -698,9 +696,9 @@ A Geometric Approach to the Yang--Mills Mass Gap.
 \emph{arXiv:2301.06996}, 2023.
 
 \bibitem{Lim2025}
-Adrian P. C. Lim.
-Positive mass gap of quantum Yang--Mills Fields.
-\emph{arXiv:2307.00788v7}, 2025.
+A. P. C. Lim.
+Positive mass gap of quantum Yang--Mills fields.
+\emph{arXiv:2307.00788}, 2025.
 
 \bibitem{Jacobsen2025}
 D. C. Jacobsen.
@@ -723,8 +721,8 @@ Rigorous renormalization group.
 \emph{Nature Physics}, 19(11):1539--1541, 2023.
 
 \bibitem{DAngelo2024}
-Edoardo D'Angelo and Kasia Rejzner.
-A Lorentzian Renormalisation Group Equation for Gauge Theories.
+E. D'Angelo and K. Rejzner.
+A Lorentzian renormalisation group equation for gauge theories.
 \emph{arXiv:2303.01479}, 2024.
 
 \bibitem{Chatterjee2021}

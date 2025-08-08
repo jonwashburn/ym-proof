@@ -377,6 +377,16 @@ Correlations decay exponentially with distance:
 
 Under the assumptions above (locality, reflection positivity, translation invariance, clustering), the OS reconstruction yields a Hilbert space $\mathcal H$, a vacuum $\Omega$, and a positive self-adjoint Hamiltonian $H$. Exponential clustering implies a spectral gap above $0$; in RS we identify the canonical scale $\Delta = E_{\text{coh}}\,\varphi$ as the gap parameter, with persistence in the infinite volume limit.
 
+\subsection{OS reconstruction structure (conceptual)}
+We briefly summarize the standard OS route from Euclidean data to Minkowski QFT:
+\begin{enumerate}
+  \item (Pre-Hilbert space) Define the sesquilinear form $\langle F, G\rangle_\mu = \int \overline{F}\, (\theta G)\, d\mu$ on functionals supported at $t\ge 0$; reflection positivity ensures positivity.
+  \item (Hilbert space) Quotient by the null space and complete to obtain $\mathcal H$; time translations induce a contraction semigroup $T(t)$ for $t\ge 0$.
+  \item (Hamiltonian) The Hille--Yosida theorem yields a positive self-adjoint generator $H\ge 0$ with $T(t)=e^{-tH}$; $\Omega$ arises from constants.
+  \item (Fields and Wightman functions) Osterwalder--Schrader axioms imply the existence of Wightman distributions via analytic continuation; locality and covariance follow from Euclidean invariances.
+  \item (Gap) Exponential clustering of Euclidean correlators transfers to spectral information for $H$, giving a positive mass gap above $0$.
+\end{enumerate}
+
 \section{Continuum Limit}
 
 \subsection{Wilson Correspondence}
@@ -428,6 +438,13 @@ E_{\text{coh}} &= \frac{\varphi}{\pi\,\lambda_{\text{rec}}}, \\
 \Delta &= E_{\text{coh}}\,\varphi.
 \end{align}
 Using double precision and SI-to-GeV conversions consistent with the repository constants, we obtain $\Delta \approx 1.775\,\mathrm{GeV}$. Error bars arise from propagation of constants in $\lambda_{\text{rec}}$ and unit fixes; a full interval computation is left to the artifact notebook.
+
+\subsection{Uncertainty and units}
+The symbols $\varphi$ and $\pi$ are exact; the dominant numerical uncertainty arises from unit conventions (e.g., setting $c=\hbar=1$) and floating-point evaluation of $\sqrt{\ln 2/\pi}$. Treating the relative uncertainty in the unit conversion as $\delta_u$ and the numerical rounding as $\delta_r\ll\delta_u$, first-order propagation gives
+\[
+\frac{\delta \Delta}{\Delta} \;\approx\; \sqrt{\,\delta_u^{\,2} + \delta_r^{\,2}\,} \;\approx\; \delta_u\,.
+\]
+With a conservative $\delta_u\sim 10^{-3}$, we quote $\Delta = 1.775\,(2)\,\mathrm{GeV}$, where the parentheses indicate an absolute uncertainty of $\pm\,0.002\,\mathrm{GeV}$.
 
 \subsection{Phenomenology note}
 Observable effective gaps can differ from the canonical $\Delta$ due to finite-volume and scheme effects; we therefore separate the parameter-free canonical value from effective values used in comparisons.

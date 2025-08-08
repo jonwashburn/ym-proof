@@ -42,7 +42,7 @@ M3. Section by section content work
   - [x] Give the exact lattice objects and Wilson loop definitions used later.
 - OS reconstruction and reflection positivity
   - [x] State hypotheses precisely; isolate what is proven vs assumed.
-  - [ ] Provide the structure of the reconstruction without code references.
+  - [x] Provide the structure of the reconstruction without code references.
 - Wilson correspondence / Continuum limit
   - [x] Clarify limits, topologies, and error terms. Include a statement of what “converges” means.
 - BRST/cohomology
@@ -53,6 +53,7 @@ M3. Section by section content work
 - Numerical section
   - [ ] Present a single computation pipeline from constants to \(\Delta\) with error bars and unit consistency.
   - [ ] Remove duplicate or inconsistent numbers.
+  - [x] Add a brief uncertainty and units note; quote a conservative error bar.
 - Related work / comparison
   - [ ] Positioning with lattice QCD and rigorous RG; cite accurately.
 - Conclusion

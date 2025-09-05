@@ -60,6 +60,27 @@ open YM
 -- have h : MassGapCont p.γ := pipeline_mass_gap_export p
 ```
 
+## Final theorem and axioms report
+
+To use the final wrapper in code:
+
+```lean
+import YM
+open YM
+
+-- Given a PipelineCertificate `p`:
+have hfinal : MassGapCont p.γ := mass_gap_final p
+```
+
+To inspect axioms for the final theorem locally, add at the end of a scratch
+Lean file (or use CI):
+
+```lean
+import YM
+open YM
+#print axioms YM.mass_gap_final
+```
+
 Final theorem wrapper (no placeholders):
 
 ```lean
@@ -68,6 +89,18 @@ open YM
 -- Given a `PipelineCertificate p` built from concrete components:
 #check mass_gap_final
 -- have hfinal : MassGapCont p.γ := mass_gap_final p
+```
+
+Quantitative export (once reflection→Dobrushin and kernel model land):
+
+```lean
+open YM
+
+-- Given p : PipelineCertificate at base scale and a quantitative PF gap:
+have hQuant : ∃ γ : ℝ, 0 < γ ∧ TransferPFGap (p.sf.μ_at ⟨0⟩) (p.sf.K_at ⟨0⟩) γ :=
+  pf_gap_via_reflection_blocks (μ := p.sf.μ_at ⟨0⟩) (K := p.sf.K_at ⟨0⟩) (R := p.R)
+    p.hRef (p.hBlk)
+have : ∃ γ, MassGapCont γ := pipeline_mass_gap_export_quant p hQuant
 ```
 
 ## Contributing (parallel agents)

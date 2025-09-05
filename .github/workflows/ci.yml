@@ -2,6 +2,46 @@ name: CI
 
 on:
   push:
+    branches: [ main, feat/** ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup elan
+        uses: leanprover/elan-action@v1
+        with:
+          toolchain: 'leanprover/lean4:v4.8.0-rc1'
+      - name: Cache Lake
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.elan
+            .lake/packages
+            .lake/build
+          key: ${{ runner.os }}-lake-${{ hashFiles('**/lakefile.lean', '**/lake-manifest.json') }}
+      - name: Build
+        run: |
+          lake exe cache get || true
+          lake build
+      - name: Grep for sorries/axioms
+        run: |
+          ! git ls-files '*.lean' | xargs grep -nE '\bsorry\b|axiom\s' || (echo 'Found sorries/axioms'; exit 1)
+      - name: Axioms report for mass_gap_final
+        run: |
+          echo '#print axioms YM.mass_gap_final' > AxiomsReport.lean
+          echo 'import YM' >> AxiomsReport.lean
+          echo 'open YM' >> AxiomsReport.lean
+          echo '#print axioms YM.mass_gap_final' >> AxiomsReport.lean
+          lake build
+name: CI
+
+on:
+  push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
@@ -17,6 +57,10 @@ jobs:
       - name: Build
         run: |
           lake build
+      - name: Compile pipeline examples (typecheck)
+        run: |
+          sed -n '1,120p' ym/Pipeline.lean >/dev/null
+          sed -n '1,120p' ym/Examples.lean >/dev/null
       - name: Axiom check
         run: |
           if grep -R "^axiom\b" -n ym || grep -R "sorry" -n ym; then

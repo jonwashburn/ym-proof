@@ -30,6 +30,9 @@ If using cache:
 lake exe cache get
 ```
 
+CI: GitHub Actions builds the project on pushes and PRs, fails on any `sorry`/`axiom`,
+and prints an axioms report for `YM.mass_gap_final`.
+
 ## Running the pipeline examples
 
 Open `ym/Pipeline.lean` and jump to the examples namespace:

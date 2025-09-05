@@ -2,9 +2,9 @@
 
 - Use branches and file ownership per guardrails below.
 
-### Guardrails for Parallel Agents (Round 1)
+### Guardrails for Parallel Agents
 
-- Interface freeze: Do not modify shared core types (e.g., TransferKernel) in this round.
+- Interface freeze: Do not modify shared core types (e.g., TransferKernel). If needed, open a tiny interface PR first.
 - Step 3 must implement its adapter in a new file (e.g., ym/Adapter/MatrixToTransfer.lean) without editing ym/Transfer.lean.
 - One branch per agent; change only owned files.
 
@@ -27,8 +27,16 @@
   - Files: ym/Embedding.lean (or extend ym/Continuum.lean)
 
 - Step 5 (OS→PF uniform γ):
-  - Branch: feat/os-to-pf
+  - Branch: feat/os-to-pf (or feat/os-dobrushin for quantitative work)
   - Files: ym/Reflection.lean; new lemmas in ym/Transfer.lean without changing existing signatures
+
+### Examples to typecheck in CI
+
+- `YM.Examples.toy_pipeline_mass_gap`
+- `YM.Examples.two_thirds_end_to_end`
+- `YM.Examples.three_fourths_end_to_end`
+
+These should continue to compile as the pipeline is strengthened.
 
 ### PR acceptance checklist (each agent)
 

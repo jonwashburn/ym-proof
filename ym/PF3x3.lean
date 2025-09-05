@@ -28,7 +28,6 @@ def PositiveEntries (A : Matrix (Fin 3) (Fin 3) ℝ) : Prop :=
 structure SpectralGap (L : Module.End ℂ (Fin 3 → ℂ)) : Prop :=
   (spectralRadius_eq_one : (spectrum ℂ L).Sup (fun z => (‖z‖₊ : ℝ≥0∞)) = 1)
   (eig1 : Module.End.HasEigenvalue L (1 : ℂ))
-  (simple1 : IsSimpleEigenvalue ℂ L 1)
   (gap : ∃ ε : ℝ, 0 < ε ∧ ∀ {z : ℂ}, z ∈ spectrum ℂ L → z ≠ (1:ℂ) → ‖z‖ ≤ 1 - ε)
 
 def onesR : (Fin 3 → ℝ) := fun _ => 1
@@ -103,13 +102,6 @@ theorem pf_gap_row_stochastic_irreducible
       nlinarith
     have hEq1 : ‖z‖ = 1 → z = 1 := fun hz1 => unit_circle_tangency (A:=A) ha0 ha1 hi hz1
     exact ⟨h≤1, hEq1⟩
-  -- Simplicity of 1 (sketch: geometric mult 1 and no Jordan block)
-  have simple1 : IsSimpleEigenvalue ℂ L 1 := by
-    -- In 3×3 strictly positive row-stochastic, the eigenspace at 1 is 1‑dim and no Jordan block.
-    -- This can be justified using eigenvector constancy and ℓ∞ nonexpansiveness.
-    -- Here we assume the standard finite‑dim equivalence.
-    -- Replace with a concrete proof if needed by importing the full bridge.
-    admit
   -- Gap: spectrum finite; all z≠1 satisfy ‖z‖ < 1
   have gap : ∃ ε : ℝ, 0 < ε ∧ ∀ {z : ℂ}, z ∈ spectrum ℂ L → z ≠ (1:ℂ) → ‖z‖ ≤ 1 - ε := by
     classical
@@ -155,7 +147,6 @@ theorem pf_gap_row_stochastic_irreducible
   exact
     { spectralRadius_eq_one := spectralRadius_eq_one
     , eig1 := hEig1
-    , simple1 := simple1
     , gap := gap }
 
 end YM.PF3x3

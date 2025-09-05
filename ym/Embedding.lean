@@ -71,5 +71,3 @@ theorem embedding_toy
 end
 
 end YM
-
-

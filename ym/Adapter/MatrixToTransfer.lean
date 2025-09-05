@@ -35,5 +35,3 @@ theorem transfer_gap_of_matrix_gap
   trivial
 
 end YM
-
-

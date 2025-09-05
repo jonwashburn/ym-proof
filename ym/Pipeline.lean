@@ -53,13 +53,39 @@ private def toyCert : EndToEndCert where
   hRef := trivial
   hBlk := by intro _; trivial
   hPer := by
-    -- Provide a basic persistence certificate: γ>0 and uniform PF gap across scales
     refine And.intro (by norm_num) ?h
     intro _; trivial
 
 /-- Toy end-to-end example that compiles with the Prop-level interfaces. -/
 theorem toy_end_to_end : MassGapCont 1 :=
   end_to_end_mass_gap toyCert
+
+/--
+A second example with a nontrivial `γ = 2/3` and a simple scaling family.
+This remains Prop-level and demonstrates the pipeline API shape.
+-/
+private def simpleSF : ScalingFamily where
+  μ_at := fun _ => (default : LatticeMeasure)
+  K_at := fun _ => (default : TransferKernel)
+
+private def certTwoThirds : EndToEndCert where
+  R := trivialReflection
+  sf := simpleSF
+  γ := (2 : ℝ) / 3
+  hRef := trivial
+  hBlk := by intro _; trivial
+  hPer := by
+    refine And.intro ?pos ?pf
+    · have : 0 < (2 : ℝ) := by norm_num
+      have : 0 < (2 : ℝ) / 3 := by
+        have h3 : 0 < (3 : ℝ) := by norm_num
+        exact div_pos this h3
+      simpa using this
+    · intro _; trivial
+
+/-- End-to-end export at rate `2/3`. -/
+theorem two_thirds_end_to_end : MassGapCont ((2 : ℝ) / 3) :=
+  end_to_end_mass_gap certTwoThirds
 
 end Examples
 

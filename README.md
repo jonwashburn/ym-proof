@@ -13,6 +13,8 @@ pipeline composes cleanly; you can strengthen pieces incrementally.
 - `ym/SpectralStability.lean` – P2/P5: gap persistence and embedding glue
 - `ym/Interfaces.lean` – `GapCertificate`, `PipelineCertificate`, exports
 - `ym/Pipeline.lean` – end-to-end glue + examples
+- `ym/Embedding.lean` – trivial embedding demo invoking persistence
+- `ym/Adapter/MatrixToTransfer.lean` – `TransferOp` and matrix→transfer bridge
 - `ym/PF3x3.lean`, `ym/PF3x3_Bridge.lean` – finite PF route (bridge draft)
 - `ym/MatrixTransferAdapter.lean` – matrix↦transfer adapter (Prop-level)
 - `ym/Examples.lean` – assorted toy examples
@@ -34,6 +36,10 @@ Open `ym/Pipeline.lean` and jump to the examples namespace:
 
 - `YM.Examples.toy_end_to_end` – end-to-end export at γ = 1
 - `YM.Examples.two_thirds_end_to_end` – end-to-end export at γ = 2/3
+ - `YM.Examples.three_fourths_end_to_end` – end-to-end export at γ = 3/4
+
+See also the embedding demo in `ym/Embedding.lean` for a tiny finite‑dimensional
+example showing how to invoke the persistence connector with trivial embeddings.
 
 These use Prop-level interfaces, so they compile without additional
 dependencies. For stronger results, replace the Prop-level pieces with
@@ -47,6 +53,8 @@ open YM
 
 -- Given a PipelineCertificate `p`, we can export directly:
 #check pipeline_mass_gap_export
+-- example usage (replace `p` with your certificate):
+-- have h : MassGapCont p.γ := pipeline_mass_gap_export p
 ```
 
 ## Contributing (parallel agents)

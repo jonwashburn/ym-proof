@@ -57,6 +57,16 @@ open YM
 -- have h : MassGapCont p.γ := pipeline_mass_gap_export p
 ```
 
+Final theorem wrapper (no placeholders):
+
+```lean
+open YM
+
+-- Given a `PipelineCertificate p` built from concrete components:
+#check mass_gap_final
+-- have hfinal : MassGapCont p.γ := mass_gap_final p
+```
+
 ## Contributing (parallel agents)
 
 - Do not modify shared core types in a feature branch. If needed, propose a

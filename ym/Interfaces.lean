@@ -50,4 +50,17 @@ theorem pipeline_mass_gap_export (p : PipelineCertificate) : MassGapCont p.γ :=
     { μ := p.sf.μ_at ⟨0⟩, K := p.sf.K_at ⟨0⟩, γ := p.γ, hOS := hOS, hPF := hPF, hPer := hPer }
   exact grand_mass_gap_export c
 
+/-- Builder that assembles a `GapCertificate` from base-scale reflection positivity,
+block positivity, and a persistence certificate on a scaling family. This is a
+non-quantitative wrapper; quantitative routes can refine `hPF` via
+`pf_gap_via_reflection_blocks` when available. -/
+def buildGapCertificate (p : PipelineCertificate) : GapCertificate :=
+  let μ0 := p.sf.μ_at ⟨0⟩
+  let K0 := p.sf.K_at ⟨0⟩
+  have hOS : OSPositivity μ0 := os_of_reflection (μ := μ0) (R := p.R) p.hRef
+  have hPF : TransferPFGap μ0 K0 p.γ :=
+    pf_gap_of_block_pos (μ := μ0) (K := K0) p.γ p.hBlk
+  have hPer : GapPersists p.γ := gap_persists_of_cert (sf := p.sf) (γ := p.γ) p.hPer
+  { μ := μ0, K := K0, γ := p.γ, hOS := hOS, hPF := hPF, hPer := hPer }
+
 end YM

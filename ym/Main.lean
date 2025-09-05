@@ -3,6 +3,7 @@ import ym.RGOneLoop
 import ym.Reflection
 import ym.Transfer
 import ym.Continuum
+import ym.Interfaces
 
 /-!
 YM Main assembly: exposes key wrapper theorems as public names for reporting.
@@ -28,5 +29,18 @@ theorem continuum_mass_gap_export
 /-- Public export: one-loop exactness from the discrete 8‑beat symmetry certificate. -/
 theorem one_loop_exact_export (h : EightBeatSym) : ZeroHigherLoops :=
   one_loop_exact_of_clock h
+
+end YM
+
+/--
+Final export: given a `PipelineCertificate` (reflection positivity at base scale,
+uniform block positivity and a persistence certificate), we export a continuum
+mass gap at rate `γ` without placeholders.
+This is a thin wrapper around `pipeline_mass_gap_export` in `Interfaces`.
+-/
+namespace YM
+
+theorem mass_gap_final (p : PipelineCertificate) : MassGapCont p.γ :=
+  pipeline_mass_gap_export p
 
 end YM

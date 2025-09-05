@@ -94,6 +94,21 @@ theorem coercive_strictlyPositive {ε : ℝ} (h : K.Coercive ε) : K.StrictlyPos
   refine ⟨1, by decide, ?_⟩
   simpa [pow_one] using (hpos i j)
 
+/-- Dobrushin-type contraction bound on the zero-sum subspace (sup norm).
+When `α < 1`, this yields a spectral gap `γ = 1 - α` for `K`.
+This is an interface-level definition that abstracts the usual TV contraction. -/
+@[simp] def DobrushinBound (α : ℝ) : Prop :=
+  ∀ v : (ι → ℝ), (∑ i, v i) = 0 → ‖K.P.mulVec v‖ ≤ α * ‖v‖
+
+/-- Contraction bound ⇒ spectral gap with `γ = 1 - α`. -/
+@[simp] theorem spectral_gap_of_dobrushin {α : ℝ}
+    (hα0 : 0 ≤ α) (hα1 : α < 1) (h : K.DobrushinBound α) :
+    SpectralGap K (1 - α) := by
+  refine And.intro ?pos ?ineq
+  · simpa using sub_pos.mpr hα1
+  · intro v hv
+    simpa using h v hv
+
 end MarkovKernel
 
 /--

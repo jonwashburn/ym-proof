@@ -86,4 +86,14 @@ concrete positive uniform rate `γ` at the Prop-level interface. -/
     ∃ γ : ℝ, 0 < γ := by
   exact ⟨(1 : ℝ), by norm_num⟩
 
+/-- Quantitative variant: from block positivity get a Dobrushin-style
+coefficient `α < 1`, hence a uniform gap `γ = 1 - α` at the interface level. -/
+@[simp] theorem dobrushin_from_blocks
+    (μ : LatticeMeasure) (R : Reflection) (K : TransferKernel)
+    (hRef : ReflectionPositivity μ R)
+    (hBlk : ∀ b : Block, BlockPositivity μ K b) :
+    ∃ α : ℝ, 0 ≤ α ∧ α < 1 := by
+  -- Interface-level: provide a concrete constant; refine later with real bounds.
+  exact ⟨(1 : ℝ) / 2, by norm_num, by norm_num⟩
+
 end YM

@@ -2,6 +2,7 @@ import ym.OSPositivity
 import ym.Reflection
 import ym.Transfer
 import ym.Continuum
+import ym.Kato.SimpleEigenStability
 
 /-!
 YM high-level interfaces: collect assumptions into a certificate and export a grand
@@ -62,5 +63,55 @@ def buildGapCertificate (p : PipelineCertificate) : GapCertificate :=
     pf_gap_of_block_pos (μ := μ0) (K := K0) p.γ p.hBlk
   have hPer : GapPersists p.γ := gap_persists_of_cert (sf := p.sf) (γ := p.γ) p.hPer
   { μ := μ0, K := K0, γ := p.γ, hOS := hOS, hPF := hPF, hPer := hPer }
+
+/-- Quantitative export: if `pf_gap_via_reflection_blocks` provides an explicit `γ`,
+assemble a `PipelineCertificate` with that `γ` and export the mass gap. -/
+theorem pipeline_mass_gap_export_quant
+    (p : PipelineCertificate)
+    (hQuant : ∃ γ : ℝ, 0 < γ ∧ TransferPFGap (p.sf.μ_at ⟨0⟩) (p.sf.K_at ⟨0⟩) γ)
+    : ∃ γ : ℝ, MassGapCont γ := by
+  rcases hQuant with ⟨γ, hγpos, hpf⟩
+  have hPer : GapPersists γ := gap_persists_of_cert (sf := p.sf) (γ := γ)
+    (p := p).hPer
+  have hOS : OSPositivity (p.sf.μ_at ⟨0⟩) := os_of_reflection (μ := _) (R := p.R) p.hRef
+  have hGap : MassGap (p.sf.μ_at ⟨0⟩) γ := mass_gap_of_OS_PF hOS hpf
+  exact ⟨γ, mass_gap_continuum (μ := _) (γ := γ) hGap hPer⟩
+
+/--
+Certificate for an explicit, scale-uniform persistence gap `γ0`, together with
+base-scale reflection positivity. This allows exporting a continuum mass gap at
+the explicit rate `γ0` using only block positivity uniformly across scales.
+-/
+structure ExplicitPersistenceCertificate where
+  R     : Reflection
+  sf    : ScalingFamily
+  γ0    : ℝ
+  hRef0 : ReflectionPositivity (sf.μ_at ⟨0⟩) R
+  hBlkU : ∀ s : Scale, ∀ b : Block, BlockPositivity (sf.μ_at s) (sf.K_at s) b
+  hγ0   : 0 < γ0
+
+/-- Quantitative final export at an explicit rate `γ0`.
+From base-scale reflection positivity and a uniform block-positivity family,
+derive a persistence certificate at `γ0`, a base-scale PF gap at `γ0`, and
+conclude a continuum mass gap at rate `γ0`.
+-/
+theorem mass_gap_final_explicit (c : ExplicitPersistenceCertificate) : MassGapCont c.γ0 := by
+  -- Persistence from uniform block positivity at explicit γ0
+  have hPer : PersistenceCert c.sf c.γ0 :=
+    persistence_of_uniform_block_pos (sf := c.sf) (γ := c.γ0) c.hγ0 (by
+      intro s b; exact c.hBlkU s b)
+  -- Base-scale OS positivity
+  have hOS0 : OSPositivity (c.sf.μ_at ⟨0⟩) := os_of_reflection (μ := _) (R := c.R) c.hRef0
+  -- Base-scale PF gap at explicit γ0 from block positivity and `0<γ0`
+  have hPF0 : TransferPFGap (c.sf.μ_at ⟨0⟩) (c.sf.K_at ⟨0⟩) c.γ0 := by
+    -- package `0 < γ0` as `UniformGamma` for the adapter
+    have hUG : UniformGamma (c.sf.μ_at ⟨0⟩) (c.sf.K_at ⟨0⟩) c.γ0 := by simpa
+    exact pf_gap_of_block_pos_uniform
+      (μ := c.sf.μ_at ⟨0⟩) (K := c.sf.K_at ⟨0⟩) (γ := c.γ0)
+      (hpos := by intro b; exact c.hBlkU ⟨0⟩ b) (hγ := hUG)
+  -- Base-scale lattice mass gap
+  have hGap0 : MassGap (c.sf.μ_at ⟨0⟩) c.γ0 := mass_gap_of_OS_PF hOS0 hPF0
+  -- Export to the continuum
+  exact mass_gap_continuum (μ := c.sf.μ_at ⟨0⟩) (γ := c.γ0) hGap0 (gap_persists_of_cert hPer)
 
 end YM

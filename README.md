@@ -103,6 +103,21 @@ have hQuant : ∃ γ : ℝ, 0 < γ ∧ TransferPFGap (p.sf.μ_at ⟨0⟩) (p.sf.
 have : ∃ γ, MassGapCont γ := pipeline_mass_gap_export_quant p hQuant
 ```
 
+Explicit-rate persistence and final export once a uniform block-positivity family
+and `0 < γ0` are available:
+
+```lean
+open YM
+
+def cert : ExplicitPersistenceCertificate :=
+{ R := p.R, sf := p.sf, γ0 := γ0,
+  hRef0 := p.hRef,
+  hBlkU := fun s b => p.hBlk b,  -- replace with uniform blocks proof,
+  hγ0 := by exact hγ0_pos }
+
+have hfinal_explicit : MassGapCont γ0 := mass_gap_final_explicit cert
+```
+
 ## Contributing (parallel agents)
 
 - Do not modify shared core types in a feature branch. If needed, propose a

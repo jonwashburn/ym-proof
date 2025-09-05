@@ -1,0 +1,36 @@
+[{"message":
+  ".> LEAN_PATH=././.lake/packages/std/.lake/build/lib:././.lake/packages/Qq/.lake/build/lib:././.lake/packages/aesop/.lake/build/lib:././.lake/packages/proofwidgets/.lake/build/lib:././.lake/packages/Cli/.lake/build/lib:././.lake/packages/importGraph/.lake/build/lib:././.lake/packages/mathlib/.lake/build/lib:././.lake/build/lib DYLD_LIBRARY_PATH=././.lake/build/lib /Users/jonathanwashburn/.elan/toolchains/leanprover--lean4---v4.8.0-rc1/bin/lean ././././ym/OSPositivity.lean -R ./././. -o ././.lake/build/lib/ym/OSPositivity.olean -i ././.lake/build/lib/ym/OSPositivity.ilean -c ././.lake/build/ir/ym/OSPositivity.c --json",
+  "level": "trace"},
+ {"message":
+  "././././ym/OSPositivity.lean:20:18-20:19: unused variable `μ`\nnote: this linter can be disabled with `set_option linter.unusedVariables false`",
+  "level": "warning"},
+ {"message":
+  "././././ym/OSPositivity.lean:23:19-23:20: unused variable `μ`\nnote: this linter can be disabled with `set_option linter.unusedVariables false`",
+  "level": "warning"},
+ {"message":
+  "././././ym/OSPositivity.lean:23:40-23:41: unused variable `K`\nnote: this linter can be disabled with `set_option linter.unusedVariables false`",
+  "level": "warning"},
+ {"message":
+  "././././ym/OSPositivity.lean:23:61-23:62: unused variable `γ`\nnote: this linter can be disabled with `set_option linter.unusedVariables false`",
+  "level": "warning"},
+ {"message":
+  "././././ym/OSPositivity.lean:29:13-29:14: unused variable `μ`\nnote: this linter can be disabled with `set_option linter.unusedVariables false`",
+  "level": "warning"},
+ {"message":
+  "././././ym/OSPositivity.lean:29:34-29:35: unused variable `γ`\nnote: this linter can be disabled with `set_option linter.unusedVariables false`",
+  "level": "warning"},
+ {"message":
+  "././././ym/OSPositivity.lean:32:17-32:18: unused variable `γ`\nnote: this linter can be disabled with `set_option linter.unusedVariables false`",
+  "level": "warning"},
+ {"message":
+  "././././ym/OSPositivity.lean:36:5-36:8: unused variable `hOS`\nnote: this linter can be disabled with `set_option linter.unusedVariables false`",
+  "level": "warning"},
+ {"message":
+  "././././ym/OSPositivity.lean:36:28-36:31: unused variable `hPF`\nnote: this linter can be disabled with `set_option linter.unusedVariables false`",
+  "level": "warning"},
+ {"message":
+  "././././ym/OSPositivity.lean:41:5-41:9: unused variable `hGap`\nnote: this linter can be disabled with `set_option linter.unusedVariables false`",
+  "level": "warning"},
+ {"message":
+  "././././ym/OSPositivity.lean:41:26-41:31: unused variable `hPers`\nnote: this linter can be disabled with `set_option linter.unusedVariables false`",
+  "level": "warning"}]

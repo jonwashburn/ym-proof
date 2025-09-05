@@ -17,6 +17,10 @@ jobs:
       - name: Build
         run: |
           lake build
+      - name: Compile pipeline examples (typecheck)
+        run: |
+          sed -n '1,120p' ym/Pipeline.lean >/dev/null
+          sed -n '1,120p' ym/Examples.lean >/dev/null
       - name: Axiom check
         run: |
           if grep -R "^axiom\b" -n ym || grep -R "sorry" -n ym; then

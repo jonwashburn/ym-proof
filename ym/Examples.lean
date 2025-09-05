@@ -61,5 +61,9 @@ theorem three_state_transfer_gap :
     TransferPFGap (default : LatticeMeasure) (default : TransferKernel) (1/2 : ℝ) := by
   trivial
 
+/-- Smoke test: basic `#check` endpoints to ensure pipeline exports remain available. -/
+#check YM.Examples.toy_pipeline_mass_gap
+#check YM.Examples.toy_gap_persists
+
 end Examples
 end YM

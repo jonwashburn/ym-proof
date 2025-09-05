@@ -43,4 +43,11 @@ namespace YM
 theorem mass_gap_final (p : PipelineCertificate) : MassGapCont p.γ :=
   pipeline_mass_gap_export p
 
+/-- Official final YM theorem (explicit rate variant):
+Given an explicit, uniform block-positivity family and base reflection positivity,
+we export a continuum mass gap at the explicit rate `γ0`.
+-/
+theorem final_YM_mass_gap (c : ExplicitPersistenceCertificate) : MassGapCont c.γ0 :=
+  mass_gap_final_explicit c
+
 end YM

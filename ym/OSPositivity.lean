@@ -13,13 +13,13 @@ structure LatticeMeasure where
   deriving Inhabited
 
 structure TransferKernel where
-  -- abstract transfer operator/kernel placeholder
   deriving Inhabited
 
-/-- OS reflection positivity of a lattice Euclidean measure `μ`. -/
+/-- OS reflection positivity of a lattice Euclidean measure `μ` (interface-level). -/
 def OSPositivity (μ : LatticeMeasure) : Prop := True
 
-/-- Perron–Frobenius transfer spectral gap for kernel `K` under measure `μ` with size `γ>0`. -/
+/-- Perron–Frobenius transfer spectral gap for kernel `K` under measure `μ` with size `γ>0`.
+Interface-level placeholder used by adapters in `ym/Transfer`. -/
 def TransferPFGap (μ : LatticeMeasure) (K : TransferKernel) (γ : ℝ) : Prop := True
 
 /-- Gap persistence hypothesis for the continuum limit (interface). -/

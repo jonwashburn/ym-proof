@@ -38,7 +38,8 @@ abbrev Observable := Config → Complex
   ∀ f g, S f g = Complex.conj (S g f)
 
 /-- Interface: reflection positivity certificate for measure `μ` and reflection `R`. -/
-@[simp] def ReflectionPositivity (μ : LatticeMeasure) (R : Reflection) : Prop := True
+@[simp] def ReflectionPositivity (μ : LatticeMeasure) (R : Reflection) : Prop :=
+  ReflectionPositivitySesq μ R
 
 /-- Typed sesquilinear reflection positivity: there is a Hermitian sesquilinear
 form `S` on observables such that, for every finite family of observables, the

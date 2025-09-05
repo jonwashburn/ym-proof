@@ -1,5 +1,6 @@
 import Mathlib
 import ym.OSPositivity
+import ym.Reflection
 
 /-!
 YM transfer-operator interface: block positivity → PF spectral gap adapter.
@@ -157,5 +158,23 @@ structure Block where
   -- Use the existing block-positivity adapter; irreducibility packaged at the interface level.
   have hirr : Irreducible K := trivial
   exact pf_gap_of_block_pos (μ:=μ) (K:=K) γ hpos hirr
+
+/-- Export an explicit gap from reflection positivity + block positivity via a
+quantitative Dobrushin coefficient `α` with `γ = 1 - α`. This wires into the
+existing `pf_gap_of_block_pos_uniform` helper without changing public signatures. -/
+@[simp] theorem pf_gap_via_reflection_blocks
+    (μ : LatticeMeasure) (K : TransferKernel) (R : Reflection)
+    (hRef : ReflectionPositivity μ R)
+    (hBlk : ∀ b : Block, BlockPositivity μ K b) :
+    ∃ γ : ℝ, 0 < γ ∧ TransferPFGap μ K γ := by
+  -- Get an explicit `α` with `0 ≤ α < 1` from reflection + blocks.
+  obtain ⟨α, hα0, hα1⟩ := dobrushin_from_blocks (μ := μ) (R := R) (K := K) hRef hBlk
+  -- Define `γ = 1 - α`.
+  refine ⟨1 - α, ?pos, ?gap⟩
+  · exact sub_pos.mpr hα1
+  · -- Package as `UniformGamma` and use the uniform block positivity adapter.
+    have hUnif : UniformGamma μ K (1 - α) := by
+      simpa using sub_pos.mpr hα1
+    exact pf_gap_of_block_pos_uniform (μ := μ) (K := K) (γ := 1 - α) hBlk hUnif
 
 end YM

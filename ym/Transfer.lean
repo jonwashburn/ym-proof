@@ -1,6 +1,7 @@
 import Mathlib
 import ym.OSPositivity
 import ym.Reflection
+import ym.Dobrushin
 
 /-!
 YM transfer-operator interface: block positivity → PF spectral gap adapter.
@@ -170,7 +171,7 @@ existing `pf_gap_of_block_pos_uniform` helper without changing public signatures
     (hBlk : ∀ b : Block, BlockPositivity μ K b) :
     ∃ γ : ℝ, 0 < γ ∧ TransferPFGap μ K γ := by
   -- Get an explicit `α` with `0 ≤ α < 1` from reflection + blocks.
-  obtain ⟨α, hα0, hα1⟩ := dobrushin_from_blocks (μ := μ) (R := R) (K := K) hRef hBlk
+  obtain ⟨α, hα0, hα1⟩ := YM.Dobrushin.dobrushin_from_blocks_quant (μ := μ) (R := R) (K := K) hRef hBlk
   -- Define `γ = 1 - α`.
   refine ⟨1 - α, ?pos, ?gap⟩
   · exact sub_pos.mpr hα1

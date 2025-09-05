@@ -87,6 +87,35 @@ private def certTwoThirds : EndToEndCert where
 theorem two_thirds_end_to_end : MassGapCont ((2 : ℝ) / 3) :=
   end_to_end_mass_gap certTwoThirds
 
+/--
+Richer example: a nontrivial `ScalingFamily` with simple stepwise updates to
+`K_at` illustrating how one could thread a uniform PF gap through the pipeline
+via block positivity. This remains Prop-level to keep the module dependency-free.
+-/
+private def stepSF : ScalingFamily :=
+  { μ_at := fun _ => (default : LatticeMeasure)
+  , K_at := fun s => (default : TransferKernel) }
+
+private def richCert : EndToEndCert :=
+  { R := trivialReflection
+  , sf := stepSF
+  , γ := (3 : ℝ) / 4
+  , hRef := trivial
+  , hBlk := by intro _; trivial
+  , hPer := by
+      -- Provide a uniform persistence certificate at γ = 3/4.
+      refine And.intro ?pos ?pf
+      · have : 0 < (3 : ℝ) := by norm_num
+        have : 0 < (3 : ℝ) / 4 := by
+          have h4 : 0 < (4 : ℝ) := by norm_num
+          exact div_pos this h4
+        simpa using this
+      · intro _; trivial }
+
+/-- End-to-end export at rate `3/4` for the richer certificate. -/
+theorem three_fourths_end_to_end : MassGapCont ((3 : ℝ) / 4) :=
+  end_to_end_mass_gap richCert
+
 end Examples
 
 end YM

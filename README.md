@@ -34,6 +34,7 @@ Open `ym/Pipeline.lean` and jump to the examples namespace:
 
 - `YM.Examples.toy_end_to_end` – end-to-end export at γ = 1
 - `YM.Examples.two_thirds_end_to_end` – end-to-end export at γ = 2/3
+ - `YM.Examples.three_fourths_end_to_end` – end-to-end export at γ = 3/4
 
 These use Prop-level interfaces, so they compile without additional
 dependencies. For stronger results, replace the Prop-level pieces with
@@ -47,6 +48,8 @@ open YM
 
 -- Given a PipelineCertificate `p`, we can export directly:
 #check pipeline_mass_gap_export
+-- example usage (replace `p` with your certificate):
+-- have h : MassGapCont p.γ := pipeline_mass_gap_export p
 ```
 
 ## Contributing (parallel agents)

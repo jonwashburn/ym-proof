@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Lean cache (optional)
+        run: |
+          echo "(cache step optional)"
+      - name: Build
+        run: |
+          lake build
+      - name: Axiom check
+        run: |
+          if grep -R "^axiom\b" -n ym || grep -R "sorry" -n ym; then
+            echo "Found axioms or sorries"; exit 1; fi
+
+

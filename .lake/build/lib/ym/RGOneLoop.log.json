@@ -1,6 +1,0 @@
-[{"message":
-  ".> LEAN_PATH=././.lake/packages/std/.lake/build/lib:././.lake/packages/Qq/.lake/build/lib:././.lake/packages/aesop/.lake/build/lib:././.lake/packages/proofwidgets/.lake/build/lib:././.lake/packages/Cli/.lake/build/lib:././.lake/packages/importGraph/.lake/build/lib:././.lake/packages/mathlib/.lake/build/lib:././.lake/build/lib DYLD_LIBRARY_PATH=././.lake/build/lib /Users/jonathanwashburn/.elan/toolchains/leanprover--lean4---v4.8.0-rc1/bin/lean ././././ym/RGOneLoop.lean -R ./././. -o ././.lake/build/lib/ym/RGOneLoop.olean -i ././.lake/build/lib/ym/RGOneLoop.ilean -c ././.lake/build/ir/ym/RGOneLoop.c --json",
-  "level": "trace"},
- {"message":
-  "././././ym/RGOneLoop.lean:16:33-16:34: unused variable `h`\nnote: this linter can be disabled with `set_option linter.unusedVariables false`",
-  "level": "warning"}]

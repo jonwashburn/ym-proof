@@ -2,6 +2,7 @@ import ym.Interfaces
 import ym.Reflection
 import ym.Transfer
 import ym.Continuum
+import ym.Adapter.MatrixToTransfer
 
 /-!
 Quantitative-style example wiring a base-scale quantitative PF gap into the
@@ -39,6 +40,17 @@ theorem quant_end_to_end : ∃ γ : ℝ, MassGapCont γ := by
       (μ := toyCert.sf.μ_at ⟨0⟩) (K := toyCert.sf.K_at ⟨0⟩) (R := toyCert.R)
       toyCert.hRef toyCert.hBlk
   -- Compose into the pipeline export.
+  exact pipeline_mass_gap_export_quant toyCert hQuant
+
+/-- Alternative quantitative example using the matrix adapter at the base scale. -/
+theorem quant_end_to_end_matrix : ∃ γ : ℝ, MassGapCont γ := by
+  -- Base-scale quantitative PF gap via a 1×1 toy matrix adapter.
+  have hGap : TransferPFGap (toyCert.sf.μ_at ⟨0⟩) (toyCert.sf.K_at ⟨0⟩) 1 := by
+    simpa using YM.transfer_gap_of_matrix_gap (A := YM.Examples.toy1x1) (γ := 1)
+      (YM.Examples.toy1x1_matrix_gap)
+  have hQuant : ∃ γ : ℝ, 0 < γ ∧
+      TransferPFGap (toyCert.sf.μ_at ⟨0⟩) (toyCert.sf.K_at ⟨0⟩) γ := by
+    exact ⟨1, by norm_num, hGap⟩
   exact pipeline_mass_gap_export_quant toyCert hQuant
 
 end ExamplesQuant

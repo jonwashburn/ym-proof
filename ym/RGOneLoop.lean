@@ -13,7 +13,7 @@ def EightBeatSym : Prop := True
 def ZeroHigherLoops : Prop := True
 
 /-- Wrapper: symmetry implies one-loop exact RG closure. -/
-theorem one_loop_exact_of_clock (h : EightBeatSym) : ZeroHigherLoops := by
+theorem one_loop_exact_of_clock (_h : EightBeatSym) : ZeroHigherLoops := by
   trivial
 
 end YM

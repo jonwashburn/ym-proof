@@ -18,6 +18,7 @@ your P1 lemma as the `P1` argument.
 import Mathlib/Analysis/InnerProductSpace/Adjoint
 import Mathlib/Analysis/NormedSpace/OperatorNorm
 import Mathlib/Tactic
+import ym.EigenvalueOrder
 
 noncomputable section
 open scoped Real
@@ -203,5 +204,41 @@ by
   exact gap_persistence λ₁ λ₂ P1 hA hSA hδpos hGapLift hConvLift
 
 end Embedding
+
+/-!
+Hook: expose a ready-to-use P1 based on the ordered eigenvalue functionals
+`YM.EigenOrder.lambda₁` and `YM.EigenOrder.lambda₂`. This lets downstream users
+instantiate `gap_persistence` / `gap_persists_under_convergence` /
+`gap_persists_via_embedding` with a concrete `P1`.
+-/
+
+namespace SpectralP1
+
+variables {𝕂 : Type*} [IsROrC 𝕂]
+variables {E : Type*} [NormedAddCommGroup E] [InnerProductSpace 𝕂 E]
+variables [FiniteDimensional 𝕂 E] [Fact (1 < finrank 𝕂 E)]
+
+open EigenOrder
+
+/-- Alias for the top ordered eigenvalue functional. -/
+def λ₁ : (E →L[𝕂] E) → ℝ := EigenOrder.lambda₁ (𝕂:=𝕂) (E:=E)
+
+/-- Alias for the second ordered eigenvalue functional. -/
+def λ₂ : (E →L[𝕂] E) → ℝ := EigenOrder.lambda₂ (𝕂:=𝕂) (E:=E)
+
+/-- Ready-to-use P1 Lipschitz inequality for ordered eigenvalues, consumable by P2/P5. -/
+theorem P1_lipschitz
+    {X Y : E →L[𝕂] E}
+    (hX : IsSelfAdjoint X) (hY : IsSelfAdjoint Y) :
+    |λ₁ (𝕂:=𝕂) (E:=E) X - λ₁ (𝕂:=𝕂) (E:=E) Y| ≤ ‖X - Y‖ ∧
+    |λ₂ (𝕂:=𝕂) (E:=E) X - λ₂ (𝕂:=𝕂) (E:=E) Y| ≤ ‖X - Y‖ :=
+  EigenOrder.P1_lipschitz (𝕂:=𝕂) (E:=E) (X:=X) (Y:=Y) hX hY
+
+end SpectralP1
+
+-- Smoke checks for the hook (types only; no runtime effect)
+#check YM.SpectralP1.λ₁
+#check YM.SpectralP1.λ₂
+#check YM.SpectralP1.P1_lipschitz
 
 end YM

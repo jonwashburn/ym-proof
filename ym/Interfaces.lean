@@ -50,4 +50,23 @@ theorem pipeline_mass_gap_export (p : PipelineCertificate) : MassGapCont p.γ :=
     { μ := p.sf.μ_at ⟨0⟩, K := p.sf.K_at ⟨0⟩, γ := p.γ, hOS := hOS, hPF := hPF, hPer := hPer }
   exact grand_mass_gap_export c
 
+/-- Quantitative final export: given a scaling family and a quantitative
+bundle `QuantPersistence sf γ0` providing a uniform PF gap `γ0 > 0` at all
+scales, together with OS positivity at the base scale and a base-scale PF gap,
+we produce a continuum mass gap of rate `γ0`.
+
+This theorem packages the persistence certificate directly. -/
+theorem mass_gap_final
+    (sf : ScalingFamily) (γ0 : ℝ)
+    (hQuant : QuantPersistence sf γ0)
+    (hOS0 : OSPositivity (sf.μ_at ⟨0⟩))
+    (hPF0 : TransferPFGap (sf.μ_at ⟨0⟩) (sf.K_at ⟨0⟩) γ0) :
+    MassGapCont γ0 := by
+  -- Build the persistence certificate from the quantitative bundle.
+  have hPer : PersistenceCert sf γ0 := persistence_of_quant (sf := sf) (γ0 := γ0) hQuant
+  -- Assemble via the existing grand export interface.
+  let c : GapCertificate :=
+    { μ := sf.μ_at ⟨0⟩, K := sf.K_at ⟨0⟩, γ := γ0, hOS := hOS0, hPF := hPF0, hPer := gap_persists_of_cert (sf := sf) (γ := γ0) hPer }
+  exact grand_mass_gap_export c
+
 end YM

@@ -34,6 +34,15 @@ variables [FiniteDimensional 𝕂 E]
 -- We require at least two dimensions so that λ₂ exists meaningfully.
 variable  [Fact (1 < finrank 𝕂 E)]
 
+/-- Bundle of spectral aliases: top two eigenvalue functionals and the P1 Lipschitz
+stability hypothesis for self-adjoint operators, used by P2/P5 connectors. -/
+structure EigenAliases where
+  λ₁ : (E →L[𝕂] E) → ℝ
+  λ₂ : (E →L[𝕂] E) → ℝ
+  P1 : ∀ {X Y : E →L[𝕂] E},
+    IsSelfAdjoint X → IsSelfAdjoint Y →
+    |λ₁ X - λ₁ Y| ≤ ‖X - Y‖ ∧ |λ₂ X - λ₂ Y| ≤ ‖X - Y‖
+
 /-- Spectral gap functional built from user-supplied ordered eigenvalue functionals. -/
 def eigGap (λ₁ λ₂ : (E →L[𝕂] E) → ℝ) (T : E →L[𝕂] E) : ℝ :=
   λ₁ T - λ₂ T
@@ -111,6 +120,18 @@ by
 
   exact ⟨δ / 2, by nlinarith [hδpos], gap_ge_half⟩
 
+/-- Convenience wrapper for P2 using a bundled `EigenAliases`. -/
+theorem gap_persistence_alias
+    (A : EigenAliases)
+    {Aop : E →L[𝕂] E} {Aseq : ℕ → E →L[𝕂] E}
+    (hA  : IsSelfAdjoint Aop)
+    (hAn : ∀ n, IsSelfAdjoint (Aseq n))
+    {δ : ℝ} (hδpos : 0 < δ)
+    (hGap  : ∀ n, eigGap A.λ₁ A.λ₂ (Aseq n) ≥ δ)
+    (hConv : ∀ ε > 0, ∃ N, ∀ n ≥ N, ‖Aseq n - Aop‖ ≤ ε) :
+    ∃ δ' > 0, eigGap A.λ₁ A.λ₂ Aop ≥ δ' :=
+  gap_persistence A.λ₁ A.λ₂ (by intro; exact A.P1) hA hAn hδpos hGap hConv
+
 /-!
 P5 on a fixed ambient space `E`.
 This is the polished statement you’ll actually use most often.
@@ -128,6 +149,18 @@ theorem gap_persists_under_convergence
     (hConv : ∀ ε > 0, ∃ N, ∀ n ≥ N, ‖Aseq n - A‖ ≤ ε) :
     ∃ δ' > 0, eigGap λ₁ λ₂ A ≥ δ' :=
   gap_persistence λ₁ λ₂ P1 hA hAn hδpos hGap hConv
+
+/-- Convenience wrapper for P5-on-E using a bundled `EigenAliases`. -/
+theorem gap_persists_under_convergence_alias
+    (A : EigenAliases)
+    {Aop : E →L[𝕂] E} {Aseq : ℕ → E →L[𝕂] E}
+    (hA  : IsSelfAdjoint Aop)
+    (hAn : ∀ n, IsSelfAdjoint (Aseq n))
+    {δ : ℝ} (hδpos : 0 < δ)
+    (hGap  : ∀ n, eigGap A.λ₁ A.λ₂ (Aseq n) ≥ δ)
+    (hConv : ∀ ε > 0, ∃ N, ∀ n ≥ N, ‖Aseq n - Aop‖ ≤ ε) :
+    ∃ δ' > 0, eigGap A.λ₁ A.λ₂ Aop ≥ δ' :=
+  gap_persists_under_convergence A.λ₁ A.λ₂ (by intro; exact A.P1) hA hAn hδpos hGap hConv
 
 /-
 Connector to ScalingFamily via norm‑convergent embedding.
@@ -202,6 +235,33 @@ by
   -- Apply P2 on the fixed ambient E with the lifted sequence:
   exact gap_persistence λ₁ λ₂ P1 hA hSA hδpos hGapLift hConvLift
 
+/-- Convenience wrapper for P5 via embedding using bundled `EigenAliases`. -/
+theorem gap_persists_via_embedding_alias
+    (A : EigenAliases)
+    (ι : ∀ n, (F n) →L[𝕂] E)
+    (T : ∀ n, (F n) →L[𝕂] (F n))
+    {Aop : E →L[𝕂] E} (hA : IsSelfAdjoint Aop)
+    (hTsa : ∀ n, IsSelfAdjoint (T n))
+    {δ : ℝ} (hδpos : 0 < δ)
+    (hGapLift : ∀ n, eigGap A.λ₁ A.λ₂ (liftThrough ι T n) ≥ δ)
+    (hConvLift : ∀ ε > 0, ∃ N, ∀ n ≥ N, ‖(liftThrough ι T n) - Aop‖ ≤ ε) :
+    ∃ δ' > 0, eigGap A.λ₁ A.λ₂ Aop ≥ δ' :=
+by
+  have hSA : ∀ n, IsSelfAdjoint (liftThrough ι T n) :=
+    liftThrough_isSelfAdjoint ι T hTsa
+  exact gap_persistence A.λ₁ A.λ₂ (by intro; exact A.P1) hA hSA hδpos hGapLift hConvLift
+
 end Embedding
 
 end YM
+
+/-!
+Usage snippets for CI/discovery
+These are light-weight checks so consumers can find the ready-to-pass aliases
+and wrappers from a single import of this module.
+-/
+
+#check YM.EigenAliases
+#check YM.gap_persistence_alias
+#check YM.gap_persists_under_convergence_alias
+#check YM.gap_persists_via_embedding_alias

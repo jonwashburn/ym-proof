@@ -3,6 +3,8 @@ import ym.RGOneLoop
 import ym.Reflection
 import ym.Transfer
 import ym.Continuum
+import ym.Embedding
+import ym.Adapter.MatrixToTransfer
 
 /-!
 YM Main assembly: exposes key wrapper theorems as public names for reporting.

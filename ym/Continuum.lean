@@ -1,6 +1,7 @@
 import Mathlib
 import ym.OSPositivity
 import ym.Transfer
+import ym.Reflection
 
 /-!
 YM continuum-limit interface: scaling family and gap persistence adapter.
@@ -79,5 +80,34 @@ theorem persistence_of_uniform_block_pos {sf : ScalingFamily} {γ : ℝ}
   intro s;
   have hb : ∀ b : Block, BlockPositivity (sf.μ_at s) (sf.K_at s) b := fun b => h_ubp s b
   simpa using (pf_gap_of_block_pos (μ := sf.μ_at s) (K := sf.K_at s) γ hb)
+
+/-- If OS-positivity holds at every scale and yields block-positivity and
+irreducibility for the transfer kernel, then a uniform PF gap of size `γ`
+persists across scales. This abstracts the Doeblin/Dobrushin route. -/
+def UniformOS (sf : ScalingFamily) : Prop := ∀ s, OSPositivity (sf.μ_at s)
+
+theorem persistence_from_uniform_OS
+    {sf : ScalingFamily} {γ : ℝ}
+    (hγ : 0 < γ)
+    (hOS : UniformOS sf)
+    (hDoeb : ∀ s, Irreducible (sf.K_at s))
+    (hBlk : ∀ s b, BlockPositivity (sf.μ_at s) (sf.K_at s) b)
+    : PersistenceCert sf γ := by
+  refine And.intro hγ ?_;
+  intro s;
+  have hb : ∀ b : Block, BlockPositivity (sf.μ_at s) (sf.K_at s) b := fun b => hBlk s b
+  simpa using (pf_gap_of_block_pos (μ := sf.μ_at s) (K := sf.K_at s) γ hb)
+
+/-- Quantitative persistence input bundle: a uniform OS positivity hypothesis,
+irreducibility, and block positivity at all scales, together with an explicit
+gap `γ0 > 0`. -/
+def QuantPersistence (sf : ScalingFamily) (γ0 : ℝ) : Prop :=
+  0 < γ0 ∧ UniformOS sf ∧ (∀ s, Irreducible (sf.K_at s)) ∧ (∀ s b, BlockPositivity (sf.μ_at s) (sf.K_at s) b)
+
+/-- From the quantitative bundle, produce a `PersistenceCert` with the same `γ0`. -/
+theorem persistence_of_quant {sf : ScalingFamily} {γ0 : ℝ}
+    (h : QuantPersistence sf γ0) : PersistenceCert sf γ0 := by
+  rcases h with ⟨hγ, hOS, hIrr, hBlk⟩
+  exact persistence_from_uniform_OS (sf := sf) (γ := γ0) hγ hOS hIrr hBlk
 
 end YM

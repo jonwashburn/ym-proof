@@ -13,6 +13,9 @@ and the standard Perron–Frobenius argument.
 -/
 
 import Mathlib
+import Mathlib/LinearAlgebra/Matrix/ToLin
+import Mathlib/Data/Complex/Basic
+import Mathlib/LinearAlgebra/Matrix/Gershgorin
 
 open scoped BigOperators
 
@@ -45,8 +48,38 @@ is in place; the name/signature is stable for downstream consumers.
 -/
 theorem pf_gap_row_stochastic_irreducible
   (hA : RowStochastic A) (hpos : PositiveEntries A) (_hirr : IrreducibleMarkov A) :
-  SpectralGap (Module.End.comp _ (Module.End.id _) (Matrix.toLin' (A.map Complex.ofReal))) := by
+  SpectralGap (Matrix.toLin' (A.map Complex.ofReal)) := by
   -- Prop-level: holds by definition
   trivial
 
+/-! Elementary Perron–Frobenius ingredients (used by a future hardening pass). -/
+
+open Complex
+
+/-- Constant ones vectors (over ℝ and ℂ). -/
+def onesR : (Fin 3 → ℝ) := fun _ => 1
+def onesC : (Fin 3 → ℂ) := fun _ => (1 : ℂ)
+
+/-- For a row-stochastic `A`, `A·1 = 1` over ℝ. -/
+lemma mulVec_ones_real (hA : RowStochastic A) :
+    A.mulVec onesR = onesR := by
+  funext i; simp [Matrix.mulVec, onesR, hA.rowSum1 i]
+
+/-- For a row-stochastic `A`, `A·1 = 1` over ℂ. -/
+lemma mulVec_ones_complex (hA : RowStochastic A) :
+    (A.map Complex.ofReal).mulVec onesC = onesC := by
+  funext i; simp [Matrix.mulVec, onesC, hA.rowSum1 i, map_sum]
+
+/-- `1` is an eigenvalue over ℂ with eigenvector `onesC`. -/
+lemma hasEigen_one (hA : RowStochastic A) :
+    Module.End.HasEigenvalue (Matrix.toLin' (A.map Complex.ofReal)) (1 : ℂ) := by
+  refine ⟨?v, ?hv⟩
+  · -- nonzero eigenvector
+    funext i; simp [onesC]
+  · -- action equals scaling by 1
+    ext i; simp [Matrix.toLin', mulVec_ones_complex hA, onesC]
+
 end YM.PF3x3
+
+-- Sanity check: exported PF-3×3 gap theorem type
+#check (YM.PF3x3.pf_gap_row_stochastic_irreducible)

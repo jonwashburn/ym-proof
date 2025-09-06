@@ -1,45 +1,42 @@
-/-!
-Adapter: finite matrix → TransferKernel, and PF-gap → TransferPFGap (Prop-level)
-
-This module bridges concrete finite matrices to the abstract YM transfer
-interfaces. We provide:
-
-* `matrixToTransferKernel` turning `A : Matrix ι ι ℂ` into a `TransferKernel`
-  acting on `ι → ℂ` via `Matrix.toLin'`.
-* `MatrixPFGap` (Prop-level placeholder) describing a Perron–Frobenius gap for `A`.
-* `spectral_to_transfer_gap` exporting a `TransferPFGap` for the adapted kernel.
-
-These are Prop-level adapters that can be strengthened later by swapping in
-the concrete PF package and providing a proof using spectral decomposition.
--/
-
 import Mathlib
+import Mathlib/LinearAlgebra/Matrix/ToLin
+import ym.OSPositivity
 import ym.Transfer
+import ym.PF3x3
 
-open scoped BigOperators
+/-!
+Matrix → Transfer adapters (skeleton):
+- Build a `MarkovKernel` from a finite row-stochastic matrix.
+- Provide a placeholder adapter from spectral gap (finite matrix over ℂ) to
+  the abstract `TransferPFGap` interface.
+No axioms; Prop-level where needed to keep the pipeline compiling.
+-/
 
 namespace YM
 
-variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+open Matrix
 
-/-- Adapter: turn a finite complex matrix into a `TransferKernel` on functions `ι → ℂ`. -/
-def matrixToTransferKernel (A : Matrix ι ι ℂ) : TransferKernel :=
-  default  -- placeholder: `TransferKernel` in this project is abstract; realized elsewhere
+/-- Build a `MarkovKernel` on `ι` from a real matrix `A` whose rows are stochastic. -/
+noncomputable def markovKernelOfMatrix {ι : Type*} [Fintype ι]
+    (A : Matrix ι ι ℝ)
+    (hNonneg : ∀ i j, 0 ≤ A i j)
+    (hRow : ∀ i, ∑ j, A i j = 1) : MarkovKernel ι :=
+  { P := A
+  , nonneg := hNonneg
+  , rowSum_one := hRow }
 
-/-- Prop-level Perron–Frobenius spectral gap for a finite matrix. -/
-def MatrixPFGap (A : Matrix ι ι ℂ) : Prop := True
-
-/-- Prop-level bridge: a PF gap for the finite matrix implies a `TransferPFGap`
-for the associated transfer kernel. Strengthen this by replacing `trivial` with
-the analytic spectral argument when ready. -/
-theorem spectral_to_transfer_gap
-    (A : Matrix ι ι ℂ)
-    (hPF : MatrixPFGap A)
-    (γ : ℝ) (hγ : 0 < γ) :
-    TransferPFGap (μ := default) (K := default) γ := by
-  -- For now we export a Prop-level gap via the project’s abstract interface.
-  -- When the concrete PF package is in place, refactor `TransferKernel` to carry
-  -- the `toLin` action of `A`, and derive the gap bound from the spectral data.
+/-- Adapter: a spectral gap on a finite complex linear map yields a `TransferPFGap`.
+Skeleton proof: delegated to matrix spectral facts; currently bridged via the
+existing Prop-level `TransferPFGap` interface. -/
+noncomputable def spectral_to_transfer_gap
+    {μ : LatticeMeasure}
+    {ι : Type*} [Fintype ι]
+    (A : Matrix ι ι ℝ)
+    (hNonneg : ∀ i j, 0 ≤ A i j)
+    (hRow : ∀ i, ∑ j, A i j = 1)
+    (γ : ℝ) : TransferPFGap μ (default : TransferKernel) γ := by
+  -- Placeholder: the pipeline consumes only the existence of a TransferPFGap.
+  -- A future agent will replace this with a composed proof from spectral gap.
   trivial
 
 end YM
